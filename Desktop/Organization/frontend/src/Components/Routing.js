@@ -35,8 +35,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import LoginPage from './LoginPage';
 import ProtectedRoute from './ProtectedRoute'; // Ensure this is correct
-import EmployeeLoginPage from './EmployeeLoginPage';
-import AdminLoginPage from './AdminLoginPage';
+//import EmployeeLoginPage from './EmployeeLoginPage';
+//import AdminLoginPage from './AdminLoginPage';
 
 
 function Routing() {
