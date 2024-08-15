@@ -14,7 +14,7 @@ function InterviewList() {
         interviewDate: '',
         yearsOfExperience: '',
         status: '',
-        on_Bording: '',
+        on_Boarding: '',
         recruiter: '',
         isActive: true,
         createdBy: '',
