@@ -44,7 +44,7 @@ function InterviewList() {
             interviewDate: '',
             yearsOfExperience: '',
             status: '',
-            on_Bording: '',
+            on_Boarding: '',
             recruiter: '',
             isActive: true,
             createdBy: '',
@@ -133,7 +133,7 @@ function InterviewList() {
                             <TableCell>InterviewDate</TableCell>
                             <TableCell>YearsOfExperience</TableCell>
                             <TableCell>Status</TableCell>
-                            <TableCell>On_Bording</TableCell>
+                            <TableCell>On_Boarding</TableCell>
                             <TableCell>Recuriter</TableCell>
                             <TableCell>Is Active</TableCell>
                             <TableCell>Created By</TableCell>
@@ -152,7 +152,7 @@ function InterviewList() {
                                 <TableCell>{Interview.interviewDate}</TableCell>
                                 <TableCell>{Interview.yearsOfExperience}</TableCell>
                                 <TableCell>{Interview.status}</TableCell>
-                                <TableCell>{Interview.on_Bording}</TableCell>
+                                <TableCell>{Interview.on_Boarding}</TableCell>
                                 <TableCell>{Interview.recruiter}</TableCell>
                                 <TableCell>{Interview.isActive ? 'Active' : 'Inactive'}</TableCell>
                                 <TableCell>{Interview.createdBy}</TableCell>
