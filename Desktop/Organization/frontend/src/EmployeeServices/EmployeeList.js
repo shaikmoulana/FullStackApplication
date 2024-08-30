@@ -11,10 +11,10 @@ function EmployeeList() {
     const [currentEmployee, setCurrentEmployee] = useState({
         id: '',
         name: '',
-        designationId: '',
+        designation: '',
         employeeID: '',
         emailId: '',
-        departmentId: '',
+        department: '',
         reportingTo: '',
         joiningDate: '',
         relievingDate: '',
@@ -44,10 +44,10 @@ function EmployeeList() {
         setCurrentEmployee({
             id: '',
             name: '',
-            designationId: '',
+            designation: '',
             employeeId: '',
             emailId: '',
-            departmentId: '',
+            department: '',
             reportingTo: '',
             joiningDate: '',
             relievingDate: '',
@@ -136,10 +136,10 @@ function EmployeeList() {
                         <TableRow>
                             <TableCell>ID</TableCell>
                             <TableCell>Name</TableCell>
-                            <TableCell>DesignationId</TableCell>
+                            <TableCell>Designation</TableCell>
                             <TableCell>EmployeeId</TableCell>
                             <TableCell>EmailId</TableCell>
-                            <TableCell>DepartmentId</TableCell>
+                            <TableCell>Department</TableCell>
                             <TableCell>ReportingTo</TableCell>
                             <TableCell>JoiningDate</TableCell>
                             <TableCell>RelievingDate</TableCell>
@@ -159,10 +159,10 @@ function EmployeeList() {
                             <TableRow key={Employee.id}>
                                 <TableCell>{Employee.id}</TableCell>
                                 <TableCell>{Employee.name}</TableCell>
-                                <TableCell>{Employee.designationId}</TableCell>
+                                <TableCell>{Employee.designation}</TableCell>
                                 <TableCell>{Employee.employeeID}</TableCell>
                                 <TableCell>{Employee.emailId}</TableCell>
-                                <TableCell>{Employee.departmentId}</TableCell>
+                                <TableCell>{Employee.department}</TableCell>
                                 <TableCell>{Employee.reportingTo}</TableCell>
                                 <TableCell>{Employee.joiningDate}</TableCell>
                                 <TableCell>{Employee.relievingDate}</TableCell>
@@ -195,9 +195,9 @@ function EmployeeList() {
                     />
                     <TextField
                         margin="dense"
-                        label="Designation Id"
-                        name="designationId"
-                        value={currentEmployee.designationId}
+                        label="Designation"
+                        name="designation"
+                        value={currentEmployee.designation}
                         onChange={handleChange}
                         fullWidth
                     />
@@ -220,8 +220,8 @@ function EmployeeList() {
                     <TextField
                         margin="dense"
                         label="DepartmentId"
-                        name="departmentId"
-                        value={currentEmployee.departmentId}
+                        name="department"
+                        value={currentEmployee.department}
                         onChange={handleChange}
                         fullWidth
                     />

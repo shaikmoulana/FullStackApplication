@@ -94,102 +94,102 @@
 // export default LoginPage;
 
 //===============================================================================================================
-import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
-import axios from './AuthService';
-import { useNavigate } from 'react-router-dom';
-//import AuthService from './AuthService';
+// import React, { useState } from 'react';
+// import { TextField, Button, Container, Typography, Box } from '@mui/material';
+// import axios from './AuthService';
+// import { useNavigate } from 'react-router-dom';
+// //import AuthService from './AuthService';
 
-const LoginPage = (props) => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+// const LoginPage = (props) => {
+//     const [username, setUsername] = useState('');
+//     const [password, setPassword] = useState('');
+//     const [error, setError] = useState('');
+//     const navigate = useNavigate();
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+//     const handleSubmit = async (event) => {
+//         event.preventDefault();
 
-        try {
-            const response = await axios.post('http://localhost:5107/api/Login', { username, password });
+//         try {
+//             const response = await axios.post('http://localhost:5107/api/Login', { username, password });
 
-            if (response.status === 200) {
-                // Store the token in local storage
-                localStorage.setItem('oauth2', response.data);
-                console.log('Login successful:', response.data);
-                // Redirect to the home page
-                navigate('/home');
-            }
-        } catch (err) {
-            setError('Invalid username or password.');
-            console.error('Login error:', err);
-        }
-    };
+//             if (response.status === 200) {
+//                 // Store the token in local storage
+//                 localStorage.setItem('oauth2', response.data);
+//                 console.log('Login successful:', response.data);
+//                 // Redirect to the home page
+//                 navigate('/home');
+//             }
+//         } catch (err) {
+//             setError('Invalid username or password.');
+//             console.error('Login error:', err);
+//         }
+//     };
 
 
-    return (
-        <Container component="main" maxWidth="xs">
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    mt: 8,
-                    mb: 4,
-                }}
-            >
-                <Typography component="h1" variant="h5">
-                    Login
-                </Typography>
-                <Box
-                    component="form"
-                    onSubmit={handleSubmit}
-                    noValidate
-                    sx={{ mt: 1 }}
-                >
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="username"
-                        label="Username"
-                        name="username"
-                        autoComplete="username"
-                        autoFocus
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        id="password"
-                        autoComplete="current-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    {error && (
-                        <Typography color="error" variant="body2">
-                            {error}
-                        </Typography>
-                    )}
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
-                    >
-                        Login
-                    </Button>
-                </Box>
-            </Box>
-        </Container>
-    );
-};
+//     return (
+//         <Container component="main" maxWidth="xs">
+//             <Box
+//                 sx={{
+//                     display: 'flex',
+//                     flexDirection: 'column',
+//                     alignItems: 'center',
+//                     mt: 8,
+//                     mb: 4,
+//                 }}
+//             >
+//                 <Typography component="h1" variant="h5">
+//                     Login
+//                 </Typography>
+//                 <Box
+//                     component="form"
+//                     onSubmit={handleSubmit}
+//                     noValidate
+//                     sx={{ mt: 1 }}
+//                 >
+//                     <TextField
+//                         margin="normal"
+//                         required
+//                         fullWidth
+//                         id="username"
+//                         label="Username"
+//                         name="username"
+//                         autoComplete="username"
+//                         autoFocus
+//                         value={username}
+//                         onChange={(e) => setUsername(e.target.value)}
+//                     />
+//                     <TextField
+//                         margin="normal"
+//                         required
+//                         fullWidth
+//                         name="password"
+//                         label="Password"
+//                         type="password"
+//                         id="password"
+//                         autoComplete="current-password"
+//                         value={password}
+//                         onChange={(e) => setPassword(e.target.value)}
+//                     />
+//                     {error && (
+//                         <Typography color="error" variant="body2">
+//                             {error}
+//                         </Typography>
+//                     )}
+//                     <Button
+//                         type="submit"
+//                         fullWidth
+//                         variant="contained"
+//                         sx={{ mt: 3, mb: 2 }}
+//                     >
+//                         Login
+//                     </Button>
+//                 </Box>
+//             </Box>
+//         </Container>
+//     );
+// };
 
-export default LoginPage;
+// export default LoginPage;
 
 //===========================================================================================================
 // import React, { useState } from 'react';
@@ -387,3 +387,141 @@ export default LoginPage;
 // };
 
 // export default LoginPage;
+///////-----------------------------------------------------------------------------------------------------
+import React, { useState } from 'react';
+import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import axios from './AuthService';
+import { useNavigate } from 'react-router-dom';
+//import AuthService from './AuthService';
+
+const LoginPage = (props) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+
+    // const handleSubmit = async (event) => {
+    //     event.preventDefault();
+
+    //     try {
+    //         const response = await axios.post('http://localhost:5107/api/Login', { email, password });
+
+    //         if (response.status === 200) {
+    //             // Store the token in local storage
+    //             localStorage.setItem('oauth2', response.data);
+    //             console.log('Login successful:', response.data);
+    //             // Redirect to the home page
+    //             navigate('/home');
+    //         }
+    //     } catch (err) {
+    //         setError('Invalid Email or password.');
+    //         console.error('Login error:', err);
+    //     }
+    // };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        try {
+            const response = await axios.post(`http://localhost:5107/api/Login?emailId=${email}&password=${password}`);
+
+            if (response.status === 200) {
+                localStorage.setItem('oauth2', response.data);
+                navigate('/home');
+            }
+        } catch (err) {
+            setError('Invalid Email or password.');
+            console.error('Login error:', err);
+        }
+    };
+    //----------------for URL safety--------------------------
+    // const handleSubmit = async (event) => {
+    //     event.preventDefault();
+
+    //     const data = new URLSearchParams();
+    //     data.append('emailId', email);
+    //     data.append('password', password);
+
+    //     try {
+    //         const response = await axios.post('http://localhost:5107/api/Login', data, {
+    //             headers: {
+    //                 'Content-Type': 'application/x-www-form-urlencoded',
+    //             },
+    //         });
+
+    //         if (response.status === 200) {
+    //             localStorage.setItem('oauth2', response.data);
+    //             navigate('/home');
+    //         }
+    //     } catch (err) {
+    //         setError('Invalid Email or password.');
+    //         console.error('Login error:', err);
+    //     }
+    // };
+
+
+
+
+    return (
+        <Container component="main" maxWidth="xs">
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    mt: 8,
+                    mb: 4,
+                }}
+            >
+                <Typography component="h1" variant="h5">
+                    Login
+                </Typography>
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                    sx={{ mt: 1 }}
+                >
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email"
+                        name="email"
+                        autoComplete="username"
+                        autoFocus
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    {error && (
+                        <Typography color="error" variant="body2">
+                            {error}
+                        </Typography>
+                    )}
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
+                        Login
+                    </Button>
+                </Box>
+            </Box>
+        </Container>
+    );
+};
+
+export default LoginPage;

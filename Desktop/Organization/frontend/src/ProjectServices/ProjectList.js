@@ -10,7 +10,7 @@ function ProjectList() {
 
     const [currentProject, setCurrentProject] = useState({
         id: '',
-        clientId: '',
+        client: '',
         projectName: '',
         technicalProjectManager: '',
         salesContact: '',
@@ -42,7 +42,7 @@ function ProjectList() {
     const handleAdd = () => {
         setCurrentProject({
             id: '',
-            clientId: '',
+            client: '',
             projectName: '',
             technicalProjectManager: '',
             salesContact: '',
@@ -133,7 +133,7 @@ function ProjectList() {
                     <TableHead>
                         <TableRow>
                             <TableCell>ID</TableCell>
-                            <TableCell>ClientId</TableCell>
+                            <TableCell>Client</TableCell>
                             <TableCell>ProjectName</TableCell>
                             <TableCell>TechnicalProjectManager</TableCell>
                             <TableCell>SalesContact</TableCell>
@@ -154,7 +154,7 @@ function ProjectList() {
                         {Projects.map(Project => (
                             <TableRow key={Project.id}>
                                 <TableCell>{Project.id}</TableCell>
-                                <TableCell>{Project.clientId}</TableCell>
+                                <TableCell>{Project.client}</TableCell>
                                 <TableCell>{Project.projectName}</TableCell>
                                 <TableCell>{Project.technicalProjectManager}</TableCell>
                                 <TableCell>{Project.salesContact}</TableCell>
@@ -182,9 +182,9 @@ function ProjectList() {
                 <DialogContent>
                     <TextField
                         margin="dense"
-                        label="ClientId"
-                        name="clientId"
-                        value={currentProject.clientId}
+                        label="Client"
+                        name="client"
+                        value={currentProject.client}
                         onChange={handleChange}
                         fullWidth
                     />

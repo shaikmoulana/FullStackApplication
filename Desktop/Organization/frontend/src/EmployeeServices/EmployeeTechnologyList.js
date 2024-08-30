@@ -10,7 +10,7 @@ function EmployeeTechnologyList() {
     const [currentEmployeeTechnology, setCurrentEmployeeTechnology] = useState({
         id: '',
         name: '',
-        technologyId: '',
+        technology: '',
         isActive: true,
         createdBy: '',
         createdDate: '',
@@ -35,7 +35,7 @@ function EmployeeTechnologyList() {
         setCurrentEmployeeTechnology({
             id: '',
             name: '',
-            technologyId: '',
+            technology: '',
             isActive: true,
             createdBy: '',
             createdDate: '',
@@ -119,7 +119,7 @@ function EmployeeTechnologyList() {
                         <TableRow>
                             <TableCell>ID</TableCell>
                             <TableCell>Name</TableCell>
-                            <TableCell>technologyId</TableCell>
+                            <TableCell>Technology</TableCell>
                             <TableCell>Is Active</TableCell>
                             <TableCell>Created By</TableCell>
                             <TableCell>Created Date</TableCell>
@@ -133,7 +133,7 @@ function EmployeeTechnologyList() {
                             <TableRow key={EmployeeTechnology.id}>
                                 <TableCell>{EmployeeTechnology.id}</TableCell>
                                 <TableCell>{EmployeeTechnology.name}</TableCell>
-                                <TableCell>{EmployeeTechnology.technologyId}</TableCell>
+                                <TableCell>{EmployeeTechnology.technology}</TableCell>
                                 <TableCell>{EmployeeTechnology.isActive ? 'Active' : 'Inactive'}</TableCell>
                                 <TableCell>{EmployeeTechnology.createdBy}</TableCell>
                                 <TableCell>{new Date(EmployeeTechnology.createdDate).toLocaleString()}</TableCell>
@@ -161,9 +161,9 @@ function EmployeeTechnologyList() {
                     />
                     <TextField
                         margin="dense"
-                        label="technologyId"
-                        name="technologyId"
-                        value={currentEmployeeTechnology.technologyId}
+                        label="technology"
+                        name="technology"
+                        value={currentEmployeeTechnology.technology}
                         onChange={handleChange}
                         fullWidth
                     />

@@ -9,7 +9,7 @@ function ClientContactList() {
     const [open, setOpen] = useState(false);
     const [currentClientContact, setCurrentClientContact] = useState({
         id: '',
-        clientId: '',
+        client: '',
         contactValue: '',
         contactType: '',
         isActive: true,
@@ -35,7 +35,7 @@ function ClientContactList() {
     const handleAdd = () => {
         setCurrentClientContact({
             id: '',
-            clientId: '',
+            client: '',
             contactValue: '',
             contactType: '',
             isActive: true,
@@ -120,7 +120,7 @@ function ClientContactList() {
                     <TableHead>
                         <TableRow>
                             <TableCell>Id</TableCell>
-                            <TableCell>ClientId</TableCell>
+                            <TableCell>Client</TableCell>
                             <TableCell>ContactValue</TableCell>
                             <TableCell>ContactType</TableCell>
                             <TableCell>Is Active</TableCell>
@@ -135,7 +135,7 @@ function ClientContactList() {
                         {ClientContact.map(ClientContact => (
                             <TableRow key={ClientContact.id}>
                                 <TableCell>{ClientContact.id}</TableCell>
-                                <TableCell>{ClientContact.clientId}</TableCell>
+                                <TableCell>{ClientContact.client}</TableCell>
                                 <TableCell>{ClientContact.contactValue}</TableCell>
                                 <TableCell>{ClientContact.contactType}</TableCell>
                                 <TableCell>{ClientContact.isActive ? 'Active' : 'Inactive'}</TableCell>
@@ -157,9 +157,9 @@ function ClientContactList() {
                 <DialogContent>
                     <TextField
                         margin="dense"
-                        label="ClientId"
-                        name="clientId"
-                        value={currentClientContact.clientId}
+                        label="Client"
+                        name="client"
+                        value={currentClientContact.client}
                         onChange={handleChange}
                         fullWidth
                     />
