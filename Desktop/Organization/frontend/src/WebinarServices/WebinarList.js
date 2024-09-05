@@ -15,8 +15,8 @@ function WebinarList() {
         webinarDate: '',
         numberOfAudience: '',
         isActive: true,
-        createdBy: '',
-        createdDate: '',
+        createdBy: 'SYSTEM',
+        createdDate: new Date(),
         updatedBy: '',
         updatedDate: ''
     });
@@ -43,8 +43,8 @@ function WebinarList() {
             webinarDate: '',
             numberOfAudience: '',
             isActive: true,
-            createdBy: '',
-            createdDate: '',
+            createdBy: 'SYSTEM',
+            createdDate: new Date(),
             updatedBy: '',
             updatedDate: ''
         });
@@ -123,7 +123,7 @@ function WebinarList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Id</TableCell>
+                            {/* <TableCell>Id</TableCell> */}
                             <TableCell>Title</TableCell>
                             <TableCell>Speaker</TableCell>
                             <TableCell>Status</TableCell>
@@ -140,7 +140,7 @@ function WebinarList() {
                     <TableBody>
                         {Webinars.map(Webinar => (
                             <TableRow key={Webinar.id}>
-                                <TableCell>{Webinar.id}</TableCell>
+                                {/* <TableCell>{Webinar.id}</TableCell> */}
                                 <TableCell>{Webinar.title}</TableCell>
                                 <TableCell>{Webinar.speaker}</TableCell>
                                 <TableCell>{Webinar.status}</TableCell>

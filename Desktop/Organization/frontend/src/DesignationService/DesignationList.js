@@ -13,8 +13,8 @@ function DesignationList() {
         name: '',
         departmentId: '',
         isActive: true,
-        createdBy: '',
-        createdDate: '',
+        createdBy: 'SYSTEM',
+        createdDate: new Date(),
         updatedBy: '',
         updatedDate: ''
     });
@@ -38,8 +38,8 @@ function DesignationList() {
             name: '',
             departmentId: '',
             isActive: true,
-            createdBy: '',
-            createdDate: '',
+            createdBy: 'SYSTEM',
+            createdDate: new Date(),
             updatedBy: '',
             updatedDate: ''
         });
@@ -118,7 +118,7 @@ function DesignationList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
+                            {/* <TableCell>ID</TableCell> */}
                             <TableCell>Name</TableCell>
                             <TableCell>Is Active</TableCell>
                             <TableCell>Created By</TableCell>
@@ -131,7 +131,7 @@ function DesignationList() {
                     <TableBody>
                         {Designations.map(Designation => (
                             <TableRow key={Designation.id}>
-                                <TableCell>{Designation.id}</TableCell>
+                                {/* <TableCell>{Designation.id}</TableCell> */}
                                 <TableCell>{Designation.name}</TableCell>
                                 <TableCell>{Designation.isActive ? 'Active' : 'Inactive'}</TableCell>
                                 <TableCell>{Designation.createdBy}</TableCell>

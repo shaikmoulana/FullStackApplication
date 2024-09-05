@@ -20,11 +20,13 @@ function EmployeeList() {
         relievingDate: '',
         projection: '',
         isActive: true,
-        createdBy: '',
-        createdDate: '',
+        createdBy: 'SYSTEM',
+        createdDate: new Date(),
         updatedBy: '',
         updatedDate: '',
-        password: ''
+        password: '',
+        profile: '',
+        phoneNo:''
     });
 
     useEffect(() => {
@@ -53,11 +55,13 @@ function EmployeeList() {
             relievingDate: '',
             projection: '',
             isActive: true,
-            createdBy: '',
-            createdDate: '',
+            createdBy: 'SYSTEM',
+            createdDate: new Date(),
             updatedBy: '',
             updatedDate: '',
-            password: ''
+            password: '',
+            profile: '',
+            phoneNo:''
         });
         setOpen(true);
     };
@@ -134,7 +138,7 @@ function EmployeeList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
+                            {/* <TableCell>ID</TableCell> */}
                             <TableCell>Name</TableCell>
                             <TableCell>Designation</TableCell>
                             <TableCell>EmployeeId</TableCell>
@@ -149,7 +153,9 @@ function EmployeeList() {
                             <TableCell>Created Date</TableCell>
                             <TableCell>Updated By</TableCell>
                             <TableCell>Updated Date</TableCell>
-                            <TableCell>Password</TableCell>
+                            {/* <TableCell>Password</TableCell> */}
+                            <TableCell>PhoneNo</TableCell>
+                            <TableCell>Profile</TableCell>
 
                             <TableCell>Actions</TableCell>
                         </TableRow>
@@ -157,7 +163,7 @@ function EmployeeList() {
                     <TableBody>
                         {Employees.map(Employee => (
                             <TableRow key={Employee.id}>
-                                <TableCell>{Employee.id}</TableCell>
+                                {/* <TableCell>{Employee.id}</TableCell> */}
                                 <TableCell>{Employee.name}</TableCell>
                                 <TableCell>{Employee.designation}</TableCell>
                                 <TableCell>{Employee.employeeID}</TableCell>
@@ -172,7 +178,9 @@ function EmployeeList() {
                                 <TableCell>{new Date(Employee.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{Employee.updatedBy || 'N/A'}</TableCell>
                                 <TableCell>{Employee.updatedDate ? new Date(Employee.updatedDate).toLocaleString() : 'N/A'}</TableCell>
-                                <TableCell>{Employee.password}</TableCell>
+                                {/* <TableCell>{Employee.password}</TableCell> */}
+                                <TableCell>{Employee.phoneNo}</TableCell>
+                                <TableCell>{Employee.profile}</TableCell>
                                 <TableCell>
                                     <Button variant="contained" color="secondary" onClick={() => handleUpdate(Employee)}>Update</Button>
                                     <Button variant="contained" color="error" onClick={() => handleDelete(Employee.id)}>Delete</Button>
@@ -297,11 +305,27 @@ function EmployeeList() {
                         onChange={handleChange}
                         fullWidth
                     />
-                    <TextField
+                    {/* <TextField
                         margin="dense"
                         label="Password"
                         name="password"
                         value={currentEmployee.password}
+                        onChange={handleChange}
+                        fullWidth
+                    /> */}
+                    <TextField
+                        margin="dense"
+                        label="PhoneNumber"
+                        name="phoneNo"
+                        value={currentEmployee.phoneNo}
+                        onChange={handleChange}
+                        fullWidth
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Profile"
+                        name="profile"
+                        value={currentEmployee.profile}
                         onChange={handleChange}
                         fullWidth
                     />

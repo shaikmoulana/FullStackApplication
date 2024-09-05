@@ -16,8 +16,8 @@ function BlogsList() {
         completedDate: '',
         publishedDate:'',
         isActive: true,
-        createdBy: '',
-        createdDate: '',
+        createdBy: 'SYSTEM',
+        createdDate: new Date(),
         updatedBy: '',
         updatedDate: ''
     });
@@ -45,8 +45,8 @@ function BlogsList() {
             completedDate: '',
             publishedDate: '',
             isActive: true,
-            createdBy: '',
-            createdDate: '',
+            createdBy: 'SYSTEM',
+            createdDate: new Date(),
             updatedBy: '',
             updatedDate: ''
         });
@@ -125,7 +125,7 @@ function BlogsList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
+                            {/* <TableCell>ID</TableCell> */}
                             <TableCell>Title</TableCell>
                             <TableCell>Author</TableCell>
                             <TableCell>Status</TableCell>
@@ -143,7 +143,7 @@ function BlogsList() {
                     <TableBody>
                         {blogs.map(Blogs => (
                             <TableRow key={Blogs.id}>
-                                <TableCell>{Blogs.id}</TableCell>
+                                {/* <TableCell>{Blogs.id}</TableCell> */}
                                 <TableCell>{Blogs.title}</TableCell>
                                 <TableCell>{Blogs.author}</TableCell>
                                 <TableCell>{Blogs.status}</TableCell>

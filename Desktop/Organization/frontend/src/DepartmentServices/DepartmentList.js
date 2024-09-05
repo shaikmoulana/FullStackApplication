@@ -17,16 +17,16 @@
 //     }, []);
 
 //     const handleAdd = () => {
-        
-        
+
+
 //     };
 
 //     const handleUpdate = (id) => {
-        
+
 //     };
 
 //     const handleDelete = (id) => {
-        
+
 //     };
 
 //     return (
@@ -89,8 +89,8 @@ function DepartmentList() {
         id: '',
         name: '',
         isActive: true,
-        createdBy: '',
-        createdDate: '',
+        createdBy: 'SYSTEM',
+        createdDate: new Date(),
         updatedBy: '',
         updatedDate: ''
     });
@@ -113,8 +113,8 @@ function DepartmentList() {
             id: '',
             name: '',
             isActive: true,
-            createdBy: '',
-            createdDate: '',
+            createdBy: 'SYSTEM',
+            createdDate: new Date(),
             updatedBy: '',
             updatedDate: ''
         });
@@ -193,7 +193,7 @@ function DepartmentList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
+                            {/* <TableCell>ID</TableCell> */}
                             <TableCell>Name</TableCell>
                             <TableCell>Is Active</TableCell>
                             <TableCell>Created By</TableCell>
@@ -206,7 +206,7 @@ function DepartmentList() {
                     <TableBody>
                         {departments.map(Department => (
                             <TableRow key={Department.id}>
-                                <TableCell>{Department.id}</TableCell>
+                                {/* <TableCell>{Department.id}</TableCell> */}
                                 <TableCell>{Department.name}</TableCell>
                                 <TableCell>{Department.isActive ? 'Active' : 'Inactive'}</TableCell>
                                 <TableCell>{Department.createdBy}</TableCell>

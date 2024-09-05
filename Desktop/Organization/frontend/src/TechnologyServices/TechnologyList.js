@@ -225,7 +225,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select,MenuItem,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 function TechnologyList() {
     const [technologies, setTechnologies] = useState([]);
@@ -238,8 +238,8 @@ function TechnologyList() {
         name: '',
         department: '',
         isActive: true,
-        createdBy: '',
-        createdDate: '',
+        createdBy: 'SYSTEM',
+        createdDate: new Date(),
         updatedBy: '',
         updatedDate: ''
     });
@@ -276,8 +276,8 @@ function TechnologyList() {
             name: '',
             department: '',
             isActive: true,
-            createdBy: '',
-            createdDate: '',
+            createdBy: 'SYSTEM',
+            createdDate: new Date(),
             updatedBy: '',
             updatedDate: ''
         });
@@ -356,7 +356,7 @@ function TechnologyList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
+                            {/* <TableCell>ID</TableCell> */}
                             <TableCell>Name</TableCell>
                             <TableCell>Department</TableCell>
                             <TableCell>Is Active</TableCell>
@@ -370,7 +370,7 @@ function TechnologyList() {
                     <TableBody>
                         {technologies.map(technology => (
                             <TableRow key={technology.id}>
-                                <TableCell>{technology.id}</TableCell>
+                                {/* <TableCell>{technology.id}</TableCell> */}
                                 <TableCell>{technology.name}</TableCell>
                                 <TableCell>{technology.department}</TableCell>
                                 <TableCell>{technology.isActive ? 'Active' : 'Inactive'}</TableCell>
@@ -398,7 +398,9 @@ function TechnologyList() {
                         onChange={handleChange}
                         fullWidth
                     />
+                    <InputLabel id="demo-simple-select-label">Department</InputLabel>
                     <Select
+                        labelId="demo-simple-select-label"
                         margin="dense"
                         name="department"
                         label="Department"
