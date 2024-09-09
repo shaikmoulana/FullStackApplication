@@ -1,9 +1,9 @@
-//------------------------------------------------------------------------------------------------------------
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TablePagination, Typography, TableSortLabel } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
 
 function TechnologyList() {
     const [technologies, setTechnologies] = useState([]);
@@ -26,7 +26,7 @@ function TechnologyList() {
         updatedDate: ''
     });
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
-    const [orderBy, setOrderBy] = useState('name'); // Column to sort by
+    const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
 
     useEffect(() => {
         const fetchTechnologies = async () => {
@@ -54,7 +54,6 @@ function TechnologyList() {
         fetchDepartments();
     }, []);
 
-    // Handle sorting logic
     const handleSort = (property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -62,20 +61,15 @@ function TechnologyList() {
     };
 
     const sortedTechnologies = [...technologies].sort((a, b) => {
-        const valueA = a[orderBy] || ''; // Use an empty string if the property is undefined
-        const valueB = b[orderBy] || ''; // Use an empty string if the property is undefined
+        const valueA = a[orderBy] || '';
+        const valueB = b[orderBy] || '';
 
-        console.log(`Comparing: ${valueA} with ${valueB}`);
-
-        // Ensure that both values are strings before calling localeCompare
         if (typeof valueA === 'string' && typeof valueB === 'string') {
             return order === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
         } else {
-            // Fallback for non-string values
             return order === 'asc' ? (valueA > valueB ? 1 : -1) : (valueB > valueA ? 1 : -1);
         }
     });
-
 
     const handleAdd = () => {
         setCurrentTechnology({
@@ -178,6 +172,7 @@ function TechnologyList() {
                 <Table>
                     <TableHead>
                         <TableRow>
+                            {/* Sorting logic */}
                             <TableCell>
                                 <TableSortLabel
                                     active={orderBy === 'name'}
@@ -245,15 +240,15 @@ function TechnologyList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {sortedTechnologies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(technology => (
+                        {sortedTechnologies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((technology) => (
                             <TableRow key={technology.id}>
                                 <TableCell>{technology.name}</TableCell>
                                 <TableCell>{technology.department}</TableCell>
-                                <TableCell>{technology.isActive ? 'Active' : 'Inactive'}</TableCell>
+                                <TableCell>{technology.isActive ? 'Yes' : 'No'}</TableCell>
                                 <TableCell>{technology.createdBy}</TableCell>
-                                <TableCell>{new Date(technology.createdDate).toLocaleString()}</TableCell>
-                                <TableCell>{technology.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{technology.updatedDate ? new Date(technology.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(technology.createdDate).toLocaleDateString()}</TableCell>
+                                <TableCell>{technology.updatedBy}</TableCell>
+                                <TableCell>{new Date(technology.updatedDate).toLocaleDateString()}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(technology)}>
                                         <EditIcon color="primary" />
@@ -266,63 +261,53 @@ function TechnologyList() {
                         ))}
                     </TableBody>
                 </Table>
+                {/* Pagination Component */}
+                <PaginationComponent
+                    count={technologies.length}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    handlePageChange={handlePageChange}
+                    handleRowsPerPageChange={handleRowsPerPageChange}
+                />
             </TableContainer>
-            <TablePagination
-                component="div"
-                count={technologies.length}
-                page={page}
-                onPageChange={handlePageChange}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                rowsPerPageOptions={[10]}
-            />
 
-            {/* Confirmation Dialog */}
-            <Dialog
-                open={confirmOpen}
-                onClose={handleConfirmClose}
-            >
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <DialogContent>
-                    <Typography>Are you sure you want to delete this technology?</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleConfirmClose} color="primary">No</Button>
-                    <Button onClick={handleConfirmYes} color="error">Yes</Button>
-                </DialogActions>
-            </Dialog>
-
+            {/* Dialogs for adding/editing and confirming delete */}
             <Dialog open={open} onClose={() => setOpen(false)}>
-                <DialogTitle>{currentTechnology.id ? 'Edit Technology' : 'Add Technology'}</DialogTitle>
+                <DialogTitle>{currentTechnology.id ? 'Update Technology' : 'Add Technology'}</DialogTitle>
                 <DialogContent>
                     <TextField
-                        autoFocus
                         margin="dense"
-                        label="Technology Name"
                         name="name"
+                        label="Technology Name"
                         value={currentTechnology.name}
                         onChange={handleChange}
                         fullWidth
                     />
                     <InputLabel>Department</InputLabel>
                     <Select
+                        margin="dense"
                         name="department"
                         value={currentTechnology.department}
                         onChange={handleChange}
                         fullWidth
                     >
-                        {departments.map(dept => (
-                            <MenuItem key={dept.id} value={dept.name}>{dept.name}</MenuItem>
+                        {departments.map((department) => (
+                            <MenuItem key={department.id} value={department.name}>
+                                {department.name}
+                            </MenuItem>
                         ))}
                     </Select>
-                    <TextField
+                    <InputLabel>Is Active</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Is Active"
                         name="isActive"
                         value={currentTechnology.isActive}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        <MenuItem value={true}>Yes</MenuItem>
+                        <MenuItem value={false}>No</MenuItem>
+                    </Select>
                     <TextField
                         margin="dense"
                         label="Created By"
@@ -357,8 +342,21 @@ function TechnologyList() {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)} color="primary">Cancel</Button>
-                    <Button onClick={handleSave} color="primary">Save</Button>
+                    <Button onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button onClick={handleSave} color="primary">
+                        {currentTechnology.id ? 'Update' : 'Save'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={confirmOpen} onClose={handleConfirmClose}>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to delete this technology?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleConfirmClose}>No</Button>
+                    <Button onClick={handleConfirmYes} color="error">Yes</Button>
                 </DialogActions>
             </Dialog>
         </div>
@@ -366,4 +364,3 @@ function TechnologyList() {
 }
 
 export default TechnologyList;
-
