@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
 import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
 
 function TechnologyList() {
@@ -27,6 +28,7 @@ function TechnologyList() {
     });
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
+    const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
         const fetchTechnologies = async () => {
@@ -70,6 +72,11 @@ function TechnologyList() {
             return order === 'asc' ? (valueA > valueB ? 1 : -1) : (valueB > valueA ? 1 : -1);
         }
     });
+
+    const filteredTechnologies = sortedTechnologies.filter((technology) =>
+        technology.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        technology.department.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const handleAdd = () => {
         setCurrentTechnology({
@@ -166,8 +173,25 @@ function TechnologyList() {
                 <h3>Technology Table List</h3>
             </div>
             <div style={{ display: 'flex', marginBottom: '20px' }}>
+                <TextField
+                    label="Search"
+                    variant="outlined"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton edge="end">
+                                    <SearchIcon />
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                    style={{ marginRight: '20px', width: '90%' }}
+                />
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add Technology</Button>
             </div>
+
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -240,7 +264,7 @@ function TechnologyList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {sortedTechnologies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((technology) => (
+                        {filteredTechnologies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((technology) => (
                             <TableRow key={technology.id}>
                                 <TableCell>{technology.name}</TableCell>
                                 <TableCell>{technology.department}</TableCell>
@@ -263,7 +287,7 @@ function TechnologyList() {
                 </Table>
                 {/* Pagination Component */}
                 <PaginationComponent
-                    count={technologies.length}
+                    count={filteredTechnologies.length}
                     page={page}
                     rowsPerPage={rowsPerPage}
                     handlePageChange={handlePageChange}
@@ -364,3 +388,4 @@ function TechnologyList() {
 }
 
 export default TechnologyList;
+
