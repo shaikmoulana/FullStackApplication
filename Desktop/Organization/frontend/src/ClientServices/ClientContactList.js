@@ -20,7 +20,8 @@ function ClientContactList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5142/api/ClientContact')
+        //axios.get('http://localhost:5142/api/ClientContact')
+        axios.get('http://172.17.31.61:5142/api/clientContact')
             .then(response => {
                 setClientContact(response.data);
                 setLoading(false);
@@ -54,7 +55,8 @@ function ClientContactList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5142/api/ClientContact/${id}`)
+        //axios.delete(`http://localhost:5142/api/ClientContact/${id}`)
+        axios.delete(`http://172.17.31.61:5142/api/clientContact/${id}`)
             .then(response => {
                 setClientContact(ClientContact.filter(tech => tech.id !== id));
             })
@@ -67,7 +69,8 @@ function ClientContactList() {
     const handleSave = () => {
         if (currentClientContact.id) {
             // Update existing ClientContact
-            axios.put(`http://localhost:5142/api/ClientContact/${currentClientContact.id}`, currentClientContact)
+            //axios.put(`http://localhost:5142/api/ClientContact/${currentClientContact.id}`, currentClientContact)
+            axios.put(`http://172.17.31.61:5142/api/clientContact/${currentClientContact.id}`, currentClientContact)
                 .then(response => {
                     console.log(response)
                     //setClientContact([...ClientContact, response.data]);
@@ -81,7 +84,8 @@ function ClientContactList() {
 
         } else {
             // Add new ClientContact
-            axios.post('http://localhost:5142/api/ClientContact', currentClientContact)
+            //axios.post('http://localhost:5142/api/ClientContact', currentClientContact)
+            axios.post('http://172.17.31.61:5142/api/clientContact', currentClientContact)
                 .then(response => {
                     setClientContact([...ClientContact, response.data]);
                 })
@@ -119,7 +123,7 @@ function ClientContactList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Id</TableCell>
+                            {/* <TableCell>Id</TableCell> */}
                             <TableCell>Client</TableCell>
                             <TableCell>ContactValue</TableCell>
                             <TableCell>ContactType</TableCell>
@@ -134,7 +138,7 @@ function ClientContactList() {
                     <TableBody>
                         {ClientContact.map(ClientContact => (
                             <TableRow key={ClientContact.id}>
-                                <TableCell>{ClientContact.id}</TableCell>
+                                {/* <TableCell>{ClientContact.id}</TableCell> */}
                                 <TableCell>{ClientContact.client}</TableCell>
                                 <TableCell>{ClientContact.contactValue}</TableCell>
                                 <TableCell>{ClientContact.contactType}</TableCell>

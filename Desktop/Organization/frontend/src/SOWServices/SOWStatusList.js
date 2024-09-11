@@ -18,7 +18,8 @@ function SOWStatusList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5041/api/SOWStatus')
+        //axios.get('http://localhost:5041/api/SOWStatus')
+        axios.get('http://172.17.31.61:5041/api/sowstatus')
             .then(response => {
                 setSOWStatuss(response.data);
                 setLoading(false);
@@ -50,7 +51,8 @@ function SOWStatusList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5041/api/SOWStatus/${id}`)
+        //axios.delete(`http://localhost:5041/api/SOWStatus/${id}`)
+        axios.delete(`http://172.17.31.61:5041/api/sowstatus/${id}`)
             .then(response => {
                 setSOWStatuss(SOWStatuss.filter(tech => tech.id !== id));
             })
@@ -63,7 +65,8 @@ function SOWStatusList() {
     const handleSave = () => {
         if (currentSOWStatus.id) {
             // Update existing SOWStatus
-            axios.put(`http://localhost:5041/api/SOWStatus/${currentSOWStatus.id}`, currentSOWStatus)
+            //axios.put(`http://localhost:5041/api/SOWStatus/${currentSOWStatus.id}`, currentSOWStatus)
+            axios.put(`http://172.17.31.61:5041/api/sowstatus/${currentSOWStatus.id}`, currentSOWStatus)
                 .then(response => {
                     console.log(response)
                     //setSOWStatuss([...SOWStatuss, response.data]);
@@ -77,7 +80,8 @@ function SOWStatusList() {
 
         } else {
             // Add new SOWStatus
-            axios.post('http://localhost:5041/api/SOWStatus', currentSOWStatus)
+            //axios.post('http://localhost:5041/api/SOWStatus', currentSOWStatus)
+            axios.post('http://172.17.31.61:5041/api/sowstatus', currentSOWStatus)
                 .then(response => {
                     setSOWStatuss([...SOWStatuss, response.data]);
                 })
@@ -115,7 +119,7 @@ function SOWStatusList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
+                            {/* <TableCell>ID</TableCell> */}
                             <TableCell>Status</TableCell>
                             <TableCell>Is Active</TableCell>
                             <TableCell>Created By</TableCell>
@@ -128,7 +132,7 @@ function SOWStatusList() {
                     <TableBody>
                         {SOWStatuss.map(SOWStatus => (
                             <TableRow key={SOWStatus.id}>
-                                <TableCell>{SOWStatus.id}</TableCell>
+                                {/* <TableCell>{SOWStatus.id}</TableCell> */}
                                 <TableCell>{SOWStatus.status}</TableCell>
                                 <TableCell>{SOWStatus.isActive ? 'Active' : 'Inactive'}</TableCell>
                                 <TableCell>{SOWStatus.createdBy}</TableCell>

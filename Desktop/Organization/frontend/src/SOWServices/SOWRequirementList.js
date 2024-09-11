@@ -21,7 +21,8 @@ function SOWRequirementList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5041/api/SOWRequirement')
+        //axios.get('http://localhost:5041/api/SOWRequirement')
+        axios.get('http://172.17.31.61:5041/api/sowRequirement')
             .then(response => {
                 setSOWRequirements(response.data);
                 setLoading(false);
@@ -56,7 +57,8 @@ function SOWRequirementList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5041/api/SOWRequirement/${id}`)
+        //axios.delete(`http://localhost:5041/api/SOWRequirement/${id}`)
+        axios.delete(`http://172.17.31.61:5041/api/sowRequirement/${id}`)
             .then(response => {
                 setSOWRequirements(SOWRequirements.filter(tech => tech.id !== id));
             })
@@ -69,7 +71,8 @@ function SOWRequirementList() {
     const handleSave = () => {
         if (currentSOWRequirement.id) {
             // Update existing SOWRequirement
-            axios.put(`http://localhost:5041/api/SOWRequirement/${currentSOWRequirement.id}`, currentSOWRequirement)
+            //axios.put(`http://localhost:5041/api/SOWRequirement/${currentSOWRequirement.id}`, currentSOWRequirement)
+            axios.put(`http://172.17.31.61:5041/api/sowRequirement/${currentSOWRequirement.id}`, currentSOWRequirement)
                 .then(response => {
                     console.log(response)
                     //setSOWRequirements([...SOWRequirements, response.data]);
@@ -83,7 +86,8 @@ function SOWRequirementList() {
 
         } else {
             // Add new SOWRequirement
-            axios.post('http://localhost:5041/api/SOWRequirement', currentSOWRequirement)
+            //axios.post('http://localhost:5041/api/SOWRequirement', currentSOWRequirement)
+            axios.post('http://172.17.31.61:5041/api/sowRequirement', currentSOWRequirement)
                 .then(response => {
                     setSOWRequirements([...SOWRequirements, response.data]);
                 })
@@ -121,7 +125,7 @@ function SOWRequirementList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Id</TableCell>
+                            {/* <TableCell>Id</TableCell> */}
                             <TableCell>SOW</TableCell>
                             <TableCell>Designation</TableCell>
                             <TableCell>Technologies</TableCell>
@@ -137,7 +141,7 @@ function SOWRequirementList() {
                     <TableBody>
                         {SOWRequirements.map(SOWRequirement => (
                             <TableRow key={SOWRequirement.id}>
-                                <TableCell>{SOWRequirement.id}</TableCell>
+                                {/* <TableCell>{SOWRequirement.id}</TableCell> */}
                                 <TableCell>{SOWRequirement.sow}</TableCell>
                                 <TableCell>{SOWRequirement.designation}</TableCell>
                                 <TableCell>{SOWRequirement.technologies}</TableCell>

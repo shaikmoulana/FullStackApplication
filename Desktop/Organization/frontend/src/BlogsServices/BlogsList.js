@@ -14,7 +14,7 @@ function BlogsList() {
         status: '',
         targetDate: '',
         completedDate: '',
-        publishedDate:'',
+        publishedDate: '',
         isActive: true,
         createdBy: 'SYSTEM',
         createdDate: new Date(),
@@ -23,7 +23,8 @@ function BlogsList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5147/api/Blogs')
+        //axios.get('http://localhost:5147/api/Blogs')
+        axios.get('http://172.17.31.61:5174/api/blogs')
             .then(response => {
                 setblogs(response.data);
                 setLoading(false);
@@ -60,7 +61,8 @@ function BlogsList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5147/api/Blogs/${id}`)
+        //axios.delete(`http://localhost:5147/api/Blogs/${id}`)
+        axios.delete(`http://172.17.31.61:5174/api/blogs/${id}`)
             .then(response => {
                 setblogs(blogs.filter(tech => tech.id !== id));
             })
@@ -73,7 +75,8 @@ function BlogsList() {
     const handleSave = () => {
         if (currentBlogs.id) {
             // Update existing Blogs
-            axios.put(`http://localhost:5147/api/Blogs/${currentBlogs.id}`, currentBlogs)
+            //axios.put(`http://localhost:5147/api/Blogs/${currentBlogs.id}`, currentBlogs)
+            axios.put(`http://172.17.31.61:5174/api/blogs/${currentBlogs.id}`, currentBlogs)
                 .then(response => {
                     console.log(response)
                     //setblogs([...blogs, response.data]);
@@ -87,7 +90,8 @@ function BlogsList() {
 
         } else {
             // Add new Blogs
-            axios.post('http://localhost:5147/api/Blogs', currentBlogs)
+            //axios.post('http://localhost:5147/api/Blogs', currentBlogs)
+            axios.post('http://172.17.31.61:5174/api/blogs', currentBlogs)
                 .then(response => {
                     setblogs([...blogs, response.data]);
                 })

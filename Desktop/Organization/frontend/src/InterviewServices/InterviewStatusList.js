@@ -18,7 +18,8 @@ function InterviewStatusList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5200/api/InterviewStatus')
+        //axios.get('http://localhost:5200/api/InterviewStatus')
+        axios.get('http://172.17.31.61:5200/api/interviewStatus')
             .then(response => {
                 setInterviewStatuss(response.data);
                 setLoading(false);
@@ -50,7 +51,8 @@ function InterviewStatusList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5200/api/InterviewStatus/${id}`)
+        //axios.delete(`http://localhost:5200/api/InterviewStatus/${id}`)
+        axios.delete(`http://172.17.31.61:5200/api/interviewStatus/${id}`)
             .then(response => {
                 setInterviewStatuss(InterviewStatuss.filter(tech => tech.id !== id));
             })
@@ -63,7 +65,8 @@ function InterviewStatusList() {
     const handleSave = () => {
         if (currentInterviewStatus.id) {
             // Update existing InterviewStatus
-            axios.put(`http://localhost:5200/api/InterviewStatus/${currentInterviewStatus.id}`, currentInterviewStatus)
+            //axios.put(`http://localhost:5200/api/InterviewStatus/${currentInterviewStatus.id}`, currentInterviewStatus)
+            axios.put(`http://172.17.31.61:5200/api/interviewStatus/${currentInterviewStatus.id}`, currentInterviewStatus)
                 .then(response => {
                     console.log(response)
                     //setInterviewStatuss([...InterviewStatuss, response.data]);
@@ -77,7 +80,8 @@ function InterviewStatusList() {
 
         } else {
             // Add new InterviewStatus
-            axios.post('http://localhost:5200/api/InterviewStatus', currentInterviewStatus)
+            //axios.post('http://localhost:5200/api/InterviewStatus', currentInterviewStatus)
+            axios.post('http://172.17.31.61:5200/api/interviewStatus', currentInterviewStatus)
                 .then(response => {
                     setInterviewStatuss([...InterviewStatuss, response.data]);
                 })
@@ -115,7 +119,7 @@ function InterviewStatusList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Id</TableCell>
+                            {/* <TableCell>Id</TableCell> */}
                             <TableCell>Status</TableCell>
                             <TableCell>Is Active</TableCell>
                             <TableCell>Created By</TableCell>
@@ -128,7 +132,7 @@ function InterviewStatusList() {
                     <TableBody>
                         {InterviewStatuss.map(InterviewStatus => (
                             <TableRow key={InterviewStatus.id}>
-                                <TableCell>{InterviewStatus.id}</TableCell>
+                                {/* <TableCell>{InterviewStatus.id}</TableCell> */}
                                 <TableCell>{InterviewStatus.status}</TableCell>
                                 <TableCell>{InterviewStatus.isActive ? 'Active' : 'Inactive'}</TableCell>
                                 <TableCell>{InterviewStatus.createdBy}</TableCell>

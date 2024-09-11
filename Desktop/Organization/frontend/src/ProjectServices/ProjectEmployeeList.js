@@ -21,7 +21,8 @@ function ProjectEmployeeList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5151/api/ProjectEmployee')
+        //axios.get('http://localhost:5151/api/ProjectEmployee')
+        axios.get('http://172.17.31.61:5151/api/projectEmployee')
             .then(response => {
                 setProjectEmployees(response.data);
                 setLoading(false);
@@ -56,7 +57,8 @@ function ProjectEmployeeList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5151/api/ProjectEmployee/${id}`)
+        //axios.delete(`http://localhost:5151/api/ProjectEmployee/${id}`)
+        axios.delete(`http://172.17.31.61:5151/api/projectEmployee/${id}`)
             .then(response => {
                 setProjectEmployees(ProjectEmployees.filter(tech => tech.id !== id));
             })
@@ -69,7 +71,8 @@ function ProjectEmployeeList() {
     const handleSave = () => {
         if (currentProjectEmployee.id) {
             // Update existing ProjectEmployee
-            axios.put(`http://localhost:5151/api/ProjectEmployee/${currentProjectEmployee.id}`, currentProjectEmployee)
+            //axios.put(`http://localhost:5151/api/ProjectEmployee/${currentProjectEmployee.id}`, currentProjectEmployee)
+            axios.put(`http://172.17.31.61:5151/api/projectEmployee/${currentProjectEmployee.id}`, currentProjectEmployee)
                 .then(response => {
                     console.log(response)
                     //setProjectEmployees([...ProjectEmployees, response.data]);
@@ -83,7 +86,8 @@ function ProjectEmployeeList() {
 
         } else {
             // Add new ProjectEmployee
-            axios.post('http://localhost:5151/api/ProjectEmployee', currentProjectEmployee)
+            //axios.post('http://localhost:5151/api/ProjectEmployee', currentProjectEmployee)
+            axios.post('http://172.17.31.61:5151/api/projectEmployee', currentProjectEmployee)
                 .then(response => {
                     setProjectEmployees([...ProjectEmployees, response.data]);
                 })
@@ -121,7 +125,7 @@ function ProjectEmployeeList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Id</TableCell>
+                            {/* <TableCell>Id</TableCell> */}
                             <TableCell>Project</TableCell>
                             <TableCell>Empoyee</TableCell>
                             <TableCell>StartDate</TableCell>
@@ -137,7 +141,7 @@ function ProjectEmployeeList() {
                     <TableBody>
                         {ProjectEmployees.map(ProjectEmployee => (
                             <TableRow key={ProjectEmployee.id}>
-                                <TableCell>{ProjectEmployee.id}</TableCell>
+                                {/* <TableCell>{ProjectEmployee.id}</TableCell> */}
                                 <TableCell>{ProjectEmployee.project}</TableCell>
                                 <TableCell>{ProjectEmployee.employee}</TableCell>
                                 <TableCell>{ProjectEmployee.startDate}</TableCell>

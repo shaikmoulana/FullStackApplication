@@ -27,7 +27,8 @@ function ProjectList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5151/api/Project')
+        //axios.get('http://localhost:5151/api/Project')
+        axios.get('http://172.17.31.61:5151/api/project')
             .then(response => {
                 setProjects(response.data);
                 setLoading(false);
@@ -67,7 +68,8 @@ function ProjectList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5151/api/Project/${id}`)
+        //axios.delete(`http://localhost:5151/api/Project/${id}`)
+        axios.delete(`http://172.17.31.61:5151/api/project/${id}`)
             .then(response => {
                 setProjects(Projects.filter(tech => tech.id !== id));
             })
@@ -80,7 +82,8 @@ function ProjectList() {
     const handleSave = () => {
         if (currentProject.id) {
             // Update existing Project
-            axios.put(`http://localhost:5151/api/Project/${currentProject.id}`, currentProject)
+            //axios.put(`http://localhost:5151/api/Project/${currentProject.id}`, currentProject)
+            axios.put(`http://172.17.31.61:5151/api/project/${currentProject.id}`, currentProject)
                 .then(response => {
                     console.log(response)
                     //setProjects([...Projects, response.data]);
@@ -94,7 +97,8 @@ function ProjectList() {
 
         } else {
             // Add new Project
-            axios.post('http://localhost:5151/api/Project', currentProject)
+            //axios.post('http://localhost:5151/api/Project', currentProject)
+            axios.post('http://172.17.31.61:5151/api/project', currentProject)
                 .then(response => {
                     setProjects([...Projects, response.data]);
                 })
@@ -132,7 +136,7 @@ function ProjectList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
+                            {/* <TableCell>ID</TableCell> */}
                             <TableCell>Client</TableCell>
                             <TableCell>ProjectName</TableCell>
                             <TableCell>TechnicalProjectManager</TableCell>
@@ -153,7 +157,7 @@ function ProjectList() {
                     <TableBody>
                         {Projects.map(Project => (
                             <TableRow key={Project.id}>
-                                <TableCell>{Project.id}</TableCell>
+                                {/* <TableCell>{Project.id}</TableCell> */}
                                 <TableCell>{Project.client}</TableCell>
                                 <TableCell>{Project.projectName}</TableCell>
                                 <TableCell>{Project.technicalProjectManager}</TableCell>

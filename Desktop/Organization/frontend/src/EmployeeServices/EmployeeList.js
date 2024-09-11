@@ -27,13 +27,14 @@ function EmployeeList() {
         updatedDate: '',
         password: '',
         profile: '',
-        phoneNo:''
+        phoneNo: ''
     });
 
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                const empResponse = await axios.get('http://localhost:5033/api/Employee');
+                //const empResponse = await axios.get('http://localhost:5033/api/Employee');
+                const empResponse = await axios.get('http://172.17.31.61:5033/api/employee');
                 setEmployees(empResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the employees!', error);
@@ -44,7 +45,8 @@ function EmployeeList() {
 
         const fetchDepartments = async () => {
             try {
-                const deptResponse = await axios.get('http://localhost:5160/api/Department');
+                //const deptResponse = await axios.get('http://localhost:5160/api/Department');
+                const deptResponse = await axios.get('http://172.17.31.61:5160/api/Department');
                 setDepartments(deptResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the departments!', error);
@@ -54,7 +56,7 @@ function EmployeeList() {
 
         const fetchDesignations = async () => {
             try {
-                const desigResponse = await axios.get('http://localhost:5201/api/Designation');
+                const desigResponse = await axios.get('http://172.17.31.61:5201/api/Designation');
                 setDesignations(desigResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the departments!', error);
@@ -86,7 +88,7 @@ function EmployeeList() {
             updatedDate: '',
             password: '',
             profile: '',
-            phoneNo:''
+            phoneNo: ''
         });
         setOpen(true);
     };
@@ -98,7 +100,8 @@ function EmployeeList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5033/api/Employee/${id}`)
+        //axios.delete(`http://localhost:5033/api/Employee/${id}`)
+        axios.delete(`http://172.17.31.61:5033/api/employee/${id}`)
             .then(response => {
                 setEmployees(Employees.filter(tech => tech.id !== id));
             })
@@ -111,7 +114,8 @@ function EmployeeList() {
     const handleSave = () => {
         if (currentEmployee.id) {
             // Update existing Employee
-            axios.put(`http://localhost:5033/api/Employee/${currentEmployee.id}`, currentEmployee)
+            //axios.put(`http://localhost:5033/api/Employee/${currentEmployee.id}`, currentEmployee)
+            axios.put(`http://172.17.31.61:5033/api/employee/${currentEmployee.id}`, currentEmployee)
                 .then(response => {
                     console.log(response)
                     //setEmployees([...Employees, response.data]);
@@ -125,7 +129,8 @@ function EmployeeList() {
 
         } else {
             // Add new Employee
-            axios.post('http://localhost:5033/api/Employee', currentEmployee)
+            //axios.post('http://localhost:5033/api/Employee', currentEmployee)
+            axios.post('http://172.17.31.61:5033/api/employee', currentEmployee)
                 .then(response => {
                     setEmployees([...Employees, response.data]);
                 })

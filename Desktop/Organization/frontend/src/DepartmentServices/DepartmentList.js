@@ -1,81 +1,3 @@
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
-
-
-// function DepartmentList() {
-//     const [departments, setDepartments] = useState([]);
-
-//     useEffect(() => {
-//         axios.get('https://localhost:7000/api/Department')
-//             .then(response => {
-//                 setDepartments(response.data);
-//             })
-//             .catch(error => {
-//                 console.error('There was an error fetching the departments!', error);
-//             });
-//     }, []);
-
-//     const handleAdd = () => {
-
-
-//     };
-
-//     const handleUpdate = (id) => {
-
-//     };
-
-//     const handleDelete = (id) => {
-
-//     };
-
-//     return (
-//         <div>
-//             <div style={{display:'flex'}}>
-//                 <h3>Department Table List</h3>
-//                 <Button variant="contained" color="primary" onClick={handleAdd} style={{marginBlockEnd:'10px' }}>Add Department</Button>
-//             </div>
-//         <TableContainer component={Paper}>
-//             <Table>
-//                 <TableHead>
-//                     <TableRow>
-//                         <TableCell>ID</TableCell>
-//                         <TableCell>Name</TableCell>
-//                         <TableCell>Is Active</TableCell>
-//                         <TableCell>Created By</TableCell>
-//                         <TableCell>Created Date</TableCell>
-//                         <TableCell>Updated By</TableCell>
-//                         <TableCell>Updated Date</TableCell>
-//                         <TableCell>Actions</TableCell>
-//                     </TableRow>
-//                 </TableHead>
-//                 <TableBody>
-//                     {departments.map(department => (
-//                         <TableRow key={department.id}>
-//                             <TableCell>{department.id}</TableCell>
-//                             <TableCell>{department.name}</TableCell>
-//                             <TableCell>{department.isActive ? 'Active' : 'Inactive'}</TableCell>
-//                             <TableCell>{department.createdBy}</TableCell>
-//                             <TableCell>{new Date(department.createdDate).toLocaleString()}</TableCell>
-//                             <TableCell>{department.updatedBy || 'N/A'}</TableCell>
-//                             <TableCell>{department.updatedDate ? new Date(department.updatedDate).toLocaleString() : 'N/A'}</TableCell>
-//                             <TableCell>
-//                                 {/* <Button variant="contained" color="primary" onClick={handleAdd}>Add</Button> */}
-//                                 <Button variant="contained" color="secondary" onClick={() => handleUpdate(department.id)}>Update</Button>
-//                                 <Button variant="contained" color="error" onClick={() => handleDelete(department.id)}>Delete</Button>
-//                             </TableCell>
-//                         </TableRow>
-//                     ))}
-//                 </TableBody>
-//             </Table>
-//             </TableContainer>
-//             {/* <Button variant="contained" color="primary" onClick={handleAdd} style={{marginRight:'auto'}}>Add Department</Button> */}
-//         </div>
-//     );
-// }
-
-// export default DepartmentList;
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
@@ -96,7 +18,8 @@ function DepartmentList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5160/api/Department')
+        //axios.get('http://localhost:5160/api/Department')
+        axios.get('http://172.17.31.61:5160/api/department')
             .then(response => {
                 setdepartments(response.data);
                 setLoading(false);
@@ -128,7 +51,8 @@ function DepartmentList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5160/api/Department/${id}`)
+        //axios.delete(`http://localhost:5160/api/Department/${id}`)
+        axios.delete(`http://172.17.31.61:5160/api/department/${id}`)
             .then(response => {
                 setdepartments(departments.filter(tech => tech.id !== id));
             })
@@ -141,7 +65,8 @@ function DepartmentList() {
     const handleSave = () => {
         if (currentDepartment.id) {
             // Update existing Department
-            axios.put(`http://localhost:5160/api/Department/${currentDepartment.id}`, currentDepartment)
+            //axios.put(`http://localhost:5160/api/Department/${currentDepartment.id}`, currentDepartment)
+            axios.put(`http://172.17.31.61:5160/api/department/${currentDepartment.id}`, currentDepartment)
                 .then(response => {
                     console.log(response)
                     //setdepartments([...departments, response.data]);
@@ -155,7 +80,8 @@ function DepartmentList() {
 
         } else {
             // Add new Department
-            axios.post('http://localhost:5160/api/Department', currentDepartment)
+            //axios.post('http://localhost:5160/api/Department', currentDepartment)
+            axios.post('http://172.17.31.61:5160/api/department', currentDepartment)
                 .then(response => {
                     setdepartments([...departments, response.data]);
                 })

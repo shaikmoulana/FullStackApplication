@@ -19,7 +19,8 @@ function SOWProposedTeamList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5041/api/SOWProposedTeam')
+        //axios.get('http://localhost:5041/api/SOWProposedTeam')
+        axios.get('http://172.17.31.61:5041/api/sowProposedTeam')
             .then(response => {
                 setSOWProposedTeams(response.data);
                 setLoading(false);
@@ -52,7 +53,8 @@ function SOWProposedTeamList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5041/api/SOWProposedTeam/${id}`)
+        //axios.delete(`http://localhost:5041/api/SOWProposedTeam/${id}`)
+        axios.delete(`http://172.17.31.61:5041/api/sowProposedTeam/${id}`)
             .then(response => {
                 setSOWProposedTeams(SOWProposedTeams.filter(tech => tech.id !== id));
             })
@@ -65,7 +67,8 @@ function SOWProposedTeamList() {
     const handleSave = () => {
         if (currentSOWProposedTeam.id) {
             // Update existing SOWProposedTeam
-            axios.put(`http://localhost:5041/api/SOWProposedTeam/${currentSOWProposedTeam.id}`, currentSOWProposedTeam)
+            //axios.put(`http://localhost:5041/api/SOWProposedTeam/${currentSOWProposedTeam.id}`, currentSOWProposedTeam)
+            axios.put(`http://172.17.31.61:5041/api/sowProposedTeam/${currentSOWProposedTeam.id}`, currentSOWProposedTeam)
                 .then(response => {
                     console.log(response)
                     //setSOWProposedTeams([...SOWProposedTeams, response.data]);
@@ -79,7 +82,8 @@ function SOWProposedTeamList() {
 
         } else {
             // Add new SOWProposedTeam
-            axios.post('http://localhost:5041/api/SOWProposedTeam', currentSOWProposedTeam)
+            //axios.post('http://localhost:5041/api/SOWProposedTeam', currentSOWProposedTeam)
+            axios.post('http://172.17.31.61:5041/api/sowProposedTeam', currentSOWProposedTeam)
                 .then(response => {
                     setSOWProposedTeams([...SOWProposedTeams, response.data]);
                 })
@@ -117,7 +121,7 @@ function SOWProposedTeamList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
+                            {/* <TableCell>ID</TableCell> */}
                             <TableCell>SOWRequirement</TableCell>
                             <TableCell>Employee</TableCell>
                             <TableCell>Is Active</TableCell>
@@ -131,7 +135,7 @@ function SOWProposedTeamList() {
                     <TableBody>
                         {SOWProposedTeams.map(SOWProposedTeam => (
                             <TableRow key={SOWProposedTeam.id}>
-                                <TableCell>{SOWProposedTeam.id}</TableCell>
+                                {/* <TableCell>{SOWProposedTeam.id}</TableCell> */}
                                 <TableCell>{SOWProposedTeam.sowRequirement}</TableCell>
                                 <TableCell>{SOWProposedTeam.employee}</TableCell>
                                 <TableCell>{SOWProposedTeam.isActive ? 'Active' : 'Inactive'}</TableCell>

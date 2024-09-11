@@ -24,7 +24,8 @@ function InterviewList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5200/api/Interview')
+        //axios.get('http://localhost:5200/api/Interview')
+        axios.get('http://172.17.31.61:5200/api/interview')
             .then(response => {
                 setInterviews(response.data);
                 setLoading(false);
@@ -62,7 +63,8 @@ function InterviewList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5200/api/Interview/${id}`)
+        //axios.delete(`http://localhost:5200/api/Interview/${id}`)
+        axios.delete(`http://172.17.31.61:5200/api/interview/${id}`)
             .then(response => {
                 setInterviews(Interviews.filter(tech => tech.id !== id));
             })
@@ -75,7 +77,8 @@ function InterviewList() {
     const handleSave = () => {
         if (currentInterview.id) {
             // Update existing Interview
-            axios.put(`http://localhost:5200/api/Interview/${currentInterview.id}`, currentInterview)
+            //axios.put(`http://localhost:5200/api/Interview/${currentInterview.id}`, currentInterview)
+            axios.put(`http://172.17.31.61:5200/api/interview/${currentInterview.id}`, currentInterview)
                 .then(response => {
                     console.log(response)
                     //setInterviews([...Interviews, response.data]);
@@ -89,7 +92,8 @@ function InterviewList() {
 
         } else {
             // Add new Interview
-            axios.post('http://localhost:5200/api/Interview', currentInterview)
+            //axios.post('http://localhost:5200/api/Interview', currentInterview)
+            axios.post('http://172.17.31.61:5200/api/interview', currentInterview)
                 .then(response => {
                     setInterviews([...Interviews, response.data]);
                 })
@@ -127,7 +131,7 @@ function InterviewList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
+                            {/* <TableCell>ID</TableCell> */}
                             <TableCell>SOWRequirement</TableCell>
                             <TableCell>Name</TableCell>
                             <TableCell>InterviewDate</TableCell>
@@ -146,7 +150,7 @@ function InterviewList() {
                     <TableBody>
                         {Interviews.map(Interview => (
                             <TableRow key={Interview.id}>
-                                <TableCell>{Interview.id}</TableCell>
+                                {/* <TableCell>{Interview.id}</TableCell> */}
                                 <TableCell>{Interview.sowRequirement}</TableCell>
                                 <TableCell>{Interview.name}</TableCell>
                                 <TableCell>{Interview.interviewDate}</TableCell>

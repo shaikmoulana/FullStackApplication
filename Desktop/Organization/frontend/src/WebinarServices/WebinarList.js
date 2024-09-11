@@ -22,7 +22,8 @@ function WebinarList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5017/api/Webinars')
+        //axios.get('http://localhost:5017/api/Webinars')
+        axios.get('http://172.17.31.61:5017/api/webinars')
             .then(response => {
                 setWebinars(response.data);
                 setLoading(false);
@@ -58,7 +59,8 @@ function WebinarList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5017/api/Webinars/${id}`)
+        //axios.delete(`http://localhost:5017/api/Webinars/${id}`)
+        axios.delete(`http://172.17.31.61:5017/api/webinars/${id}`)
             .then(response => {
                 setWebinars(Webinars.filter(tech => tech.id !== id));
             })
@@ -71,7 +73,8 @@ function WebinarList() {
     const handleSave = () => {
         if (currentWebinar.id) {
             // Update existing Webinar
-            axios.put(`http://localhost:5017/api/Webinars/${currentWebinar.id}`, currentWebinar)
+            //axios.put(`http://localhost:5017/api/Webinars/${currentWebinar.id}`, currentWebinar)
+            axios.put(`http://172.17.31.61:5017/api/webinars/${currentWebinar.id}`, currentWebinar)
                 .then(response => {
                     console.log(response)
                     //setWebinars([...Webinars, response.data]);
@@ -85,7 +88,8 @@ function WebinarList() {
 
         } else {
             // Add new Webinar
-            axios.post('http://localhost:5017/api/Webinars', currentWebinar)
+            //axios.post('http://localhost:5017/api/Webinars', currentWebinar)
+            axios.post('http://172.17.31.61:5017/api/webinars', currentWebinar)
                 .then(response => {
                     setWebinars([...Webinars, response.data]);
                 })

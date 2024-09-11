@@ -20,7 +20,8 @@ function DesignationList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5201/api/Designation')
+        //axios.get('http://localhost:5201/api/Designation')
+        axios.get('http://172.17.31.61:5201/api/designation')
             .then(response => {
                 setDesignations(response.data);
                 setLoading(false);
@@ -53,7 +54,8 @@ function DesignationList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5201/api/Designation/${id}`)
+        //axios.delete(`http://localhost:5201/api/Designation/${id}`)
+        axios.delete(`http://172.17.31.61:5201/api/designation/${id}`)
             .then(response => {
                 setDesignations(Designations.filter(tech => tech.id !== id));
             })
@@ -66,7 +68,8 @@ function DesignationList() {
     const handleSave = () => {
         if (currentDesignation.id) {
             // Update existing Designation
-            axios.put(`http://localhost:5201/api/Designation/${currentDesignation.id}`, currentDesignation)
+            //axios.put(`http://localhost:5201/api/Designation/${currentDesignation.id}`, currentDesignation)
+            axios.put(`http://172.17.31.61:5201/api/designation/${currentDesignation.id}`, currentDesignation)
                 .then(response => {
                     console.log(response)
                     //setDesignations([...Designations, response.data]);
@@ -80,7 +83,8 @@ function DesignationList() {
 
         } else {
             // Add new Designation
-            axios.post('http://localhost:5201/api/Designation', currentDesignation)
+            //axios.post('http://localhost:5201/api/Designation', currentDesignation)
+            axios.post('http://172.17.31.61:5201/api/designation', currentDesignation)
                 .then(response => {
                     setDesignations([...Designations, response.data]);
                 })

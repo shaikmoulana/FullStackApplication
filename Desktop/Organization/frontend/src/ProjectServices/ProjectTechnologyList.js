@@ -19,7 +19,8 @@ function ProjectTechnologyList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5151/api/ProjectTechnology')
+        //axios.get('http://localhost:5151/api/ProjectTechnology')
+        axios.get('http://172.17.31.61:5151/api/projectTechnology')
             .then(response => {
                 setProjectTechnologys(response.data);
                 setLoading(false);
@@ -52,7 +53,8 @@ function ProjectTechnologyList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5151/api/ProjectTechnology/${id}`)
+        //axios.delete(`http://localhost:5151/api/ProjectTechnology/${id}`)
+        axios.delete(`http://172.17.31.61:5151/api/projectTechnology/${id}`)
             .then(response => {
                 setProjectTechnologys(ProjectTechnologys.filter(tech => tech.id !== id));
             })
@@ -65,7 +67,8 @@ function ProjectTechnologyList() {
     const handleSave = () => {
         if (currentProjectTechnology.id) {
             // Update existing ProjectTechnology
-            axios.put(`http://localhost:5151/api/ProjectTechnology/${currentProjectTechnology.id}`, currentProjectTechnology)
+            //axios.put(`http://localhost:5151/api/ProjectTechnology/${currentProjectTechnology.id}`, currentProjectTechnology)
+            axios.put(`http://172.17.31.61:5151/api/projectTechnology/${currentProjectTechnology.id}`, currentProjectTechnology)
                 .then(response => {
                     console.log(response)
                     //setProjectTechnologys([...ProjectTechnologys, response.data]);
@@ -79,7 +82,8 @@ function ProjectTechnologyList() {
 
         } else {
             // Add new ProjectTechnology
-            axios.post('http://localhost:5151/api/ProjectTechnology', currentProjectTechnology)
+            //axios.post('http://localhost:5151/api/ProjectTechnology', currentProjectTechnology)
+            axios.post('http://172.17.31.61:5151/api/projectTechnology', currentProjectTechnology)
                 .then(response => {
                     setProjectTechnologys([...ProjectTechnologys, response.data]);
                 })
@@ -117,7 +121,7 @@ function ProjectTechnologyList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Id</TableCell>
+                            {/* <TableCell>Id</TableCell> */}
                             <TableCell>Project</TableCell>
                             <TableCell>Technology</TableCell>
                             <TableCell>Is Active</TableCell>
@@ -131,7 +135,7 @@ function ProjectTechnologyList() {
                     <TableBody>
                         {ProjectTechnologys.map(ProjectTechnology => (
                             <TableRow key={ProjectTechnology.id}>
-                                <TableCell>{ProjectTechnology.id}</TableCell>
+                                {/* <TableCell>{ProjectTechnology.id}</TableCell> */}
                                 <TableCell>{ProjectTechnology.project}</TableCell>
                                 <TableCell>{ProjectTechnology.technology}</TableCell>
                                 <TableCell>{ProjectTechnology.isActive ? 'Active' : 'Inactive'}</TableCell>

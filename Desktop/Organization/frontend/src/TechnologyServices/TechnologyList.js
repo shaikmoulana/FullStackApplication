@@ -33,7 +33,8 @@ function TechnologyList() {
     useEffect(() => {
         const fetchTechnologies = async () => {
             try {
-                const techResponse = await axios.get('http://localhost:5274/api/Technology');
+                //const techResponse = await axios.get('http://localhost:5274/api/Technology');
+                const techResponse = await axios.get('http://172.17.31.61:5274/api/technology');
                 setTechnologies(techResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the technologies!', error);
@@ -44,7 +45,8 @@ function TechnologyList() {
 
         const fetchDepartments = async () => {
             try {
-                const deptResponse = await axios.get('http://localhost:5160/api/Department');
+                //const deptResponse = await axios.get('http://localhost:5160/api/Department');
+                const deptResponse = await axios.get('http://172.17.31.61:5160/api/department');
                 setDepartments(deptResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the departments!', error);
@@ -98,7 +100,8 @@ function TechnologyList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5274/api/Technology/${id}`)
+        //axios.delete(`http://localhost:5274/api/Technology/${id}`)
+        axios.delete(`http://172.17.31.61:5274/api/technology/${id}`)
             .then(response => {
                 setTechnologies(technologies.filter(tech => tech.id !== id));
             })
@@ -111,7 +114,8 @@ function TechnologyList() {
 
     const handleSave = () => {
         if (currentTechnology.id) {
-            axios.put(`http://localhost:5274/api/Technology/${currentTechnology.id}`, currentTechnology)
+            //axios.put(`http://localhost:5274/api/Technology/${currentTechnology.id}`, currentTechnology)
+            axios.put(`http://172.17.31.61:5274/api/technology/${currentTechnology.id}`, currentTechnology)
                 .then(response => {
                     setTechnologies(technologies.map(tech => tech.id === currentTechnology.id ? response.data : tech));
                 })
@@ -120,7 +124,8 @@ function TechnologyList() {
                     setError(error);
                 });
         } else {
-            axios.post('http://localhost:5274/api/Technology', currentTechnology)
+            //axios.post('http://localhost:5274/api/Technology', currentTechnology)
+            axios.post('http://172.17.31.61:5274/api/technology', currentTechnology)
                 .then(response => {
                     setTechnologies([...technologies, response.data]);
                 })

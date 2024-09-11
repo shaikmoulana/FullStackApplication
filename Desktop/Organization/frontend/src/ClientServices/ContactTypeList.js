@@ -18,7 +18,8 @@ function ContactTypeList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5142/api/ContactType')
+        //axios.get('http://localhost:5142/api/ContactType')
+        axios.get('http://172.17.31.61:5142/api/contactType')
             .then(response => {
                 setcontactTypes(response.data);
                 setLoading(false);
@@ -50,7 +51,8 @@ function ContactTypeList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5142/api/ContactType/${id}`)
+        //axios.delete(`http://localhost:5142/api/ContactType/${id}`)
+        axios.delete(`http://172.17.31.61:5142/api/contactType/${id}`)
             .then(response => {
                 setcontactTypes(contactTypes.filter(tech => tech.id !== id));
             })
@@ -63,7 +65,8 @@ function ContactTypeList() {
     const handleSave = () => {
         if (currentContactType.id) {
             // Update existing ContactType
-            axios.put(`http://localhost:5142/api/ContactType/${currentContactType.id}`, currentContactType)
+            //axios.put(`http://localhost:5142/api/ContactType/${currentContactType.id}`, currentContactType)
+            axios.put(`http://172.17.31.61:5142/api/contactType/${currentContactType.id}`, currentContactType)
                 .then(response => {
                     console.log(response)
                     //setcontactTypes([...contactTypes, response.data]);
@@ -77,7 +80,8 @@ function ContactTypeList() {
 
         } else {
             // Add new ContactType
-            axios.post('http://localhost:5142/api/ContactType', currentContactType)
+            //axios.post('http://localhost:5142/api/ContactType', currentContactType)
+            axios.post('http://172.17.31.61:5142/api/contactType', currentContactType)
                 .then(response => {
                     setcontactTypes([...contactTypes, response.data]);
                 })
@@ -115,7 +119,7 @@ function ContactTypeList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Id</TableCell>
+                            {/* <TableCell>Id</TableCell> */}
                             <TableCell>TypeName</TableCell>
                             <TableCell>Is Active</TableCell>
                             <TableCell>Created By</TableCell>
@@ -128,7 +132,7 @@ function ContactTypeList() {
                     <TableBody>
                         {contactTypes.map(ContactType => (
                             <TableRow key={ContactType.id}>
-                                <TableCell>{ContactType.id}</TableCell>
+                                {/* <TableCell>{ContactType.id}</TableCell> */}
                                 <TableCell>{ContactType.typeName}</TableCell>
                                 <TableCell>{ContactType.isActive ? 'Active' : 'Inactive'}</TableCell>
                                 <TableCell>{ContactType.createdBy}</TableCell>

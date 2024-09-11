@@ -23,7 +23,8 @@ function SOWList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5041/api/SOW')
+        //axios.get('http://localhost:5041/api/SOW')
+        axios.get('http://172.17.31.61:5041/api/sow')
             .then(response => {
                 setSOWs(response.data);
                 setLoading(false);
@@ -60,7 +61,8 @@ function SOWList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5041/api/SOW/${id}`)
+        //axios.delete(`http://localhost:5041/api/SOW/${id}`)
+        axios.delete(`http://172.17.31.61:5041/api/sow/${id}`)
             .then(response => {
                 setSOWs(SOWs.filter(tech => tech.id !== id));
             })
@@ -73,7 +75,8 @@ function SOWList() {
     const handleSave = () => {
         if (currentSOW.id) {
             // Update existing SOW
-            axios.put(`http://localhost:5041/api/SOW/${currentSOW.id}`, currentSOW)
+            //axios.put(`http://localhost:5041/api/SOW/${currentSOW.id}`, currentSOW)
+            axios.put(`http://172.17.31.61:5041/api/sow/${currentSOW.id}`, currentSOW)
                 .then(response => {
                     console.log(response)
                     //setSOWs([...SOWs, response.data]);
@@ -87,7 +90,8 @@ function SOWList() {
 
         } else {
             // Add new SOW
-            axios.post('http://localhost:5041/api/SOW', currentSOW)
+            //axios.post('http://localhost:5041/api/SOW', currentSOW)
+            axios.post('http://172.17.31.61:5041/api/sow', currentSOW)
                 .then(response => {
                     setSOWs([...SOWs, response.data]);
                 })
@@ -125,7 +129,7 @@ function SOWList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Id</TableCell>
+                            {/* <TableCell>Id</TableCell> */}
                             <TableCell>Client</TableCell>
                             <TableCell>Project</TableCell>
                             <TableCell>preparedDate</TableCell>
@@ -143,7 +147,7 @@ function SOWList() {
                     <TableBody>
                         {SOWs.map(SOW => (
                             <TableRow key={SOW.id}>
-                                <TableCell>{SOW.id}</TableCell>
+                                {/* <TableCell>{SOW.id}</TableCell> */}
                                 <TableCell>{SOW.client}</TableCell>
                                 <TableCell>{SOW.project}</TableCell>
                                 <TableCell>{SOW.preparedDate}</TableCell>

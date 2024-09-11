@@ -24,7 +24,8 @@ function ClientList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5142/api/Client')
+        //axios.get('http://localhost:5142/api/Client')
+        axios.get('http://172.17.31.61:5142/api/client')
             .then(response => {
                 setClients(response.data);
                 setLoading(false);
@@ -62,7 +63,8 @@ function ClientList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5142/api/Client/${id}`)
+        //axios.delete(`http://localhost:5142/api/Client/${id}`)
+        axios.delete(`http://172.17.31.61:5142/api/client/${id}`)
             .then(response => {
                 setClients(Clients.filter(tech => tech.id !== id));
             })
@@ -75,7 +77,8 @@ function ClientList() {
     const handleSave = () => {
         if (currentClient.id) {
             // Update existing Client
-            axios.put(`http://localhost:5142/api/Client/${currentClient.id}`, currentClient)
+            //axios.put(`http://localhost:5142/api/Client/${currentClient.id}`, currentClient)
+            axios.put(`http://172.17.31.61:5142/api/client/${currentClient.id}`, currentClient)
                 .then(response => {
                     console.log(response)
                     //setClients([...Clients, response.data]);
@@ -89,7 +92,8 @@ function ClientList() {
 
         } else {
             // Add new Client
-            axios.post('http://localhost:5142/api/Client', currentClient)
+            //axios.post('http://localhost:5142/api/Client', currentClient)
+            axios.post('http://172.17.31.61:5142/api/client', currentClient)
                 .then(response => {
                     setClients([...Clients, response.data]);
                 })
@@ -127,7 +131,7 @@ function ClientList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
+                            {/* <TableCell>ID</TableCell> */}
                             <TableCell>Name</TableCell>
                             <TableCell>LineofBusiness</TableCell>
                             <TableCell>SalesEmployee</TableCell>
@@ -146,7 +150,7 @@ function ClientList() {
                     <TableBody>
                         {Clients.map(Client => (
                             <TableRow key={Client.id}>
-                                <TableCell>{Client.id}</TableCell>
+                                {/* <TableCell>{Client.id}</TableCell> */}
                                 <TableCell>{Client.name}</TableCell>
                                 <TableCell>{Client.lineofBusiness}</TableCell>
                                 <TableCell>{Client.salesEmployee}</TableCell>
