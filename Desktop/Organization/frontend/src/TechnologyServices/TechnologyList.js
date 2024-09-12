@@ -276,7 +276,7 @@ function TechnologyList() {
                                 <TableCell>{technology.isActive ? 'Yes' : 'No'}</TableCell>
                                 <TableCell>{technology.createdBy}</TableCell>
                                 <TableCell>{new Date(technology.createdDate).toLocaleDateString()}</TableCell>
-                                <TableCell>{technology.updatedBy}</TableCell>
+                                <TableCell>{technology.updatedBy || 'N/A'}</TableCell>
                                 <TableCell>{new Date(technology.updatedDate).toLocaleDateString()}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(technology)}>

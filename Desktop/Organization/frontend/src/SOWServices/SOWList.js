@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
+import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
 
 function SOWList() {
     const [SOWs, setSOWs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteTechId, setDeleteTechId] = useState(null);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentSOW, setCurrentSOW] = useState({
         id: '',
         client: '',
@@ -21,6 +29,10 @@ function SOWList() {
         updatedBy: '',
         updatedDate: ''
     });
+    const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
+    const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
+    const [searchQuery, setSearchQuery] = useState(''); // State for search query
+
 
     useEffect(() => {
         //axios.get('http://localhost:5041/api/SOW')
@@ -35,6 +47,30 @@ function SOWList() {
                 setLoading(false);
             });
     }, []);
+
+    const handleSort = (property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const sortedSOWs = [...SOWs].sort((a, b) => {
+        const valueA = a[orderBy] || '';
+        const valueB = b[orderBy] || '';
+
+        if (typeof valueA === 'string' && typeof valueB === 'string') {
+            return order === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+        } else {
+            return order === 'asc' ? (valueA > valueB ? 1 : -1) : (valueB > valueA ? 1 : -1);
+        }
+    });
+
+    const filteredSOWs = sortedSOWs.filter((SOW) =>
+        SOW.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        SOW.project.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        SOW.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        SOW.comments.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const handleAdd = () => {
         setCurrentSOW({
@@ -109,6 +145,28 @@ function SOWList() {
         setCurrentSOW({ ...currentSOW, [name]: value });
     };
 
+    const handlePageChange = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleRowsPerPageChange = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const confirmDelete = (id) => {
+        setDeleteTechId(id);
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmClose = () => {
+        setConfirmOpen(false);
+    };
+
+    const handleConfirmYes = () => {
+        handleDelete(deleteTechId);
+    };
+
     if (loading) {
         return <p>Loading...</p>;
     }
@@ -123,29 +181,132 @@ function SOWList() {
                 <h3>SOW Table List</h3>
             </div>
             <div style={{ display: 'flex', marginBottom: '20px' }}>
+                <TextField
+                    label="Search"
+                    variant="outlined"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton edge="end">
+                                    <SearchIcon />
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                    style={{ marginRight: '20px', width: '90%' }}
+                />
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add SOW</Button>
             </div>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            {/* <TableCell>Id</TableCell> */}
-                            <TableCell>Client</TableCell>
-                            <TableCell>Project</TableCell>
-                            <TableCell>preparedDate</TableCell>
-                            <TableCell>SubmittedDate</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell>Comments</TableCell>
-                            <TableCell>Is Active</TableCell>
-                            <TableCell>Created By</TableCell>
-                            <TableCell>Created Date</TableCell>
-                            <TableCell>Updated By</TableCell>
-                            <TableCell>Updated Date</TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'client'}
+                                    direction={orderBy === 'client' ? order : 'asc'}
+                                    onClick={() => handleSort('client')}
+                                >
+                                    Client
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'project'}
+                                    direction={orderBy === 'project' ? order : 'asc'}
+                                    onClick={() => handleSort('project')}
+                                >
+                                    Project
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'preparedDate'}
+                                    direction={orderBy === 'preparedDate' ? order : 'asc'}
+                                    onClick={() => handleSort('preparedDate')}
+                                >
+                                    PreparedDate
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'submittedDate'}
+                                    direction={orderBy === 'submittedDate' ? order : 'asc'}
+                                    onClick={() => handleSort('submittedDate')}
+                                >
+                                    SubmittedDate
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'status'}
+                                    direction={orderBy === 'status' ? order : 'asc'}
+                                    onClick={() => handleSort('status')}
+                                >
+                                    Status
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'comments'}
+                                    direction={orderBy === 'comments' ? order : 'asc'}
+                                    onClick={() => handleSort('comments')}
+                                >
+                                    Comments
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'isActive'}
+                                    direction={orderBy === 'isActive' ? order : 'asc'}
+                                    onClick={() => handleSort('isActive')}
+                                >
+                                    Is Active
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'createdBy'}
+                                    direction={orderBy === 'createdBy' ? order : 'asc'}
+                                    onClick={() => handleSort('createdBy')}
+                                >
+                                    Created By
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'createdDate'}
+                                    direction={orderBy === 'createdDate' ? order : 'asc'}
+                                    onClick={() => handleSort('createdDate')}
+                                >
+                                    Created Date
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'updatedBy'}
+                                    direction={orderBy === 'updatedBy' ? order : 'asc'}
+                                    onClick={() => handleSort('updatedBy')}
+                                >
+                                    Updated By
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'updatedDate'}
+                                    direction={orderBy === 'updatedDate' ? order : 'asc'}
+                                    onClick={() => handleSort('updatedDate')}
+                                >
+                                    Updated Date
+                                </TableSortLabel>
+                            </TableCell>
                             <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {SOWs.map(SOW => (
+                        {filteredSOWs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((SOW) => (
                             <TableRow key={SOW.id}>
                                 {/* <TableCell>{SOW.id}</TableCell> */}
                                 <TableCell>{SOW.client}</TableCell>
@@ -159,14 +320,25 @@ function SOWList() {
                                 <TableCell>{new Date(SOW.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{SOW.updatedBy || 'N/A'}</TableCell>
                                 <TableCell>{SOW.updatedDate ? new Date(SOW.updatedDate).toLocaleString() : 'N/A'}</TableCell>
-                                <TableCell>
-                                    <Button variant="contained" color="secondary" onClick={() => handleUpdate(SOW)}>Update</Button>
-                                    <Button variant="contained" color="error" onClick={() => handleDelete(SOW.id)}>Delete</Button>
+                                <TableCell >
+                                    <IconButton onClick={() => handleUpdate(SOW)}>
+                                        <EditIcon color="primary" />
+                                    </IconButton>
+                                    <IconButton onClick={() => confirmDelete(SOW.id)}>
+                                        <DeleteIcon color="error" />
+                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
+                <PaginationComponent
+                    count={filteredSOWs.length}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    handlePageChange={handlePageChange}
+                    handleRowsPerPageChange={handleRowsPerPageChange}
+                />
             </TableContainer>
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{currentSOW.id ? 'Update SOW' : 'Add SOW'}</DialogTitle>
@@ -188,12 +360,12 @@ function SOWList() {
                         fullWidth
                     />
                     <TextField
-                            margin="dense"
-                            label="PreparedDate"
-                            name="preparedDate"
-                            value={currentSOW.preparedDate}
-                            onChange={handleChange}
-                            fullWidth
+                        margin="dense"
+                        label="PreparedDate"
+                        name="preparedDate"
+                        value={currentSOW.preparedDate}
+                        onChange={handleChange}
+                        fullWidth
                     />
                     <TextField
                         margin="dense"
@@ -261,12 +433,21 @@ function SOWList() {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)} color="primary">
-                        Cancel
-                    </Button>
+                    <Button onClick={() => setOpen(false)}>Cancel</Button>
                     <Button onClick={handleSave} color="primary">
-                        Save
+                        {currentSOW.id ? 'Update' : 'Save'}
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={confirmOpen} onClose={handleConfirmClose}>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to delete this SOW?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleConfirmClose}>No</Button>
+                    <Button onClick={handleConfirmYes} color="error">Yes</Button>
                 </DialogActions>
             </Dialog>
         </div>

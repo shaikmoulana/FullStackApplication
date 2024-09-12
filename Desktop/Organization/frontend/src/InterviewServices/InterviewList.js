@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
+import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
 
 function InterviewList() {
     const [Interviews, setInterviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteTechId, setDeleteTechId] = useState(null);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentInterview, setCurrentInterview] = useState({
         id: '',
         sowRequirement: '',
@@ -23,6 +31,10 @@ function InterviewList() {
         updatedDate: ''
     });
 
+    const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
+    const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
+    const [searchQuery, setSearchQuery] = useState(''); // State for search query
+
     useEffect(() => {
         //axios.get('http://localhost:5200/api/Interview')
         axios.get('http://172.17.31.61:5200/api/interview')
@@ -37,6 +49,29 @@ function InterviewList() {
             });
     }, []);
 
+    const handleSort = (property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const sortedInterviews = [...Interviews].sort((a, b) => {
+        const valueA = a[orderBy] || '';
+        const valueB = b[orderBy] || '';
+
+        if (typeof valueA === 'string' && typeof valueB === 'string') {
+            return order === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+        } else {
+            return order === 'asc' ? (valueA > valueB ? 1 : -1) : (valueB > valueA ? 1 : -1);
+        }
+    });
+
+    const filteredInterviews = sortedInterviews.filter((Interviews) =>
+        Interviews.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        Interviews.sowRequirement.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        Interviews.recruiter.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        Interviews.status.toLowerCase().includes(searchQuery.toLowerCase())
+    );
     const handleAdd = () => {
         setCurrentInterview({
             id: '',
@@ -111,6 +146,28 @@ function InterviewList() {
         setCurrentInterview({ ...currentInterview, [name]: value });
     };
 
+    const handlePageChange = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleRowsPerPageChange = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const confirmDelete = (id) => {
+        setDeleteTechId(id);
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmClose = () => {
+        setConfirmOpen(false);
+    };
+
+    const handleConfirmYes = () => {
+        handleDelete(deleteTechId);
+    };
+
     if (loading) {
         return <p>Loading...</p>;
     }
@@ -125,30 +182,141 @@ function InterviewList() {
                 <h3>Interview Table List</h3>
             </div>
             <div style={{ display: 'flex', marginBottom: '20px' }}>
+                <TextField
+                    label="Search"
+                    variant="outlined"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton edge="end">
+                                    <SearchIcon />
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                    style={{ marginRight: '20px', width: '90%' }}
+                />
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add Interview</Button>
             </div>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            {/* <TableCell>ID</TableCell> */}
-                            <TableCell>SOWRequirement</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>InterviewDate</TableCell>
-                            <TableCell>YearsOfExperience</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell>On_Boarding</TableCell>
-                            <TableCell>Recuriter</TableCell>
-                            <TableCell>Is Active</TableCell>
-                            <TableCell>Created By</TableCell>
-                            <TableCell>Created Date</TableCell>
-                            <TableCell>Updated By</TableCell>
-                            <TableCell>Updated Date</TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'sowRequirement'}
+                                    direction={orderBy === 'sowRequirement' ? order : 'asc'}
+                                    onClick={() => handleSort('sowRequirement')}
+                                >
+                                    SOWRequirement
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'name'}
+                                    direction={orderBy === 'name' ? order : 'asc'}
+                                    onClick={() => handleSort('name')}
+                                >
+                                    Name
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'interviewDate'}
+                                    direction={orderBy === 'interviewDate' ? order : 'asc'}
+                                    onClick={() => handleSort('interviewDate')}
+                                >
+                                    InterviewDate
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'yearsOfExperience'}
+                                    direction={orderBy === 'yearsOfExperience' ? order : 'asc'}
+                                    onClick={() => handleSort('yearsOfExperience')}
+                                >
+                                    YearsOfExperience
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'status'}
+                                    direction={orderBy === 'status' ? order : 'asc'}
+                                    onClick={() => handleSort('status')}
+                                >
+                                    Status
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'on_Boarding'}
+                                    direction={orderBy === 'on_Boarding' ? order : 'asc'}
+                                    onClick={() => handleSort('on_Boarding')}
+                                >
+                                    On_Boarding
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'recuriter'}
+                                    direction={orderBy === 'recuriter' ? order : 'asc'}
+                                    onClick={() => handleSort('recuriter')}
+                                >
+                                    Recuriter
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'isActive'}
+                                    direction={orderBy === 'isActive' ? order : 'asc'}
+                                    onClick={() => handleSort('isActive')}
+                                >
+                                    Is Active
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'createdBy'}
+                                    direction={orderBy === 'createdBy' ? order : 'asc'}
+                                    onClick={() => handleSort('createdBy')}
+                                >
+                                    Created By
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'createdDate'}
+                                    direction={orderBy === 'createdDate' ? order : 'asc'}
+                                    onClick={() => handleSort('createdDate')}
+                                >
+                                    Created Date
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'updatedBy'}
+                                    direction={orderBy === 'updatedBy' ? order : 'asc'}
+                                    onClick={() => handleSort('updatedBy')}
+                                >
+                                    Updated By
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'updatedDate'}
+                                    direction={orderBy === 'updatedDate' ? order : 'asc'}
+                                    onClick={() => handleSort('updatedDate')}
+                                >
+                                    Updated Date
+                                </TableSortLabel>
+                            </TableCell>
                             <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {Interviews.map(Interview => (
+                        {filteredInterviews.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Interview) => (
                             <TableRow key={Interview.id}>
                                 {/* <TableCell>{Interview.id}</TableCell> */}
                                 <TableCell>{Interview.sowRequirement}</TableCell>
@@ -163,14 +331,25 @@ function InterviewList() {
                                 <TableCell>{new Date(Interview.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{Interview.updatedBy || 'N/A'}</TableCell>
                                 <TableCell>{Interview.updatedDate ? new Date(Interview.updatedDate).toLocaleString() : 'N/A'}</TableCell>
-                                <TableCell>
-                                    <Button variant="contained" color="secondary" onClick={() => handleUpdate(Interview)}>Update</Button>
-                                    <Button variant="contained" color="error" onClick={() => handleDelete(Interview.id)}>Delete</Button>
+                                <TableCell >
+                                    <IconButton onClick={() => handleUpdate(Interview)}>
+                                        <EditIcon color="primary" />
+                                    </IconButton>
+                                    <IconButton onClick={() => confirmDelete(Interview.id)}>
+                                        <DeleteIcon color="error" />
+                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
+                <PaginationComponent
+                    count={filteredInterviews.length}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    handlePageChange={handlePageChange}
+                    handleRowsPerPageChange={handleRowsPerPageChange}
+                />
             </TableContainer>
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{currentInterview.id ? 'Update Interview' : 'Add Interview'}</DialogTitle>
@@ -275,12 +454,21 @@ function InterviewList() {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)} color="primary">
-                        Cancel
-                    </Button>
+                    <Button onClick={() => setOpen(false)}>Cancel</Button>
                     <Button onClick={handleSave} color="primary">
-                        Save
+                        {currentInterview.id ? 'Update' : 'Save'}
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={confirmOpen} onClose={handleConfirmClose}>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to delete this Interview?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleConfirmClose}>No</Button>
+                    <Button onClick={handleConfirmYes} color="error">Yes</Button>
                 </DialogActions>
             </Dialog>
         </div>
