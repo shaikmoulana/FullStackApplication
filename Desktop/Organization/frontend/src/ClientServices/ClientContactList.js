@@ -8,6 +8,7 @@ import PaginationComponent from '../Components/PaginationComponent'; // Import y
 
 function ClientContactList() {
     const [ClientContact, setClientContact] = useState([]);
+    const [Client, setClient] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -44,6 +45,35 @@ function ClientContactList() {
                 setLoading(false);
             });
     }, []);
+
+    // useEffect(() => {
+    //     const fetchCliebtContacts = async () => {
+    //         try {
+    //             //const techResponse = await axios.get('http://localhost:5274/api/Technology');
+    //             const clientContactResponse = await axios.get('http://172.17.31.61:5274/api/technology');
+    //             setClientContact(clientContactResponse.data);
+    //         } catch (error) {
+    //             console.error('There was an error fetching the technologies!', error);
+    //             setError(error);
+    //         }
+    //         setLoading(false);
+    //     };
+
+    //     const fetchDepartments = async () => {
+    //         try {
+    //             //const deptResponse = await axios.get('http://localhost:5160/api/Department');
+    //             const deptResponse = await axios.get('http://172.17.31.61:5160/api/department');
+    //             setDepartments(deptResponse.data);
+    //         } catch (error) {
+    //             console.error('There was an error fetching the departments!', error);
+    //             setError(error);
+    //         }
+    //     };
+
+    //     fetchTechnologies();
+    //     fetchDepartments();
+    // }, []);
+
 
     const handleSort = (property) => {
         const isAsc = orderBy === property && order === 'asc';

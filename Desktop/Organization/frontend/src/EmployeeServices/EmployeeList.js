@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, InputLabel, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
+import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
 
 function EmployeeList() {
     const [Employees, setEmployees] = useState([]);
+    const [departments, setDepartments] = useState([]);
+    const [designations, setDesignations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
-    const [departments, setDepartments] = useState([]);
-    const [designations, setDesignations] = useState([]);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteTechId, setDeleteTechId] = useState(null);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentEmployee, setCurrentEmployee] = useState({
         id: '',
         name: '',
@@ -29,6 +37,10 @@ function EmployeeList() {
         profile: '',
         phoneNo: ''
     });
+
+    const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
+    const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
+    const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
         const fetchEmployees = async () => {
@@ -69,6 +81,35 @@ function EmployeeList() {
         fetchDesignations();
     }, []);
 
+    const handleSort = (property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const sortedEmployees = [...Employees].sort((a, b) => {
+        const valueA = a[orderBy] || '';
+        const valueB = b[orderBy] || '';
+
+        if (typeof valueA === 'string' && typeof valueB === 'string') {
+            return order === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+        } else {
+            return order === 'asc' ? (valueA > valueB ? 1 : -1) : (valueB > valueA ? 1 : -1);
+        }
+    });
+
+    const filteredEmployees = sortedEmployees.filter((employee) =>
+    (employee.name && employee.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (employee.designation && employee.designation.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (employee.employeeID && employee.employeeID.toString().toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (employee.emailId && employee.emailId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (employee.department && employee.department.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (employee.reportingTo && employee.reportingTo.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (employee.projection && employee.projection.toLowerCase().includes(searchQuery.toLowerCase()))
+);
+
+
+
     const handleAdd = () => {
         setCurrentEmployee({
             id: '',
@@ -88,7 +129,8 @@ function EmployeeList() {
             updatedDate: '',
             password: '',
             profile: '',
-            phoneNo: ''
+            phoneNo: '',
+            role: ''
         });
         setOpen(true);
     };
@@ -148,6 +190,28 @@ function EmployeeList() {
         setCurrentEmployee({ ...currentEmployee, [name]: value });
     };
 
+    const handlePageChange = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleRowsPerPageChange = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const confirmDelete = (id) => {
+        setDeleteTechId(id);
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmClose = () => {
+        setConfirmOpen(false);
+    };
+
+    const handleConfirmYes = () => {
+        handleDelete(deleteTechId);
+    };
+
     if (loading) {
         return <p>Loading...</p>;
     }
@@ -162,6 +226,22 @@ function EmployeeList() {
                 <h3>Employee Table List</h3>
             </div>
             <div style={{ display: 'flex', marginBottom: '20px' }}>
+                <TextField
+                    label="Search"
+                    variant="outlined"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton edge="end">
+                                    <SearchIcon />
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                    style={{ marginRight: '20px', width: '90%' }}
+                />
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add Employee</Button>
             </div>
             <TableContainer component={Paper}>
@@ -169,31 +249,156 @@ function EmployeeList() {
                     <TableHead>
                         <TableRow>
                             {/* <TableCell>ID</TableCell> */}
-                            <TableCell>Name</TableCell>
-                            <TableCell>Designation</TableCell>
-                            <TableCell>EmployeeId</TableCell>
-                            <TableCell>EmailId</TableCell>
-                            <TableCell>Department</TableCell>
-                            <TableCell>ReportingTo</TableCell>
-                            <TableCell>JoiningDate</TableCell>
-                            <TableCell>RelievingDate</TableCell>
-                            <TableCell>Projection</TableCell>
-                            <TableCell>Is Active</TableCell>
-                            <TableCell>Created By</TableCell>
-                            <TableCell>Created Date</TableCell>
-                            <TableCell>Updated By</TableCell>
-                            <TableCell>Updated Date</TableCell>
-                            {/* <TableCell>Password</TableCell> */}
-                            <TableCell>PhoneNo</TableCell>
-                            <TableCell>Profile</TableCell>
-
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'name'}
+                                    direction={orderBy === 'name' ? order : 'asc'}
+                                    onClick={() => handleSort('name')}
+                                >
+                                    Name
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'designation'}
+                                    direction={orderBy === 'designation' ? order : 'asc'}
+                                    onClick={() => handleSort('designation')}
+                                >
+                                    Designation
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'employeeId'}
+                                    direction={orderBy === 'employeeId' ? order : 'asc'}
+                                    onClick={() => handleSort('employeeId')}
+                                >
+                                    EmployeeId
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'emailId'}
+                                    direction={orderBy === 'emailId' ? order : 'asc'}
+                                    onClick={() => handleSort('emailId')}
+                                >
+                                    EmailId
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'department'}
+                                    direction={orderBy === 'department' ? order : 'asc'}
+                                    onClick={() => handleSort('department')}
+                                >
+                                    Department
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'reportingTo'}
+                                    direction={orderBy === 'reportingTo' ? order : 'asc'}
+                                    onClick={() => handleSort('reportingTo')}
+                                >
+                                    ReportingTo
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'joiningDate'}
+                                    direction={orderBy === 'joiningDate' ? order : 'asc'}
+                                    onClick={() => handleSort('joiningDate')}
+                                >
+                                    JoiningDate
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'relievingDate'}
+                                    direction={orderBy === 'relievingDate' ? order : 'asc'}
+                                    onClick={() => handleSort('relievingDate')}
+                                >
+                                    RelievingDate
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'projection'}
+                                    direction={orderBy === 'projection' ? order : 'asc'}
+                                    onClick={() => handleSort('projection')}
+                                >
+                                    Projection
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'phoneNo'}
+                                    direction={orderBy === 'phoneNo' ? order : 'asc'}
+                                    onClick={() => handleSort('phoneNo')}
+                                >
+                                    PhoneNo
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'profile'}
+                                    direction={orderBy === 'profile' ? order : 'asc'}
+                                    onClick={() => handleSort('profile')}
+                                >
+                                    Profile
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'isActive'}
+                                    direction={orderBy === 'isActive' ? order : 'asc'}
+                                    onClick={() => handleSort('isActive')}
+                                >
+                                    Is Active
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'createdBy'}
+                                    direction={orderBy === 'createdBy' ? order : 'asc'}
+                                    onClick={() => handleSort('createdBy')}
+                                >
+                                    Created By
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'createdDate'}
+                                    direction={orderBy === 'createdDate' ? order : 'asc'}
+                                    onClick={() => handleSort('createdDate')}
+                                >
+                                    Created Date
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'updatedBy'}
+                                    direction={orderBy === 'updatedBy' ? order : 'asc'}
+                                    onClick={() => handleSort('updatedBy')}
+                                >
+                                    Updated By
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'updatedDate'}
+                                    direction={orderBy === 'updatedDate' ? order : 'asc'}
+                                    onClick={() => handleSort('updatedDate')}
+                                >
+                                    Updated Date
+                                </TableSortLabel>
+                            </TableCell>
                             <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {Employees.map(Employee => (
+                        {filteredEmployees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Employee) => (
                             <TableRow key={Employee.id}>
-                                {/* <TableCell>{Employee.id}</TableCell> */}
                                 <TableCell>{Employee.name}</TableCell>
                                 <TableCell>{Employee.designation}</TableCell>
                                 <TableCell>{Employee.employeeID}</TableCell>
@@ -203,22 +408,33 @@ function EmployeeList() {
                                 <TableCell>{Employee.joiningDate}</TableCell>
                                 <TableCell>{Employee.relievingDate}</TableCell>
                                 <TableCell>{Employee.projection}</TableCell>
+                                <TableCell>{Employee.phoneNo}</TableCell>
+                                <TableCell>{Employee.profile}</TableCell>
                                 <TableCell>{Employee.isActive ? 'Active' : 'Inactive'}</TableCell>
                                 <TableCell>{Employee.createdBy}</TableCell>
                                 <TableCell>{new Date(Employee.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{Employee.updatedBy || 'N/A'}</TableCell>
                                 <TableCell>{Employee.updatedDate ? new Date(Employee.updatedDate).toLocaleString() : 'N/A'}</TableCell>
                                 {/* <TableCell>{Employee.password}</TableCell> */}
-                                <TableCell>{Employee.phoneNo}</TableCell>
-                                <TableCell>{Employee.profile}</TableCell>
-                                <TableCell>
-                                    <Button variant="contained" color="secondary" onClick={() => handleUpdate(Employee)}>Update</Button>
-                                    <Button variant="contained" color="error" onClick={() => handleDelete(Employee.id)}>Delete</Button>
+                                <TableCell >
+                                    <IconButton onClick={() => handleUpdate(Employee)}>
+                                        <EditIcon color="primary" />
+                                    </IconButton>
+                                    <IconButton onClick={() => confirmDelete(Employee.id)}>
+                                        <DeleteIcon color="error" />
+                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
+                <PaginationComponent
+                    count={filteredEmployees.length}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    handlePageChange={handlePageChange}
+                    handleRowsPerPageChange={handleRowsPerPageChange}
+                />
             </TableContainer>
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{currentEmployee.id ? 'Update Employee' : 'Add Employee'}</DialogTitle>
@@ -373,12 +589,21 @@ function EmployeeList() {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)} color="primary">
-                        Cancel
-                    </Button>
+                    <Button onClick={() => setOpen(false)}>Cancel</Button>
                     <Button onClick={handleSave} color="primary">
-                        Save
+                        {currentEmployee.id ? 'Update' : 'Save'}
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={confirmOpen} onClose={handleConfirmClose}>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to delete this technology?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleConfirmClose}>No</Button>
+                    <Button onClick={handleConfirmYes} color="error">Yes</Button>
                 </DialogActions>
             </Dialog>
         </div>

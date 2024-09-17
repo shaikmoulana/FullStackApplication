@@ -40,7 +40,7 @@ const drawerWidth = 240;
 
 export default function Home() {
   const [view, setView] = useState('home');
-  const [openEmployee, setOpenEmployee] = useState(false);
+  // const [openEmployee, setOpenEmployee] = useState(false);
   const [openClient, setOpenClient] = useState(false);
   const [openProject, setOpenProject] = useState(false);
   const [openInterview, setOpenInterview] = useState(false);
@@ -54,12 +54,13 @@ export default function Home() {
   };
 
   const handleListItemClick = (view) => {
-    if (view === 'employee') {
-      setOpenEmployee(!openEmployee);
-      setOpenClient(false); // Close client menu when employee menu is toggled
-    } else if (view === 'client') {
+    // if (view === 'employee') {
+    //   setOpenEmployee(!openEmployee);
+    //   setOpenClient(false); // Close client menu when employee menu is toggled
+    // }
+    if (view === 'client') {
       setOpenClient(!openClient);
-      setOpenEmployee(false); // Close employee menu when client menu is toggled
+      // setOpenProject(false); // Close employee menu when client menu is toggled
     } else if (view === 'project') {
       setOpenProject(!openProject);
       setOpenClient(false); // Close client menu when project menu is toggled
@@ -71,7 +72,7 @@ export default function Home() {
       //setOpenClient(false); // Close client menu when project menu is toggled
     } 
     else {
-      setOpenEmployee(false);
+      // setOpenEmployee(false);
       setOpenClient(false);
       setOpenProject(false);
       setOpenInterview(false);
@@ -121,7 +122,7 @@ export default function Home() {
         <Toolbar sx={{ bgcolor: 'black', color: 'white' }}>Dashboard</Toolbar>
         <Divider />
         <List>
-          {['Home', 'Department', 'Designation', 'Technology', 'Webinar', 'Blogs'].map((text) => (
+          {['Home', 'Department', 'Designation', 'Employee','Technology', 'Webinar', 'Blogs'].map((text) => (
             <ListItem key={text} disablePadding>
               <ListItemButton
                 onClick={() => handleListItemClick(text.toLowerCase())}
@@ -134,7 +135,7 @@ export default function Home() {
               </ListItemButton>
             </ListItem>
           ))}
-          <ListItem disablePadding>
+          {/* <ListItem disablePadding>
             <ListItemButton
               onClick={() => handleListItemClick('employee')}
               sx={{
@@ -155,7 +156,7 @@ export default function Home() {
                 <ListItemText primary="Employee Technology" />
               </ListItem>
             </List>
-          </Collapse>
+          </Collapse> */}
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => handleListItemClick('client')}
