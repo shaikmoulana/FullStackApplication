@@ -5,9 +5,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import '../App.css';
 
 function BlogsList() {
-    const [blogs, setblogs] = useState([]);
+    const [blogs, setBlogs] = useState([]);
+    const [Employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -16,37 +22,44 @@ function BlogsList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentBlogs, setCurrentBlogs] = useState({
-        id: '',
         title: '',
         author: '',
         status: '',
         targetDate: '',
         completedDate: '',
-        publishedDate: '',
-        isActive: true,
-        createdBy: 'SYSTEM',
-        createdDate: new Date(),
-        updatedBy: '',
-        updatedDate: ''
+        publishedDate: ''
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
-
     useEffect(() => {
-        //axios.get('http://localhost:5147/api/Blogs')
-        axios.get('http://172.17.31.61:5174/api/blogs')
-            .then(response => {
-                setblogs(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the blogs!', error);
+        const fetchBlogs = async () => {
+            try {
+                const blogResponse = await axios.get('http://localhost:5174/api/blogs');
+                //const blogResponse = await axios.get('http://172.17.31.61:5174/api/blogs');
+                setBlogs(blogResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the Blogs!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        const fetchAuthor = async () => {
+            try {
+                const authorResponse = await axios.get('http://localhost:5733/api/employee');
+                //const authorResponse = await axios.get('http://172.17.31.61:5633/api/employee');
+                setEmployees(authorResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the speakers!', error);
+                setError(error);
+            }
+        };
+
+        fetchBlogs();
+        fetchAuthor();
     }, []);
 
     const handleSort = (property) => {
@@ -67,25 +80,24 @@ function BlogsList() {
     });
 
     const filteredBlogs = sortedBlogs.filter((blog) =>
+        blog.title && typeof blog.title === 'string' &&
         blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+
+        blog.author && typeof blog.author === 'string' &&
         blog.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        blog.status.toLowerCase().includes(searchQuery.toLowerCase()) 
+
+        blog.status && typeof blog.status === 'string' &&
+        blog.status.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handleAdd = () => {
         setCurrentBlogs({
-            id: '',
             title: '',
             author: '',
             status: '',
             targetDate: '',
             completedDate: '',
-            publishedDate: '',
-            isActive: true,
-            createdBy: 'SYSTEM',
-            createdDate: new Date(),
-            updatedBy: '',
-            updatedDate: ''
+            publishedDate: ''
         });
         setOpen(true);
     };
@@ -97,27 +109,26 @@ function BlogsList() {
     };
 
     const handleDelete = (id) => {
-        //axios.delete(`http://localhost:5147/api/Blogs/${id}`)
-        axios.delete(`http://172.17.31.61:5174/api/blogs/${id}`)
+        axios.delete(`http://localhost:5147/api/Blogs/${id}`)
+            //axios.delete(`http://172.17.31.61:5174/api/blogs/${id}`)
             .then(response => {
-                setblogs(blogs.filter(tech => tech.id !== id));
+                setBlogs(blogs.filter(tech => tech.id !== id));
             })
             .catch(error => {
                 console.error('There was an error deleting the Blogs!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
         if (currentBlogs.id) {
-            // Update existing Blogs
-            //axios.put(`http://localhost:5147/api/Blogs/${currentBlogs.id}`, currentBlogs)
-            axios.put(`http://172.17.31.61:5174/api/blogs/${currentBlogs.id}`, currentBlogs)
+            axios.put(`http://localhost:5147/api/Blogs/${currentBlogs.id}`, currentBlogs)
+                //axios.put(`http://172.17.31.61:5174/api/blogs/${currentBlogs.id}`, currentBlogs)
                 .then(response => {
-                    console.log(response)
-                    //setblogs([...blogs, response.data]);
-                    // setblogs(response.data);
-                    setblogs(blogs.map(tech => tech.id === currentBlogs.id ? response.data : tech));
+                    //setBlogs([...blogs, response.data]);
+                    // setBlogs(response.data);
+                    setBlogs(blogs.map(tech => tech.id === currentBlogs.id ? response.data : tech));
                 })
                 .catch(error => {
                     console.error('There was an error updating the Blogs!', error);
@@ -126,10 +137,10 @@ function BlogsList() {
 
         } else {
             // Add new Blogs
-            //axios.post('http://localhost:5147/api/Blogs', currentBlogs)
-            axios.post('http://172.17.31.61:5174/api/blogs', currentBlogs)
+            axios.post('http://localhost:5147/api/Blogs', currentBlogs)
+                //axios.post('http://172.17.31.61:5174/api/blogs', currentBlogs)
                 .then(response => {
-                    setblogs([...blogs, response.data]);
+                    setBlogs([...blogs, response.data]);
                 })
                 .catch(error => {
                     console.error('There was an error adding the Blogs!', error);
@@ -165,6 +176,27 @@ function BlogsList() {
 
     const handleConfirmYes = () => {
         handleDelete(deleteTechId);
+    };
+
+    const handleTargetDateChange = (newDate) => {
+        setCurrentBlogs((prevBlogs) => ({
+            ...prevBlogs,
+            targetDate: newDate ? newDate.toISOString() : "",
+        }));
+    };
+
+    const handleCompletedDateChange = (newDate) => {
+        setCurrentBlogs((prevBlogs) => ({
+            ...prevBlogs,
+            completedDate: newDate ? newDate.toISOString() : "",
+        }));
+    };
+
+    const handlePublishedDateChange = (newDate) => {
+        setCurrentBlogs((prevBlogs) => ({
+            ...prevBlogs,
+            publishedDate: newDate ? newDate.toISOString() : "",
+        }));
     };
 
     if (loading) {
@@ -321,12 +353,12 @@ function BlogsList() {
                                 <TableCell>{Blogs.createdBy}</TableCell>
                                 <TableCell>{new Date(Blogs.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{Blogs.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{Blogs.updatedDate ? new Date(Blogs.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(Blogs.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
-                                    <IconButton onClick={() => handleUpdate(blogs)}>
+                                    <IconButton onClick={() => handleUpdate(Blogs)}>
                                         <EditIcon color="primary" />
                                     </IconButton>
-                                    <IconButton onClick={() => confirmDelete(blogs.id)}>
+                                    <IconButton onClick={() => confirmDelete(Blogs.id)}>
                                         <DeleteIcon color="error" />
                                     </IconButton>
                                 </TableCell>
@@ -354,14 +386,22 @@ function BlogsList() {
                         onChange={handleChange}
                         fullWidth
                     />
-                    <TextField
+                    <InputLabel>Author</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Author"
                         name="author"
-                        value={currentBlogs.author}
+                        label="Author"
+                        value={currentBlogs.employee}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {Employees.map((employee) => (
+                            <MenuItem key={employee.id} value={employee.name}>
+                                {employee.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+
                     <TextField
                         margin="dense"
                         label="Status"
@@ -370,70 +410,36 @@ function BlogsList() {
                         onChange={handleChange}
                         fullWidth
                     />
-                    <TextField
-                        margin="dense"
-                        label="TargetDate"
-                        name="targetDate"
-                        value={currentBlogs.targetDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="CompletedDate"
-                        name="completedDate"
-                        value={currentBlogs.completedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="PublishedDate"
-                        name="publishedDate"
-                        value={currentBlogs.publishedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentBlogs.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentBlogs.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentBlogs.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentBlogs.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentBlogs.updatedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="TargetDate"
+                            value={currentBlogs.targetDate ? dayjs(currentBlogs.targetDate) : null}
+                            onChange={handleTargetDateChange}
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="CompletedDate"
+                            value={currentBlogs.completedDate ? dayjs(currentBlogs.completedDate) : null}
+                            onChange={handleCompletedDateChange}
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="PublishedDate"
+                            value={currentBlogs.publishedDate ? dayjs(currentBlogs.publishedDate) : null}
+                            onChange={handlePublishedDateChange}
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>

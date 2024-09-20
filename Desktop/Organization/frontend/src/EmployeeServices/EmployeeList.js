@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { styled, ListItemText, Checkbox, Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import '../App.css';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
 
 function EmployeeList() {
     const [Employees, setEmployees] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [designations, setDesignations] = useState([]);
+    const [technologies, setTechnologies] = useState([]);
+    const [reportingTo, setReporting] = useState([]);
+    const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -18,7 +28,6 @@ function EmployeeList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentEmployee, setCurrentEmployee] = useState({
-        id: '',
         name: '',
         designation: '',
         employeeID: '',
@@ -28,14 +37,11 @@ function EmployeeList() {
         joiningDate: '',
         relievingDate: '',
         projection: '',
-        isActive: true,
-        createdBy: 'SYSTEM',
-        createdDate: new Date(),
-        updatedBy: '',
-        updatedDate: '',
         password: '',
         profile: '',
-        phoneNo: ''
+        phoneNo: '',
+        role: '',
+        technology: []
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
@@ -45,8 +51,8 @@ function EmployeeList() {
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                //const empResponse = await axios.get('http://localhost:5033/api/Employee');
-                const empResponse = await axios.get('http://172.17.31.61:5033/api/employee');
+                const empResponse = await axios.get('http://localhost:5733/api/Employee');
+                // const empResponse = await axios.get('http://172.17.31.61:5633/api/employee');
                 setEmployees(empResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the employees!', error);
@@ -55,30 +61,72 @@ function EmployeeList() {
             setLoading(false);
         };
 
+        const fetchReportingTo = async () => {
+            try {
+                const repoResponse = await axios.get('http://localhost:5733/api/Employee');
+                //const repoResponse = await axios.get('http://172.17.31.61:5633/api/employee');
+                setReporting(repoResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the repoting!', error);
+                setError(error);
+            }
+            setLoading(false);
+        };
+
         const fetchDepartments = async () => {
             try {
-                //const deptResponse = await axios.get('http://localhost:5160/api/Department');
-                const deptResponse = await axios.get('http://172.17.31.61:5160/api/Department');
+                const deptResponse = await axios.get('http://localhost:5560/api/Department');
+                // const deptResponse = await axios.get('http://172.17.31.61:5160/api/department');
                 setDepartments(deptResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the departments!', error);
                 setError(error);
             }
+            setLoading(false);
         };
 
         const fetchDesignations = async () => {
             try {
-                const desigResponse = await axios.get('http://172.17.31.61:5201/api/Designation');
+                const desigResponse = await axios.get('http://localhost:5501/api/Designation');
+                //const desigResponse = await axios.get('http://172.17.31.61:5201/api/designation');
                 setDesignations(desigResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the departments!', error);
                 setError(error);
             }
+            setLoading(false);
+        };
+
+        const fetchTechnologies = async () => {
+            try {
+                const techResponse = await axios.get('http://localhost:5574/api/Technology');
+                //const techResponse = await axios.get('http://172.17.31.61:5274/api/technology');
+                setTechnologies(techResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the technologies!', error);
+                setError(error);
+            }
+            setLoading(false);
+        };
+
+        const fetchRole = async () => {
+            try {
+                const roleResponse = await axios.get('http://localhost:5763/api/Role');
+                // const roleResponse = await axios.get('http://172.17.31.61:5063/api/role');
+                setRoles(roleResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the roles!', error);
+                setError(error);
+            }
+            setLoading(false);
         };
 
         fetchEmployees();
         fetchDepartments();
         fetchDesignations();
+        fetchTechnologies();
+        fetchReportingTo();
+        fetchRole();
     }, []);
 
     const handleSort = (property) => {
@@ -99,20 +147,32 @@ function EmployeeList() {
     });
 
     const filteredEmployees = sortedEmployees.filter((employee) =>
-    (employee.name && employee.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (employee.designation && employee.designation.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (employee.employeeID && employee.employeeID.toString().toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (employee.emailId && employee.emailId.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (employee.department && employee.department.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (employee.reportingTo && employee.reportingTo.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (employee.projection && employee.projection.toLowerCase().includes(searchQuery.toLowerCase()))
-);
+        (employee.name && typeof employee.name === 'string' &&
+            employee.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (employee.designation && typeof employee.designation === 'string' &&
+            employee.designation.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (employee.employeeID && typeof employee.employeeID === 'string' &&
+            employee.employeeID.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (employee.emailId && typeof employee.emailId === 'string' &&
+            employee.emailId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (employee.department && typeof employee.department === 'string' &&
+            employee.department.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (employee.reportingTo && typeof employee.reportingTo === 'string' &&
+            employee.reportingTo.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (employee.projection && typeof employee.projection === 'string' &&
+            employee.projection.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
 
 
 
     const handleAdd = () => {
         setCurrentEmployee({
-            id: '',
             name: '',
             designation: '',
             employeeId: '',
@@ -122,15 +182,11 @@ function EmployeeList() {
             joiningDate: '',
             relievingDate: '',
             projection: '',
-            isActive: true,
-            createdBy: 'SYSTEM',
-            createdDate: new Date(),
-            updatedBy: '',
-            updatedDate: '',
             password: '',
             profile: '',
             phoneNo: '',
-            role: ''
+            role: '',
+            technology: []
         });
         setOpen(true);
     };
@@ -142,8 +198,8 @@ function EmployeeList() {
     };
 
     const handleDelete = (id) => {
-        //axios.delete(`http://localhost:5033/api/Employee/${id}`)
-        axios.delete(`http://172.17.31.61:5033/api/employee/${id}`)
+        axios.delete(`http://localhost:5733/api/Employee/${id}`)
+        // axios.delete(`http://172.17.31.61:5633/api/employee/${id}`)
             .then(response => {
                 setEmployees(Employees.filter(tech => tech.id !== id));
             })
@@ -151,13 +207,22 @@ function EmployeeList() {
                 console.error('There was an error deleting the Employee!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
+
+        const employeeToSave = {
+            ...currentEmployee,
+            technology: currentEmployee.technology.map(tech => {
+                const selectedTech = technologies.find(t => t.name === tech);
+                return selectedTech ? selectedTech.id : null;
+            }).filter(id => id !== null) // Convert technology names to IDs
+        };
+
         if (currentEmployee.id) {
-            // Update existing Employee
-            //axios.put(`http://localhost:5033/api/Employee/${currentEmployee.id}`, currentEmployee)
-            axios.put(`http://172.17.31.61:5033/api/employee/${currentEmployee.id}`, currentEmployee)
+            axios.put(`http://localhost:5733/api/Employee/${currentEmployee.id}`, employeeToSave)
+            // axios.put(`http://172.17.31.61:5633/api/employee/${currentEmployee.id}`, employeeToSave)
                 .then(response => {
                     console.log(response)
                     //setEmployees([...Employees, response.data]);
@@ -170,9 +235,8 @@ function EmployeeList() {
                 });
 
         } else {
-            // Add new Employee
-            //axios.post('http://localhost:5033/api/Employee', currentEmployee)
-            axios.post('http://172.17.31.61:5033/api/employee', currentEmployee)
+            axios.post('http://localhost:5733/api/Employee', employeeToSave)
+            // axios.post('http://172.17.31.61:5633/api/employee', employeeToSave)
                 .then(response => {
                     setEmployees([...Employees, response.data]);
                 })
@@ -211,6 +275,32 @@ function EmployeeList() {
     const handleConfirmYes = () => {
         handleDelete(deleteTechId);
     };
+
+    const handleJoiningDateChange = (newDate) => {
+        setCurrentEmployee((prevEmployee) => ({
+            ...prevEmployee,
+            joiningDate: newDate ? newDate.toISOString() : "",
+        }));
+    };
+
+    const handleRelievingDateChange = (newDate) => {
+        setCurrentEmployee((prevEmployee) => ({
+            ...prevEmployee,
+            relievingDate: newDate ? newDate.toISOString() : "",
+        }));
+    };
+
+    const handleTechnologyChange = (event) => {
+        const { value } = event.target;
+        setCurrentEmployee({
+            ...currentEmployee,
+            technology: typeof value === 'string' ? value.split(',') : value  // Handle multiple selection
+        });
+    };
+
+    const VisuallyHiddenInput = styled("input")({
+        width: 1,
+    });
 
     if (loading) {
         return <p>Loading...</p>;
@@ -350,6 +440,15 @@ function EmployeeList() {
                             </TableCell>
                             <TableCell>
                                 <TableSortLabel
+                                    active={orderBy === 'role'}
+                                    direction={orderBy === 'role' ? order : 'asc'}
+                                    onClick={() => handleSort('role')}
+                                >
+                                    Role
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
                                     active={orderBy === 'isActive'}
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
@@ -410,11 +509,12 @@ function EmployeeList() {
                                 <TableCell>{Employee.projection}</TableCell>
                                 <TableCell>{Employee.phoneNo}</TableCell>
                                 <TableCell>{Employee.profile}</TableCell>
+                                <TableCell>{Employee.role}</TableCell>
                                 <TableCell>{Employee.isActive ? 'Active' : 'Inactive'}</TableCell>
                                 <TableCell>{Employee.createdBy}</TableCell>
                                 <TableCell>{new Date(Employee.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{Employee.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{Employee.updatedDate ? new Date(Employee.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(Employee.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 {/* <TableCell>{Employee.password}</TableCell> */}
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(Employee)}>
@@ -491,75 +591,67 @@ function EmployeeList() {
                             </MenuItem>
                         ))}
                     </Select>
-                    <TextField
+                    <InputLabel id="demo-simple-select-label">Technology</InputLabel>
+                    <Select
+                        label="Technologies"
+                        //  placeholder="Technologies"
+                        name="technologies"
+                        multiple
+                        value={currentEmployee.technology}
+                        onChange={handleTechnologyChange}
+                        renderValue={(selected) => selected.join(', ')}
+                        fullWidth
+                    >
+                        {technologies.map((tech) => (
+                            <MenuItem key={tech.id} value={tech.name}>
+                                <Checkbox checked={currentEmployee.technology.indexOf(tech.name) > -1} />
+                                <ListItemText primary={tech.name} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+
+                    <InputLabel>ReportingTo</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Reporting To"
                         name="reportingTo"
                         value={currentEmployee.reportingTo}
                         onChange={handleChange}
                         fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Joining Date"
-                        name="joiningDate"
-                        value={currentEmployee.joiningDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="RelievingDate"
-                        name="relievingDate"
-                        value={currentEmployee.relievingDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
+                    >
+                        {reportingTo.map((report) => (
+                            <MenuItem key={report.id} value={report.name}>
+                                {report.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="Joining Date"
+                            value={currentEmployee.joiningDate ? dayjs(currentEmployee.joiningDate) : null}
+                            onChange={handleJoiningDateChange}
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
+
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="Relieving Date"
+                            value={currentEmployee.relievingDate ? dayjs(currentEmployee.relievingDate) : null}
+                            onChange={handleRelievingDateChange}
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
+
                     <TextField
                         margin="dense"
                         label="Projection"
                         name="projection"
                         value={currentEmployee.projection}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentEmployee.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentEmployee.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentEmployee.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentEmployee.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentEmployee.updatedDate}
                         onChange={handleChange}
                         fullWidth
                     />
@@ -587,6 +679,32 @@ function EmployeeList() {
                         onChange={handleChange}
                         fullWidth
                     />
+                    <InputLabel>Role</InputLabel>
+                    <Select
+                        margin="dense"
+                        name="role"
+                        value={currentEmployee.role}
+                        onChange={handleChange}
+                        fullWidth
+                    >
+                        {roles.map((role) => (
+                            <MenuItem key={role.id} value={role.roleName}>
+                                {role.roleName}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {/* <Button
+                        component="label"
+                        variant="contained"
+                        startIcon={<CloudUploadIcon />}
+                    >
+                        Upload files
+                        <VisuallyHiddenInput
+                            type="file"
+                            onChange={(event) => console.log(event.target.files)}
+                            multiple
+                        />
+                    </Button> */}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>

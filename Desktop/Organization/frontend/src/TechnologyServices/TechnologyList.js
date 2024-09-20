@@ -17,14 +17,8 @@ function TechnologyList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentTechnology, setCurrentTechnology] = useState({
-        id: '',
         name: '',
         department: '',
-        isActive: true,
-        createdBy: 'SYSTEM',
-        createdDate: new Date(),
-        updatedBy: '',
-        updatedDate: ''
     });
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
@@ -33,8 +27,8 @@ function TechnologyList() {
     useEffect(() => {
         const fetchTechnologies = async () => {
             try {
-                //const techResponse = await axios.get('http://localhost:5274/api/Technology');
-                const techResponse = await axios.get('http://172.17.31.61:5274/api/technology');
+                const techResponse = await axios.get('http://localhost:5574/api/Technology');
+                // const techResponse = await axios.get('http://172.17.31.61:5274/api/technology');
                 setTechnologies(techResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the technologies!', error);
@@ -45,8 +39,8 @@ function TechnologyList() {
 
         const fetchDepartments = async () => {
             try {
-                //const deptResponse = await axios.get('http://localhost:5160/api/Department');
-                const deptResponse = await axios.get('http://172.17.31.61:5160/api/department');
+                const deptResponse = await axios.get('http://localhost:5560/api/Department');
+                // const deptResponse = await axios.get('http://172.17.31.61:5160/api/department');
                 setDepartments(deptResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the departments!', error);
@@ -76,20 +70,17 @@ function TechnologyList() {
     });
 
     const filteredTechnologies = sortedTechnologies.filter((technology) =>
+        technology.name && typeof technology.name === 'string' &&
         technology.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+
+        technology.department && typeof technology.department === 'string' &&
         technology.department.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handleAdd = () => {
         setCurrentTechnology({
-            id: '',
             name: '',
-            department: '',
-            isActive: true,
-            createdBy: 'SYSTEM',
-            createdDate: new Date(),
-            updatedBy: '',
-            updatedDate: ''
+            department: ''
         });
         setOpen(true);
     };
@@ -100,8 +91,8 @@ function TechnologyList() {
     };
 
     const handleDelete = (id) => {
-        //axios.delete(`http://localhost:5274/api/Technology/${id}`)
-        axios.delete(`http://172.17.31.61:5274/api/technology/${id}`)
+        axios.delete(`http://localhost:5574/api/Technology/${id}`)
+            // axios.delete(`http://172.17.31.61:5274/api/technology/${id}`)
             .then(response => {
                 setTechnologies(technologies.filter(tech => tech.id !== id));
             })
@@ -114,8 +105,8 @@ function TechnologyList() {
 
     const handleSave = () => {
         if (currentTechnology.id) {
-            //axios.put(`http://localhost:5274/api/Technology/${currentTechnology.id}`, currentTechnology)
-            axios.put(`http://172.17.31.61:5274/api/technology/${currentTechnology.id}`, currentTechnology)
+            axios.put(`http://localhost:5574/api/Technology/${currentTechnology.id}`, currentTechnology)
+                // axios.put(`http://172.17.31.61:5274/api/technology/${currentTechnology.id}`, currentTechnology)
                 .then(response => {
                     setTechnologies(technologies.map(tech => tech.id === currentTechnology.id ? response.data : tech));
                 })
@@ -124,8 +115,8 @@ function TechnologyList() {
                     setError(error);
                 });
         } else {
-            //axios.post('http://localhost:5274/api/Technology', currentTechnology)
-            axios.post('http://172.17.31.61:5274/api/technology', currentTechnology)
+            axios.post('http://localhost:5574/api/Technology', currentTechnology)
+                // axios.post('http://172.17.31.61:5274/api/technology', currentTechnology)
                 .then(response => {
                     setTechnologies([...technologies, response.data]);
                 })
@@ -326,49 +317,7 @@ function TechnologyList() {
                             </MenuItem>
                         ))}
                     </Select>
-                    <InputLabel>Is Active</InputLabel>
-                    <Select
-                        margin="dense"
-                        name="isActive"
-                        value={currentTechnology.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    >
-                        <MenuItem value={true}>Yes</MenuItem>
-                        <MenuItem value={false}>No</MenuItem>
-                    </Select>
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentTechnology.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentTechnology.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentTechnology.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentTechnology.updatedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
+
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>

@@ -5,9 +5,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import '../App.css';
 
 function WebinarList() {
     const [Webinars, setWebinars] = useState([]);
+    const [Employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -16,17 +22,11 @@ function WebinarList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentWebinar, setCurrentWebinar] = useState({
-        id: '',
         title: '',
         speaker: '',
         status: '',
         webinarDate: '',
-        numberOfAudience: '',
-        isActive: true,
-        createdBy: 'SYSTEM',
-        createdDate: new Date(),
-        updatedBy: '',
-        updatedDate: ''
+        numberOfAudience: ''
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
@@ -34,17 +34,31 @@ function WebinarList() {
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
-        //axios.get('http://localhost:5017/api/Webinars')
-        axios.get('http://172.17.31.61:5017/api/webinars')
-            .then(response => {
-                setWebinars(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the Webinars!', error);
+        const fetchWebinars = async () => {
+            try {
+                const webResponse = await axios.get('http://localhost:5517/api/Webinars');
+                // const webResponse = await axios.get('http://172.17.31.61:5017/api/webinars');
+                setWebinars(webResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the webinars!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        const fetchSpeakers = async () => {
+            try {
+                const speResponse = await axios.get('http://localhost:5733/api/employee');
+                // const speResponse = await axios.get('http://172.17.31.61:5633/api/employee');
+                setEmployees(speResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the speakers!', error);
+                setError(error);
+            }
+        };
+
+        fetchWebinars();
+        fetchSpeakers();
     }, []);
 
     const handleSort = (property) => {
@@ -65,25 +79,23 @@ function WebinarList() {
     });
 
     const filteredWebinars = sortedWebinars.filter((webinar) =>
+        webinar.title && typeof webinar.title === 'string' &&
         webinar.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        webinar.speaker.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        webinar.status.toLowerCase().includes(searchQuery.toLowerCase())
-        // webinar.department.toLowerCase().includes(searchQuery.toLowerCase())
+
+        webinar.status && typeof webinar.status === 'string' &&
+        webinar.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+
+        webinar.speaker && typeof webinar.speaker === 'string' &&
+        webinar.speaker.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handleAdd = () => {
         setCurrentWebinar({
-            id: '',
             title: '',
             speaker: '',
             status: '',
             webinarDate: '',
-            numberOfAudience: '',
-            isActive: true,
-            createdBy: 'SYSTEM',
-            createdDate: new Date(),
-            updatedBy: '',
-            updatedDate: ''
+            numberOfAudience: ''
         });
         setOpen(true);
     };
@@ -95,8 +107,8 @@ function WebinarList() {
     };
 
     const handleDelete = (id) => {
-        //axios.delete(`http://localhost:5017/api/Webinars/${id}`)
-        axios.delete(`http://172.17.31.61:5017/api/webinars/${id}`)
+        axios.delete(`http://localhost:5517/api/Webinars/${id}`)
+        // axios.delete(`http://172.17.31.61:5017/api/webinars/${id}`)
             .then(response => {
                 setWebinars(Webinars.filter(tech => tech.id !== id));
             })
@@ -104,17 +116,15 @@ function WebinarList() {
                 console.error('There was an error deleting the Webinar!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
         if (currentWebinar.id) {
-            // Update existing Webinar
-            //axios.put(`http://localhost:5017/api/Webinars/${currentWebinar.id}`, currentWebinar)
-            axios.put(`http://172.17.31.61:5017/api/webinars/${currentWebinar.id}`, currentWebinar)
+            axios.put(`http://localhost:5517/api/Webinars/${currentWebinar.id}`, currentWebinar)
+            // axios.put(`http://172.17.31.61:5017/api/webinars/${currentWebinar.id}`, currentWebinar)
                 .then(response => {
                     console.log(response)
-                    //setWebinars([...Webinars, response.data]);
-                    // setWebinars(response.data);
                     setWebinars(Webinars.map(tech => tech.id === currentWebinar.id ? response.data : tech));
                 })
                 .catch(error => {
@@ -123,9 +133,8 @@ function WebinarList() {
                 });
 
         } else {
-            // Add new Webinar
-            //axios.post('http://localhost:5017/api/Webinars', currentWebinar)
-            axios.post('http://172.17.31.61:5017/api/webinars', currentWebinar)
+            axios.post('http://localhost:5517/api/Webinars', currentWebinar)
+            // axios.post('http://172.17.31.61:5017/api/webinars', currentWebinar)
                 .then(response => {
                     setWebinars([...Webinars, response.data]);
                 })
@@ -164,6 +173,17 @@ function WebinarList() {
     const handleConfirmYes = () => {
         handleDelete(deleteTechId);
     };
+    const handleWebinarDateChange = (newDate) => {
+        setCurrentWebinar((prevWebinar) => ({
+            ...prevWebinar,
+            webinarDate: newDate ? newDate.toISOString() : "",
+        }));
+    };
+
+
+    // const VisuallyHiddenInput = styled("input")({
+    //     width: 1,
+    // });
 
     if (loading) {
         return <p>Loading...</p>;
@@ -310,7 +330,7 @@ function WebinarList() {
                                 <TableCell>{Webinar.createdBy}</TableCell>
                                 <TableCell>{new Date(Webinar.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{Webinar.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{Webinar.updatedDate ? new Date(Webinar.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(Webinar.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(Webinar)}>
                                         <EditIcon color="primary" />
@@ -344,14 +364,42 @@ function WebinarList() {
                         onChange={handleChange}
                         fullWidth
                     />
-                    <TextField
+                    {/* <TextField
                         margin="dense"
                         label="Speaker"
                         name="speaker"
                         value={currentWebinar.speaker}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    /> */}
+                    <InputLabel>Speaker</InputLabel>
+                    <Select
+                        margin="dense"
+                        name="speaker"
+                        value={currentWebinar.employee}
+                        onChange={handleChange}
+                        fullWidth
+                    >
+                        {Employees.map((employee) => (
+                            <MenuItem key={employee.id} value={employee.name}>
+                                {employee.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {/* 
+                        <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={currentWebinar.status}
+                            label="Status"
+                        onChange={handleChange}
+                        fullWidth
+                        >
+                            <MenuItem value={"Planned"}>Planned</MenuItem>
+                            <MenuItem value={"Completed"}>Completed</MenuItem>
+                        </Select> */}
+
                     <TextField
                         margin="dense"
                         label="Status"
@@ -360,59 +408,22 @@ function WebinarList() {
                         onChange={handleChange}
                         fullWidth
                     />
-                    <TextField
-                        margin="dense"
-                        label="WebinarDate"
-                        name="webinarDate"
-                        value={currentWebinar.webinarDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="WebinarDate"
+                            value={currentWebinar.webinarDate ? dayjs(currentWebinar.webinarDate) : null}
+                            onChange={handleWebinarDateChange}
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
+
                     <TextField
                         margin="dense"
                         label="NumberOfAudience"
                         name="numberOfAudience"
                         value={currentWebinar.numberOfAudience}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentWebinar.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentWebinar.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentWebinar.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentWebinar.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentWebinar.updatedDate}
                         onChange={handleChange}
                         fullWidth
                     />

@@ -7,7 +7,7 @@ import PaginationComponent from '../Components/PaginationComponent'; // Import y
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
 
 function DepartmentList() {
-    const [departments, setdepartments] = useState([]);
+    const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -16,13 +16,7 @@ function DepartmentList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentDepartment, setCurrentDepartment] = useState({
-        id: '',
-        name: '',
-        isActive: true,
-        createdBy: 'SYSTEM',
-        createdDate: new Date(),
-        updatedBy: '',
-        updatedDate: ''
+        name: ''
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
@@ -30,17 +24,18 @@ function DepartmentList() {
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
-        //axios.get('http://localhost:5160/api/Department')
-        axios.get('http://172.17.31.61:5160/api/department')
-            .then(response => {
-                setdepartments(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
+        const fetchDepartments = async () => {
+            try {
+                const deptResponse = await axios.get('http://localhost:5560/api/department');
+                //const deptResponse = await axios.get('http://172.17.31.61:5160/api/department');
+                setDepartments(deptResponse.data);
+            } catch (error) {
                 console.error('There was an error fetching the departments!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+        fetchDepartments();
     }, []);
 
     const handleSort = (property) => {
@@ -61,19 +56,14 @@ function DepartmentList() {
     });
 
     const filteredDepartments = sortedDepartments.filter((department) =>
+        department.name && typeof department.name === 'string' &&
         department.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
 
     const handleAdd = () => {
         setCurrentDepartment({
-            id: '',
-            name: '',
-            isActive: true,
-            createdBy: 'SYSTEM',
-            createdDate: new Date(),
-            updatedBy: '',
-            updatedDate: ''
+            name: ''
         });
         setOpen(true);
     };
@@ -85,27 +75,24 @@ function DepartmentList() {
     };
 
     const handleDelete = (id) => {
-        //axios.delete(`http://localhost:5160/api/Department/${id}`)
-        axios.delete(`http://172.17.31.61:5160/api/department/${id}`)
+        axios.delete(`http://localhost:5560/api/Department/${id}`)
+        // axios.delete(`http://172.17.31.61:5160/api/department/${id}`)
             .then(response => {
-                setdepartments(departments.filter(tech => tech.id !== id));
+                setDepartments(departments.filter(dept => dept.id !== id));
             })
             .catch(error => {
                 console.error('There was an error deleting the Department!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
         if (currentDepartment.id) {
-            // Update existing Department
-            //axios.put(`http://localhost:5160/api/Department/${currentDepartment.id}`, currentDepartment)
-            axios.put(`http://172.17.31.61:5160/api/department/${currentDepartment.id}`, currentDepartment)
+            axios.put(`http://localhost:5560/api/Department/${currentDepartment.id}`, currentDepartment)
+            // axios.put(`http://172.17.31.61:5160/api/department/${currentDepartment.id}`, currentDepartment)
                 .then(response => {
-                    console.log(response)
-                    //setdepartments([...departments, response.data]);
-                    // setdepartments(response.data);
-                    setdepartments(departments.map(tech => tech.id === currentDepartment.id ? response.data : tech));
+                    setDepartments(departments.map(dept => dept.id === currentDepartment.id ? response.data : dept));
                 })
                 .catch(error => {
                     console.error('There was an error updating the Department!', error);
@@ -113,11 +100,10 @@ function DepartmentList() {
                 });
 
         } else {
-            // Add new Department
-            //axios.post('http://localhost:5160/api/Department', currentDepartment)
-            axios.post('http://172.17.31.61:5160/api/department', currentDepartment)
+            axios.post('http://localhost:5560/api/Department', currentDepartment)
+            // axios.post('http://172.17.31.61:5160/api/department', currentDepartment)
                 .then(response => {
-                    setdepartments([...departments, response.data]);
+                    setDepartments([...departments, response.data]);
                 })
                 .catch(error => {
                     console.error('There was an error adding the Department!', error);
@@ -259,7 +245,7 @@ function DepartmentList() {
                                 <TableCell>{Department.createdBy}</TableCell>
                                 <TableCell>{new Date(Department.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{Department.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{Department.updatedDate ? new Date(Department.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(Department.updatedDate).toLocaleString()}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(Department)}>
                                         <EditIcon color="primary" />
@@ -288,46 +274,6 @@ function DepartmentList() {
                         label="Name"
                         name="name"
                         value={currentDepartment.name}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentDepartment.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentDepartment.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentDepartment.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentDepartment.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentDepartment.updatedDate}
                         onChange={handleChange}
                         fullWidth
                     />
