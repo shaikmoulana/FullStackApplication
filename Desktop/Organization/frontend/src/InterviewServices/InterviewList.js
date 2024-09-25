@@ -5,9 +5,17 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import '../App.css';
 
 function InterviewList() {
     const [Interviews, setInterviews] = useState([]);
+    const [SOWRequirement, setSOWRequirement] = useState([]);
+    const [InterviewStatus, setInterviewStatus] = useState([]);
+    const [Employee, setEmployee] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -16,19 +24,13 @@ function InterviewList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentInterview, setCurrentInterview] = useState({
-        id: '',
         sowRequirement: '',
         name: '',
         interviewDate: '',
         yearsOfExperience: '',
         status: '',
         on_Boarding: '',
-        recruiter: '',
-        isActive: true,
-        createdBy: '',
-        createdDate: '',
-        updatedBy: '',
-        updatedDate: ''
+        recruiter: ''
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
@@ -36,17 +38,51 @@ function InterviewList() {
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
-        //axios.get('http://localhost:5200/api/Interview')
-        axios.get('http://172.17.31.61:5200/api/interview')
-            .then(response => {
-                setInterviews(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the Interviews!', error);
+        const fetchInterviews = async () => {
+            try {
+                const interviewResponse = await axios.get('http://172.17.31.61:5200/api/interview');
+                setInterviews(interviewResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the interviews!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        const fetchSOWRequirements = async () => {
+            try {
+                const SowRequirementResponse = await axios.get('http://172.17.31.61:5041/api/sowRequirement');
+                setSOWRequirement(SowRequirementResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the sowRequirement!', error);
+                setError(error);
+            }
+        };
+
+        const fetchInterviewStatus = async () => {
+            try {
+                const interviewStatutsResponse = await axios.get('http://172.17.31.61:5200/api/interviewStatus');
+                setInterviewStatus(interviewStatutsResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the interviewStatus!', error);
+                setError(error);
+            }
+        };
+
+        const fetchRecruiter = async () => {
+            try {
+                const recruiterResponse = await axios.get('http://172.17.31.61:5733/api/employee');
+                setEmployee(recruiterResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the recruiter!', error);
+                setError(error);
+            }
+        };
+
+        fetchInterviews();
+        fetchSOWRequirements();
+        fetchInterviewStatus();
+        fetchRecruiter();
     }, []);
 
     const handleSort = (property) => {
@@ -67,26 +103,24 @@ function InterviewList() {
     });
 
     const filteredInterviews = sortedInterviews.filter((Interviews) =>
-        Interviews.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        Interviews.sowRequirement.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        Interviews.recruiter.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        Interviews.status.toLowerCase().includes(searchQuery.toLowerCase())
+        (Interviews.name && typeof Interviews.name === 'string' &&
+            Interviews.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (Interviews.sowRequirement && typeof Interviews.sowRequirement === 'string' &&
+            Interviews.sowRequirement.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (Interviews.recruiter && typeof Interviews.recruiter === 'string' &&
+            Interviews.recruiter.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (Interviews.status && typeof Interviews.status === 'string' &&
+            Interviews.status.toLowerCase().includes(searchQuery.toLowerCase()))
     );
     const handleAdd = () => {
         setCurrentInterview({
-            id: '',
             sowRequirement: '',
             name: '',
             interviewDate: '',
             yearsOfExperience: '',
             status: '',
             on_Boarding: '',
-            recruiter: '',
-            isActive: true,
-            createdBy: '',
-            createdDate: '',
-            updatedBy: '',
-            updatedDate: ''
+            recruiter: ''
         });
         setOpen(true);
     };
@@ -107,6 +141,7 @@ function InterviewList() {
                 console.error('There was an error deleting the Interview!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
@@ -166,6 +201,19 @@ function InterviewList() {
 
     const handleConfirmYes = () => {
         handleDelete(deleteTechId);
+    };
+
+    const handleInterviewDateChange = (newDate) => {
+        setCurrentInterview((prev) => ({
+            ...prev,
+            interviewDate: newDate ? newDate.toISOString() : "",
+        }));
+    };
+    const handleOnBoardingDateChange = (newDate) => {
+        setCurrentInterview((prev) => ({
+            ...prev,
+            on_Boarding: newDate ? newDate.toISOString() : "",
+        }));
     };
 
     if (loading) {
@@ -330,7 +378,7 @@ function InterviewList() {
                                 <TableCell>{Interview.createdBy}</TableCell>
                                 <TableCell>{new Date(Interview.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{Interview.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{Interview.updatedDate ? new Date(Interview.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(Interview.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(Interview)}>
                                         <EditIcon color="primary" />
@@ -354,14 +402,20 @@ function InterviewList() {
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{currentInterview.id ? 'Update Interview' : 'Add Interview'}</DialogTitle>
                 <DialogContent>
-                    <TextField
+                    <InputLabel>SOWRequirement</InputLabel>
+                    <Select
                         margin="dense"
-                        label="SOWRequirement"
                         name="sowRequirement"
                         value={currentInterview.sowRequirement}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {SOWRequirement.map((sowRequirement) => (
+                            <MenuItem key={sowRequirement.id} value={sowRequirement.status}>
+                                {sowRequirement.status}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <TextField
                         margin="dense"
                         label="Name"
@@ -370,14 +424,16 @@ function InterviewList() {
                         onChange={handleChange}
                         fullWidth
                     />
-                    <TextField
-                        margin="dense"
-                        label="InterviewDate"
-                        name="interviewDate"
-                        value={currentInterview.interviewDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="InterviewDate"
+                            value={currentInterview.interviewDate ? dayjs(currentInterview.interviewDate) : null}
+                            onChange={handleInterviewDateChange}
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
                     <TextField
                         margin="dense"
                         label="YearsOfExperience"
@@ -386,32 +442,44 @@ function InterviewList() {
                         onChange={handleChange}
                         fullWidth
                     />
-                    <TextField
+                    <InputLabel>Status</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Status"
                         name="status"
-                        value={currentInterview.status}
+                        value={currentInterview.interviewStatus}
                         onChange={handleChange}
                         fullWidth
-                    />
-
-                    <TextField
+                    >
+                        {InterviewStatus.map((interviewStatus) => (
+                            <MenuItem key={interviewStatus.id} value={interviewStatus.status}>
+                                {interviewStatus.status}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="On_Boarding"
+                            value={currentInterview.on_Boarding ? dayjs(currentInterview.on_Boarding) : null}
+                            onChange={handleOnBoardingDateChange}
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
+                    <InputLabel>Recruiter</InputLabel>
+                    <Select
                         margin="dense"
-                        label="On_Bording"
-                        name="on_Bording"
-                        value={currentInterview.on_Bording}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-
-                    <TextField
-                        margin="dense"
-                        label="Recruiter"
                         name="recruiter"
-                        value={currentInterview.recruiter}
+                        value={currentInterview.employee}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {Employee.map((employee) => (
+                            <MenuItem key={employee.id} value={employee.name}>
+                                {employee.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <TextField
                         margin="dense"
                         label="Is Active"

@@ -26,8 +26,8 @@ function DesignationList() {
     useEffect(() => {
         const fetchDesignations = async () => {
             try {
-                const desigResponse = await axios.get('http://localhost:5501/api/designation');
-                //const desigResponse = await axios.get('http://172.17.31.61:5201/api/designation');
+                // const desigResponse = await axios.get('http://localhost:5501/api/designation');
+                const desigResponse = await axios.get('http://172.17.31.61:5201/api/designation');
                 setDesignations(desigResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the designation!', error);
@@ -74,8 +74,9 @@ function DesignationList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5501/api/Designation/${id}`)
+        // axios.delete(`http://localhost:5501/api/Designation/${id}`)
         //axios.delete(`http://172.17.31.61:5201/api/designation/${id}`)
+        axios.patch(`http://172.17.31.61:5201/api/designation/${id}`, { isActive: false })
             .then(response => {
                 setDesignations(designations.filter(tech => tech.id !== id));
             })
@@ -89,8 +90,8 @@ function DesignationList() {
     const handleSave = () => {
         if (currentDesignation.id) {
             // Update existing Designation
-            axios.put(`http://localhost:5501/api/Designation/${currentDesignation.id}`, currentDesignation)
-            //axios.put(`http://172.17.31.61:5201/api/designation/${currentDesignation.id}`, currentDesignation)
+            // axios.put(`http://localhost:5501/api/Designation/${currentDesignation.id}`, currentDesignation)
+            axios.put(`http://172.17.31.61:5201/api/designation/${currentDesignation.id}`, currentDesignation)
                 .then(response => {
                     //setDesignations([...Designations, response.data]);
                     // setDesignations(response.data);
@@ -103,8 +104,8 @@ function DesignationList() {
 
         } else {
             // Add new Designation
-            axios.post('http://localhost:5501/api/Designation', currentDesignation)
-            // axios.post('http://172.17.31.61:5201/api/designation', currentDesignation)
+            // axios.post('http://localhost:5501/api/Designation', currentDesignation)
+            axios.post('http://172.17.31.61:5201/api/designation', currentDesignation)
                 .then(response => {
                     setDesignations([...designations, response.data]);
                 })

@@ -8,7 +8,7 @@ import PaginationComponent from '../Components/PaginationComponent'; // Import y
 
 function ClientContactList() {
     const [ClientContact, setClientContact] = useState([]);
-    const [Client, setClient] = useState([]);
+    const [Clients, setClient] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -17,15 +17,9 @@ function ClientContactList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentClientContact, setCurrentClientContact] = useState({
-        id: '',
         client: '',
         contactValue: '',
-        contactType: '',
-        isActive: true,
-        createdBy: '',
-        createdDate: '',
-        updatedBy: '',
-        updatedDate: ''
+        contactType: ''
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
@@ -33,46 +27,30 @@ function ClientContactList() {
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
-        //axios.get('http://localhost:5142/api/ClientContact')
-        axios.get('http://172.17.31.61:5142/api/clientContact')
-            .then(response => {
-                setClientContact(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the ClientContact!', error);
+        const fetchClientContacts = async () => {
+            try {
+                const clientContactResponse = await axios.get('http://172.17.31.61:5142/api/clientContact');
+                setClientContact(clientContactResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the technologies!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        const fetchClient = async () => {
+            try {
+                const clientResponse = await axios.get('http://172.17.31.61:5142/api/client');
+                setClient(clientResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the departments!', error);
+                setError(error);
+            }
+        };
+
+        fetchClientContacts();
+        fetchClient();
     }, []);
-
-    // useEffect(() => {
-    //     const fetchCliebtContacts = async () => {
-    //         try {
-    //             //const techResponse = await axios.get('http://localhost:5274/api/Technology');
-    //             const clientContactResponse = await axios.get('http://172.17.31.61:5274/api/technology');
-    //             setClientContact(clientContactResponse.data);
-    //         } catch (error) {
-    //             console.error('There was an error fetching the technologies!', error);
-    //             setError(error);
-    //         }
-    //         setLoading(false);
-    //     };
-
-    //     const fetchDepartments = async () => {
-    //         try {
-    //             //const deptResponse = await axios.get('http://localhost:5160/api/Department');
-    //             const deptResponse = await axios.get('http://172.17.31.61:5160/api/department');
-    //             setDepartments(deptResponse.data);
-    //         } catch (error) {
-    //             console.error('There was an error fetching the departments!', error);
-    //             setError(error);
-    //         }
-    //     };
-
-    //     fetchTechnologies();
-    //     fetchDepartments();
-    // }, []);
 
 
     const handleSort = (property) => {
@@ -93,21 +71,18 @@ function ClientContactList() {
     });
 
     const filteredClientContact = sortedClientContact.filter((clientContact) =>
-        clientContact.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        clientContact.contactValue.toLowerCase().includes(searchQuery.toLowerCase())
+        (clientContact.client && typeof clientContact.client === 'string' &&
+            clientContact.client.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (clientContact.name && typeof clientContact.name === 'string' &&
+            clientContact.contactValue.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
         setCurrentClientContact({
-            id: '',
             client: '',
             contactValue: '',
-            contactType: '',
-            isActive: true,
-            createdBy: '',
-            createdDate: '',
-            updatedBy: '',
-            updatedDate: ''
+            contactType: ''
         });
         setOpen(true);
     };
@@ -337,14 +312,20 @@ function ClientContactList() {
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{currentClientContact.id ? 'Update ClientContact' : 'Add ClientContact'}</DialogTitle>
                 <DialogContent>
-                    <TextField
+                    <InputLabel>Client</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Client"
                         name="client"
                         value={currentClientContact.client}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {Clients.map((client) => (
+                            <MenuItem key={client.id} value={client.name}>
+                                {client.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <TextField
                         margin="dense"
                         label="ContactValue"
@@ -358,46 +339,6 @@ function ClientContactList() {
                         label="ContactType"
                         name="contactType"
                         value={currentClientContact.contactType}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentClientContact.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentClientContact.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentClientContact.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentClientContact.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentClientContact.updatedDate}
                         onChange={handleChange}
                         fullWidth
                     />

@@ -5,9 +5,16 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import '../App.css';
 
 function ProjectEmployeeList() {
     const [ProjectEmployees, setProjectEmployees] = useState([]);
+    const [Projects, setProjects] = useState([]);
+    const [Employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -16,16 +23,10 @@ function ProjectEmployeeList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentProjectEmployee, setCurrentProjectEmployee] = useState({
-        id: '',
         project: '',
         employee: '',
         startDate: '',
-        endDate: '',
-        isActive: true,
-        createdBy: '',
-        createdDate: '',
-        updatedBy: '',
-        updatedDate: ''
+        endDate: ''
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
@@ -33,17 +34,39 @@ function ProjectEmployeeList() {
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
-        //axios.get('http://localhost:5151/api/ProjectEmployee')
-        axios.get('http://172.17.31.61:5151/api/projectEmployee')
-            .then(response => {
-                setProjectEmployees(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
+        const fetchProjectEmployees = async () => {
+            try {
+                const proEmpResponse = await axios.get('http://172.17.31.61:5151/api/projectEmployee');
+                setProjectEmployees(proEmpResponse.data);
+            } catch (error) {
                 console.error('There was an error fetching the ProjectEmployees!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        const fetchProjects = async () => {
+            try {
+                const projectResponse = await axios.get('http://172.17.31.61:5151/api/project');
+                setProjects(projectResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the project!', error);
+                setError(error);
+            }
+        };
+        const fetchEmployees = async () => {
+            try {
+                const empResponse = await axios.get('http://172.17.31.61:5733/api/employee');
+                setEmployees(empResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the employees!', error);
+                setError(error);
+            }
+        };
+
+        fetchProjectEmployees();
+        fetchProjects();
+        fetchEmployees();
     }, []);
 
     const handleSort = (property) => {
@@ -64,22 +87,19 @@ function ProjectEmployeeList() {
     });
 
     const filteredProjectEmployees = sortedProjectEmployees.filter((ProjectEmployees) =>
-        ProjectEmployees.project.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        ProjectEmployees.employee.toLowerCase().includes(searchQuery.toLowerCase())
+        (ProjectEmployees.project && typeof ProjectEmployees.project === 'string' &&
+            ProjectEmployees.project.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (ProjectEmployees.employee && typeof ProjectEmployees.employee === 'string' &&
+            ProjectEmployees.employee.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
         setCurrentProjectEmployee({
-            id: '',
             project: '',
             employee: '',
             startDate: '',
-            endDate: '',
-            isActive: true,
-            createdBy: '',
-            createdDate: '',
-            updatedBy: '',
-            updatedDate: ''
+            endDate: ''
         });
         setOpen(true);
     };
@@ -100,6 +120,7 @@ function ProjectEmployeeList() {
                 console.error('There was an error deleting the ProjectEmployee!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
@@ -108,9 +129,6 @@ function ProjectEmployeeList() {
             //axios.put(`http://localhost:5151/api/ProjectEmployee/${currentProjectEmployee.id}`, currentProjectEmployee)
             axios.put(`http://172.17.31.61:5151/api/projectEmployee/${currentProjectEmployee.id}`, currentProjectEmployee)
                 .then(response => {
-                    console.log(response)
-                    //setProjectEmployees([...ProjectEmployees, response.data]);
-                    // setProjectEmployees(response.data);
                     setProjectEmployees(ProjectEmployees.map(tech => tech.id === currentProjectEmployee.id ? response.data : tech));
                 })
                 .catch(error => {
@@ -159,6 +177,20 @@ function ProjectEmployeeList() {
 
     const handleConfirmYes = () => {
         handleDelete(deleteTechId);
+    };
+
+    const handleStartDateChange = (newDate) => {
+        setCurrentProjectEmployee((prev) => ({
+            ...prev,
+            startDate: newDate ? newDate.toISOString() : "",
+        }));
+    };
+
+    const handleEndDateChange = (newDate) => {
+        setCurrentProjectEmployee((prev) => ({
+            ...prev,
+            endDate: newDate ? newDate.toISOString() : "",
+        }));
     };
 
     if (loading) {
@@ -292,7 +324,7 @@ function ProjectEmployeeList() {
                                 <TableCell>{ProjectEmployee.createdBy}</TableCell>
                                 <TableCell>{new Date(ProjectEmployee.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{ProjectEmployee.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{ProjectEmployee.updatedDate ? new Date(ProjectEmployee.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(ProjectEmployee.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(ProjectEmployee)}>
                                         <EditIcon color="primary" />
@@ -316,78 +348,56 @@ function ProjectEmployeeList() {
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{currentProjectEmployee.id ? 'Update ProjectEmployee' : 'Add ProjectEmployee'}</DialogTitle>
                 <DialogContent>
-                    <TextField
+                    <InputLabel>Project</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Project"
                         name="project"
                         value={currentProjectEmployee.project}
                         onChange={handleChange}
                         fullWidth
-                    />
-                    <TextField
+                    >
+                        {Projects.map((project) => (
+                            <MenuItem key={project.id} value={project.name}>
+                                {project.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <InputLabel>Employee</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Employee"
                         name="employee"
                         value={currentProjectEmployee.employee}
                         onChange={handleChange}
                         fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="StartDate"
-                        name="startDate"
-                        value={currentProjectEmployee.startDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="EndDate"
-                        name="endDate"
-                        value={currentProjectEmployee.endDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentProjectEmployee.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentProjectEmployee.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentProjectEmployee.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentProjectEmployee.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentProjectEmployee.updatedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
+                    >
+                        {Employees.map((employee) => (
+                            <MenuItem key={employee.id} value={employee.name}>
+                                {employee.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="StartDate"
+                            value={currentProjectEmployee.startDate ? dayjs(currentProjectEmployee.startDate) : null}
+                            onChange={handleStartDateChange}
+                            fullWidth
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="EndDate"
+                            value={currentProjectEmployee.endDate ? dayjs(currentProjectEmployee.endDate) : null}
+                            onChange={handleEndDateChange}
+                            fullWidth
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>

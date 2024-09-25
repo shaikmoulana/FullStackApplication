@@ -8,6 +8,8 @@ import PaginationComponent from '../Components/PaginationComponent'; // Import y
 
 function SOWRequirementList() {
     const [SOWRequirements, setSOWRequirements] = useState([]);
+    const [SOWs, setSOWs] = useState([]);
+    const [Designations, setDesignations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -16,34 +18,52 @@ function SOWRequirementList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentSOWRequirement, setCurrentSOWRequirement] = useState({
-        id: '',
         sow: '',
         designation: '',
         technologies: '',
-        teamSize:'',
-        isActive: true,
-        createdBy: '',
-        createdDate: '',
-        updatedBy: '',
-        updatedDate: ''
+        teamSize: ''
     });
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
-        //axios.get('http://localhost:5041/api/SOWRequirement')
-        axios.get('http://172.17.31.61:5041/api/sowRequirement')
-            .then(response => {
-                setSOWRequirements(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the SOWRequirements!', error);
+        const fetchSowRequirements = async () => {
+            try {
+                const sowReqResponse = await axios.get('http://172.17.31.61:5041/api/sowRequirement');
+                setSOWRequirements(sowReqResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the sow requirements!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        const fetchSow = async () => {
+            try {
+                const sowResponse = await axios.get('http://172.17.31.61:5041/api/sow');
+                setSOWs(sowResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the sow!', error);
+                setError(error);
+            }
+        };
+        const fetchDesignations = async () => {
+            try {
+                const desigResponse = await axios.get('http://172.17.31.61:5201/api/designation');
+                setDesignations(desigResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the sow!', error);
+                setError(error);
+            }
+        };
+
+        fetchSowRequirements();
+        fetchSow();
+        fetchDesignations();
     }, []);
+
+
     const handleSort = (property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -62,23 +82,22 @@ function SOWRequirementList() {
     });
 
     const filteredSOWRequirements = sortedSOWRequirements.filter((SOWRequirement) =>
-        SOWRequirement.sow.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        SOWRequirement.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        SOWRequirement.technologies.toLowerCase().includes(searchQuery.toLowerCase())
+        (SOWRequirement.sow && typeof SOWRequirement.sow === 'string' &&
+            SOWRequirement.sow.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (SOWRequirement.designation && typeof SOWRequirement.designation === 'string' &&
+            SOWRequirement.designation.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (SOWRequirement.teamSize && typeof SOWRequirement.teamSize === 'string' &&
+            SOWRequirement.teamSize.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (SOWRequirement.technologies && typeof SOWRequirement.technologies === 'string' &&
+            SOWRequirement.technologies.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
         setCurrentSOWRequirement({
-            id: '',
             sow: '',
             designation: '',
             technologies: '',
-            teamSize: '',
-            isActive: true,
-            createdBy: '',
-            createdDate: '',
-            updatedBy: '',
-            updatedDate: ''
+            teamSize: ''
         });
         setOpen(true);
     };
@@ -99,6 +118,7 @@ function SOWRequirementList() {
                 console.error('There was an error deleting the SOWRequirement!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
@@ -291,7 +311,7 @@ function SOWRequirementList() {
                                 <TableCell>{SOWRequirement.createdBy}</TableCell>
                                 <TableCell>{new Date(SOWRequirement.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{SOWRequirement.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{SOWRequirement.updatedDate ? new Date(SOWRequirement.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(SOWRequirement.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(SOWRequirement)}>
                                         <EditIcon color="primary" />
@@ -315,22 +335,34 @@ function SOWRequirementList() {
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{currentSOWRequirement.id ? 'Update SOWRequirement' : 'Add SOWRequirement'}</DialogTitle>
                 <DialogContent>
-                    <TextField
+                    <InputLabel>SOW</InputLabel>
+                    <Select
                         margin="dense"
-                        label="SOW"
                         name="sow"
                         value={currentSOWRequirement.sow}
                         onChange={handleChange}
                         fullWidth
-                    />
-                    <TextField
+                    >
+                        {SOWs.map((sow) => (
+                            <MenuItem key={sow.id} value={sow.name}>
+                                {sow.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <InputLabel>Designation</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Designation"
                         name="designation"
                         value={currentSOWRequirement.designation}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {Designations.map((designation) => (
+                            <MenuItem key={designation.id} value={designation.name}>
+                                {designation.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <TextField
                         margin="dense"
                         label="Technologies"
@@ -344,46 +376,6 @@ function SOWRequirementList() {
                         label="TeamSize"
                         name="teamSize"
                         value={currentSOWRequirement.teamSize}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentSOWRequirement.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentSOWRequirement.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentSOWRequirement.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentSOWRequirement.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentSOWRequirement.updatedDate}
                         onChange={handleChange}
                         fullWidth
                     />

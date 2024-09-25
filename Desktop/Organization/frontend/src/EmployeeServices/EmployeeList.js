@@ -10,7 +10,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import '../App.css';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+// import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 
 function EmployeeList() {
@@ -51,8 +51,8 @@ function EmployeeList() {
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                const empResponse = await axios.get('http://localhost:5733/api/Employee');
-                // const empResponse = await axios.get('http://172.17.31.61:5633/api/employee');
+                // const empResponse = await axios.get('http://localhost:5733/api/Employee');
+                const empResponse = await axios.get('http://172.17.31.61:5733/api/employee');
                 setEmployees(empResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the employees!', error);
@@ -63,8 +63,8 @@ function EmployeeList() {
 
         const fetchReportingTo = async () => {
             try {
-                const repoResponse = await axios.get('http://localhost:5733/api/Employee');
-                //const repoResponse = await axios.get('http://172.17.31.61:5633/api/employee');
+                // const repoResponse = await axios.get('http://localhost:5733/api/Employee');
+                const repoResponse = await axios.get('http://172.17.31.61:5733/api/employee');
                 setReporting(repoResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the repoting!', error);
@@ -75,8 +75,8 @@ function EmployeeList() {
 
         const fetchDepartments = async () => {
             try {
-                const deptResponse = await axios.get('http://localhost:5560/api/Department');
-                // const deptResponse = await axios.get('http://172.17.31.61:5160/api/department');
+                // const deptResponse = await axios.get('http://localhost:5560/api/Department');
+                const deptResponse = await axios.get('http://172.17.31.61:5160/api/department');
                 setDepartments(deptResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the departments!', error);
@@ -87,8 +87,8 @@ function EmployeeList() {
 
         const fetchDesignations = async () => {
             try {
-                const desigResponse = await axios.get('http://localhost:5501/api/Designation');
-                //const desigResponse = await axios.get('http://172.17.31.61:5201/api/designation');
+                // const desigResponse = await axios.get('http://localhost:5501/api/Designation');
+                const desigResponse = await axios.get('http://172.17.31.61:5201/api/designation');
                 setDesignations(desigResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the departments!', error);
@@ -99,8 +99,8 @@ function EmployeeList() {
 
         const fetchTechnologies = async () => {
             try {
-                const techResponse = await axios.get('http://localhost:5574/api/Technology');
-                //const techResponse = await axios.get('http://172.17.31.61:5274/api/technology');
+                // const techResponse = await axios.get('http://localhost:5574/api/Technology');
+                const techResponse = await axios.get('http://172.17.31.61:5274/api/technology');
                 setTechnologies(techResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the technologies!', error);
@@ -111,8 +111,8 @@ function EmployeeList() {
 
         const fetchRole = async () => {
             try {
-                const roleResponse = await axios.get('http://localhost:5763/api/Role');
-                // const roleResponse = await axios.get('http://172.17.31.61:5063/api/role');
+                // const roleResponse = await axios.get('http://localhost:5763/api/Role');
+                const roleResponse = await axios.get('http://172.17.31.61:5063/api/role');
                 setRoles(roleResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the roles!', error);
@@ -198,8 +198,8 @@ function EmployeeList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5733/api/Employee/${id}`)
-        // axios.delete(`http://172.17.31.61:5633/api/employee/${id}`)
+        // axios.delete(`http://localhost:5733/api/Employee/${id}`)
+        axios.delete(`http://172.17.31.61:5733/api/employee/${id}`)
             .then(response => {
                 setEmployees(Employees.filter(tech => tech.id !== id));
             })
@@ -221,8 +221,8 @@ function EmployeeList() {
         };
 
         if (currentEmployee.id) {
-            axios.put(`http://localhost:5733/api/Employee/${currentEmployee.id}`, employeeToSave)
-            // axios.put(`http://172.17.31.61:5633/api/employee/${currentEmployee.id}`, employeeToSave)
+            // axios.put(`http://localhost:5733/api/Employee/${currentEmployee.id}`, employeeToSave)
+            axios.put(`http://172.17.31.61:5733/api/employee/${currentEmployee.id}`, employeeToSave)
                 .then(response => {
                     console.log(response)
                     //setEmployees([...Employees, response.data]);
@@ -235,8 +235,8 @@ function EmployeeList() {
                 });
 
         } else {
-            axios.post('http://localhost:5733/api/Employee', employeeToSave)
-            // axios.post('http://172.17.31.61:5633/api/employee', employeeToSave)
+            // axios.post('http://localhost:5733/api/Employee', employeeToSave)
+            axios.post('http://172.17.31.61:5733/api/employee', employeeToSave)
                 .then(response => {
                     setEmployees([...Employees, response.data]);
                 })
@@ -298,9 +298,9 @@ function EmployeeList() {
         });
     };
 
-    const VisuallyHiddenInput = styled("input")({
-        width: 1,
-    });
+    // const VisuallyHiddenInput = styled("input")({
+    //     width: 1,
+    // });
 
     if (loading) {
         return <p>Loading...</p>;

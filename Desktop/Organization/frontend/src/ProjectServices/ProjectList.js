@@ -5,9 +5,16 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import '../App.css';
 
 function ProjectList() {
     const [Projects, setProjects] = useState([]);
+    const [Employeess, setEmployees] = useState([]);
+    const [Clients, setClients] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -16,7 +23,6 @@ function ProjectList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentProject, setCurrentProject] = useState({
-        id: '',
         client: '',
         projectName: '',
         technicalProjectManager: '',
@@ -25,12 +31,7 @@ function ProjectList() {
         sowSubmittedDate: '',
         sowSignedDate: '',
         sowValidTill: '',
-        sowLastExtendedDate: '',
-        isActive: true,
-        createdBy: '',
-        createdDate: '',
-        updatedBy: '',
-        updatedDate: ''
+        sowLastExtendedDate: ''
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
@@ -38,17 +39,41 @@ function ProjectList() {
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
-        //axios.get('http://localhost:5151/api/Project')
-        axios.get('http://172.17.31.61:5151/api/project')
-            .then(response => {
-                setProjects(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
+        const fetchProjects = async () => {
+            try {
+                const projectResponse = await axios.get('http://172.17.31.61:5151/api/project');
+                setProjects(projectResponse.data);
+            } catch (error) {
                 console.error('There was an error fetching the Projects!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        const fetchClient = async () => {
+            try {
+                const clientResponse = await axios.get('http://172.17.31.61:5142/api/client');
+                setClients(clientResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the technologies!', error);
+                setError(error);
+            }
+            setLoading(false);
+        };
+
+        const fetchEmployees = async () => {
+            try {
+                const empResponse = await axios.get('http://172.17.31.61:5733/api/employee');
+                setEmployees(empResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the employees!', error);
+                setError(error);
+            }
+        };
+
+        fetchProjects();
+        fetchClient();
+        fetchEmployees();
     }, []);
 
     const handleSort = (property) => {
@@ -69,16 +94,25 @@ function ProjectList() {
     });
 
     const filteredProjects = sortedProjects.filter((project) =>
-        project.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.technicalProjectManager.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.salesContact.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.pmo.toLowerCase().includes(searchQuery.toLowerCase())
+
+        (project.client && typeof project.client === 'string' &&
+            project.client.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (project.projectName && typeof project.projectName === 'string' &&
+            project.projectName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (project.technicalProjectManager && typeof project.technicalProjectManager === 'string' &&
+            project.technicalProjectManager.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (project.salesContact && typeof project.salesContact === 'string' &&
+            project.salesContact.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (project.pmo && typeof project.pmo === 'string' &&
+            project.pmo.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
         setCurrentProject({
-            id: '',
             client: '',
             projectName: '',
             technicalProjectManager: '',
@@ -87,12 +121,7 @@ function ProjectList() {
             sowSubmittedDate: '',
             sowSignedDate: '',
             sowValidTill: '',
-            sowLastExtendedDate: '',
-            isActive: true,
-            createdBy: '',
-            createdDate: '',
-            updatedBy: '',
-            updatedDate: ''
+            sowLastExtendedDate: ''
         });
         setOpen(true);
     };
@@ -113,6 +142,7 @@ function ProjectList() {
                 console.error('There was an error deleting the Project!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
@@ -173,6 +203,35 @@ function ProjectList() {
 
     const handleConfirmYes = () => {
         handleDelete(deleteTechId);
+    };
+
+
+    const handleSowSubmittedDateChange = (newDate) => {
+        setCurrentProject((prevSow) => ({
+            ...prevSow,
+            sowSubmittedDate: newDate ? newDate.toISOString() : "",
+        }));
+    };
+
+    const handleSowSignedDateChange = (newDate) => {
+        setCurrentProject((prevSow) => ({
+            ...prevSow,
+            sowSignedDate: newDate ? newDate.toISOString() : "",
+        }));
+    };
+
+    const handleSowValidTillDateChange = (newDate) => {
+        setCurrentProject((prevSow) => ({
+            ...prevSow,
+            sowValidTill: newDate ? newDate.toISOString() : "",
+        }));
+    };
+
+    const handleSowLastExtendedDateChange = (newDate) => {
+        setCurrentProject((prevSow) => ({
+            ...prevSow,
+            sowLastExtendedDate: newDate ? newDate.toISOString() : "",
+        }));
     };
 
     if (loading) {
@@ -358,7 +417,7 @@ function ProjectList() {
                                 <TableCell>{Project.createdBy}</TableCell>
                                 <TableCell>{new Date(Project.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{Project.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{Project.updatedDate ? new Date(Project.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(Project.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(Project)}>
                                         <EditIcon color="primary" />
@@ -383,14 +442,21 @@ function ProjectList() {
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{currentProject.id ? 'Update Project' : 'Add Project'}</DialogTitle>
                 <DialogContent>
-                    <TextField
+                    <InputLabel>Client</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Client"
                         name="client"
                         value={currentProject.client}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {Clients.map((client) => (
+                            <MenuItem key={client.id} value={client.name}>
+                                {client.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+
                     <TextField
                         margin="dense"
                         label="ProjectName"
@@ -399,110 +465,81 @@ function ProjectList() {
                         onChange={handleChange}
                         fullWidth
                     />
-
-                    <TextField
+                    <InputLabel>TechnicalProjectManager</InputLabel>
+                    <Select
                         margin="dense"
-                        label="TechnicalProjectManager"
                         name="technicalProjectManager"
-                        value={currentProject.technicalProjectManager}
+                        value={currentProject.employee}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {Employeess.map((employee) => (
+                            <MenuItem key={employee.id} value={employee.name}>
+                                {employee.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
 
-                    <TextField
+                    <InputLabel>PMO</InputLabel>
+                    <Select
                         margin="dense"
-                        label="SalesContact"
-                        name="salesContact"
-                        value={currentProject.salesContact}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-
-                    <TextField
-                        margin="dense"
-                        label="PMO"
                         name="pmo"
-                        value={currentProject.pmo}
+                        value={currentProject.employee}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {Employeess.map((employee) => (
+                            <MenuItem key={employee.id} value={employee.name}>
+                                {employee.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="SOWSubmittedDate"
+                            value={currentProject.sowSubmittedDate ? dayjs(currentProject.sowSubmittedDate) : null}
+                            onChange={handleSowSubmittedDateChange}
+                            fullWidth
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
 
-                    <TextField
-                        margin="dense"
-                        label="SOWSubmittedDate"
-                        name="SOWSubmittedDate"
-                        value={currentProject.SOWSubmittedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="SOWSignedDate"
+                            value={currentProject.SOWSignedDate ? dayjs(currentProject.SOWSignedDate) : null}
+                            onChange={handleSowSignedDateChange}
+                            fullWidth
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="SOWValidTill"
+                            value={currentProject.SOWValidTill ? dayjs(currentProject.SOWValidTill) : null}
+                            onChange={handleSowValidTillDateChange}
+                            fullWidth
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
 
-                    <TextField
-                        margin="dense"
-                        label="SOWSignedDate"
-                        name="SOWSignedDate"
-                        value={currentProject.SOWSignedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-
-                    <TextField
-                        margin="dense"
-                        label="SOWValidTill"
-                        name="SOWValidTill"
-                        value={currentProject.SOWValidTill}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-
-                    <TextField
-                        margin="dense"
-                        label="SOWLastExtendedDate"
-                        name="SOWLastExtendedDate"
-                        value={currentProject.SOWLastExtendedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentProject.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentProject.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentProject.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentProject.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentProject.updatedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="SOWLastExtendedDate"
+                            value={currentProject.SOWLastExtendedDate ? dayjs(currentProject.SOWLastExtendedDate) : null}
+                            onChange={handleSowLastExtendedDateChange}
+                            fullWidth
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -16,30 +16,25 @@ function InterviewStatusList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentInterviewStatus, setCurrentInterviewStatus] = useState({
-        id: '',
-        status: '',
-        isActive: true,
-        createdBy: '',
-        createdDate: '',
-        updatedBy: '',
-        updatedDate: ''
+        status: ''
     });
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
-        //axios.get('http://localhost:5200/api/InterviewStatus')
-        axios.get('http://172.17.31.61:5200/api/interviewStatus')
-            .then(response => {
-                setInterviewStatus(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the InterviewStatus!', error);
+        const fetchInterviewStatus = async () => {
+            try {
+                const interviewStatusResponse = await axios.get('http://172.17.31.61:5200/api/interviewStatus');
+                setInterviewStatus(interviewStatusResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the technologies!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        fetchInterviewStatus();
     }, []);
 
     const handleSort = (property) => {
@@ -60,18 +55,13 @@ function InterviewStatusList() {
     });
 
     const filteredInterviewStatus = sortedInterviewStatus.filter((InterviewStatus) =>
-        InterviewStatus.status.toLowerCase().includes(searchQuery.toLowerCase())
+    (InterviewStatus.status && typeof InterviewStatus.status === 'string' &&
+        InterviewStatus.status.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
         setCurrentInterviewStatus({
-            id: '',
-            status: '',
-            isActive: true,
-            createdBy: '',
-            createdDate: '',
-            updatedBy: '',
-            updatedDate: ''
+            status: ''
         });
         setOpen(true);
     };
@@ -92,6 +82,7 @@ function InterviewStatusList() {
                 console.error('There was an error deleting the InterviewStatus!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
@@ -254,7 +245,7 @@ function InterviewStatusList() {
                                 <TableCell>{InterviewStatus.createdBy}</TableCell>
                                 <TableCell>{new Date(InterviewStatus.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{InterviewStatus.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{InterviewStatus.updatedDate ? new Date(InterviewStatus.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(InterviewStatus.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(InterviewStatus)}>
                                         <EditIcon color="primary" />
@@ -283,46 +274,6 @@ function InterviewStatusList() {
                         label="Status"
                         name="status"
                         value={currentInterviewStatus.status}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentInterviewStatus.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentInterviewStatus.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentInterviewStatus.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentInterviewStatus.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentInterviewStatus.updatedDate}
                         onChange={handleChange}
                         fullWidth
                     />

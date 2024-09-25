@@ -26,8 +26,8 @@ function DepartmentList() {
     useEffect(() => {
         const fetchDepartments = async () => {
             try {
-                const deptResponse = await axios.get('http://localhost:5560/api/department');
-                //const deptResponse = await axios.get('http://172.17.31.61:5160/api/department');
+                // const deptResponse = await axios.get('http://localhost:5560/api/department');
+                const deptResponse = await axios.get('http://172.17.31.61:5160/api/department');
                 setDepartments(deptResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the departments!', error);
@@ -75,8 +75,8 @@ function DepartmentList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5560/api/Department/${id}`)
-        // axios.delete(`http://172.17.31.61:5160/api/department/${id}`)
+        // axios.delete(`http://localhost:5560/api/Department/${id}`)
+        axios.delete(`http://172.17.31.61:5160/api/department/${id}`)
             .then(response => {
                 setDepartments(departments.filter(dept => dept.id !== id));
             })
@@ -88,9 +88,39 @@ function DepartmentList() {
     };
 
     const handleSave = () => {
+        const nameRegex = /^[a-zA-Z0-9 ]+$/; // Allows letters, digits, and spaces
+        const minLength = 3; // Adjust according to your database constraint
+        const maxLength = 50; // Adjust according to your database constraint
+
+        // Null/empty value check
+        if (!currentDepartment.name || currentDepartment.name.trim() === '') {
+            alert('Department name cannot be empty.');
+            return;
+        }
+
+        // Special character check
+        if (!nameRegex.test(currentDepartment.name)) {
+            alert('Department name contains invalid characters. Only letters, numbers, and spaces are allowed.');
+            return;
+        }
+
+        // Length validation
+        if (currentDepartment.name.length < minLength || currentDepartment.name.length > maxLength) {
+            alert(`Department name must be between ${minLength} and ${maxLength} characters.`);
+            return;
+        }
+
+        // Uniqueness check
+        const isNameDuplicate = departments.some(dept =>
+            dept.name.toLowerCase() === currentDepartment.name.toLowerCase() && dept.id !== currentDepartment.id
+        );
+        if (isNameDuplicate) {
+            alert('Department name must be unique.');
+            return;
+        }
         if (currentDepartment.id) {
-            axios.put(`http://localhost:5560/api/Department/${currentDepartment.id}`, currentDepartment)
-            // axios.put(`http://172.17.31.61:5160/api/department/${currentDepartment.id}`, currentDepartment)
+            // axios.put(`http://localhost:5560/api/Department/${currentDepartment.id}`, currentDepartment)
+            axios.put(`http://172.17.31.61:5160/api/department/${currentDepartment.id}`, currentDepartment)
                 .then(response => {
                     setDepartments(departments.map(dept => dept.id === currentDepartment.id ? response.data : dept));
                 })
@@ -100,8 +130,8 @@ function DepartmentList() {
                 });
 
         } else {
-            axios.post('http://localhost:5560/api/Department', currentDepartment)
-            // axios.post('http://172.17.31.61:5160/api/department', currentDepartment)
+            // axios.post('http://localhost:5560/api/Department', currentDepartment)
+            axios.post('http://172.17.31.61:5160/api/department', currentDepartment)
                 .then(response => {
                     setDepartments([...departments, response.data]);
                 })

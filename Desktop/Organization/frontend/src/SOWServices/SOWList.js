@@ -5,9 +5,17 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import '../App.css';
 
 function SOWList() {
     const [SOWs, setSOWs] = useState([]);
+    const [Clients, setClients] = useState([]);
+    const [Projects, setProjects] = useState([]);
+    const [SOWStatus, setSOWStatus] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -16,36 +24,63 @@ function SOWList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentSOW, setCurrentSOW] = useState({
-        id: '',
         client: '',
         project: '',
         preparedDate: '',
         submittedDate: '',
         status: '',
-        comments: '',
-        isActive: true,
-        createdBy: '',
-        createdDate: '',
-        updatedBy: '',
-        updatedDate: ''
+        comments: ''
     });
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
-
     useEffect(() => {
-        //axios.get('http://localhost:5041/api/SOW')
-        axios.get('http://172.17.31.61:5041/api/sow')
-            .then(response => {
-                setSOWs(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the SOWs!', error);
+        const fetchSOWs = async () => {
+            try {
+                const sowResponse = await axios.get('http://172.17.31.61:5041/api/sow');
+                setSOWs(sowResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the sows!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        const fetchClients = async () => {
+            try {
+                const clientResponse = await axios.get('http://172.17.31.61:5142/api/client');
+                setClients(clientResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the Clients!', error);
+                setError(error);
+            }
+        };
+
+        const fetchProjects = async () => {
+            try {
+                const projectResponse = await axios.get('http://172.17.31.61:5151/api/project');
+                setProjects(projectResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the Projects!', error);
+                setError(error);
+            }
+        };
+
+        const fetchSowStatus = async () => {
+            try {
+                const sowStatusResponse = await axios.get('http://172.17.31.61:5041/api/sowstatus');
+                setSOWStatus(sowStatusResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the sowStatus!', error);
+                setError(error);
+            }
+        };
+
+        fetchSOWs();
+        fetchClients();
+        fetchProjects();
+        fetchSowStatus();
     }, []);
 
     const handleSort = (property) => {
@@ -66,26 +101,24 @@ function SOWList() {
     });
 
     const filteredSOWs = sortedSOWs.filter((SOW) =>
-        SOW.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        SOW.project.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        SOW.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        SOW.comments.toLowerCase().includes(searchQuery.toLowerCase())
+        (SOW.client && typeof SOW.client === 'string' &&
+            SOW.client.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (SOW.project && typeof SOW.project === 'string' &&
+            SOW.project.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (SOW.status && typeof SOW.status === 'string' &&
+            SOW.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (SOW.comments && typeof SOW.comments === 'string' &&
+            SOW.comments.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
         setCurrentSOW({
-            id: '',
             client: '',
             project: '',
             preparedDate: '',
             submittedDate: '',
             status: '',
-            comments: '',
-            isActive: true,
-            createdBy: '',
-            createdDate: '',
-            updatedBy: '',
-            updatedDate: ''
+            comments: ''
         });
         setOpen(true);
     };
@@ -106,6 +139,7 @@ function SOWList() {
                 console.error('There was an error deleting the SOW!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
@@ -165,6 +199,19 @@ function SOWList() {
 
     const handleConfirmYes = () => {
         handleDelete(deleteTechId);
+    };
+
+    const handlePreparedDateChange = (newDate) => {
+        setCurrentSOW((prev) => ({
+            ...prev,
+            preparedDate: newDate ? newDate.toISOString() : "",
+        }));
+    };
+    const handleSubmittedDateChange = (newDate) => {
+        setCurrentSOW((prev) => ({
+            ...prev,
+            submittedDate: newDate ? newDate.toISOString() : "",
+        }));
     };
 
     if (loading) {
@@ -319,7 +366,7 @@ function SOWList() {
                                 <TableCell>{SOW.createdBy}</TableCell>
                                 <TableCell>{new Date(SOW.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{SOW.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{SOW.updatedDate ? new Date(SOW.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(SOW.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(SOW)}>
                                         <EditIcon color="primary" />
@@ -343,91 +390,73 @@ function SOWList() {
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{currentSOW.id ? 'Update SOW' : 'Add SOW'}</DialogTitle>
                 <DialogContent>
-                    <TextField
+                    <InputLabel>Client</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Client"
                         name="client"
                         value={currentSOW.client}
                         onChange={handleChange}
                         fullWidth
-                    />
-                    <TextField
+                    >
+                        {Clients.map((client) => (
+                            <MenuItem key={client.id} value={client.name}>
+                                {client.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <InputLabel>Project</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Project"
                         name="project"
                         value={currentSOW.project}
                         onChange={handleChange}
                         fullWidth
-                    />
-                    <TextField
+                    >
+                        {Projects.map((project) => (
+                            <MenuItem key={project.id} value={project.name}>
+                                {project.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="PreparedDate"
+                            value={currentSOW.preparedDate ? dayjs(currentSOW.preparedDate) : null}
+                            onChange={handlePreparedDateChange}
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="SubmittedDate"
+                            value={currentSOW.submittedDate ? dayjs(currentSOW.submittedDate) : null}
+                            onChange={handleSubmittedDateChange}
+                            renderInput={(params) => (
+                                <TextField {...params} fullWidth margin="dense" />
+                            )}
+                        />
+                    </LocalizationProvider>
+                    <InputLabel>Status</InputLabel>
+                    <Select
                         margin="dense"
-                        label="PreparedDate"
-                        name="preparedDate"
-                        value={currentSOW.preparedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="SubmittedDate"
-                        name="submittedDate"
-                        value={currentSOW.submittedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Status"
                         name="status"
-                        value={currentSOW.status}
+                        value={currentSOW.Sowstatus}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {SOWStatus.map((Sowstatus) => (
+                            <MenuItem key={Sowstatus.id} value={Sowstatus.status}>
+                                {Sowstatus.status}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <TextField
                         margin="dense"
                         label="Comments"
                         name="comments"
                         value={currentSOW.comments}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentSOW.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentSOW.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentSOW.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentSOW.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentSOW.updatedDate}
                         onChange={handleChange}
                         fullWidth
                     />

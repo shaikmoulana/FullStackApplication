@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -16,30 +16,25 @@ function SOWStatusList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentSOWStatus, setCurrentSOWStatus] = useState({
-        id: '',
-        status: '',
-        isActive: true,
-        createdBy: '',
-        createdDate: '',
-        updatedBy: '',
-        updatedDate: ''
+        status: ''
     });
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
-        //axios.get('http://localhost:5041/api/SOWStatus')
-        axios.get('http://172.17.31.61:5041/api/sowstatus')
-            .then(response => {
-                setSOWStatus(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the SOWStatuss!', error);
+        const fetchSowStatus = async () => {
+            try {
+                const sowStatusResponse = await axios.get('http://172.17.31.61:5041/api/sowstatus');
+                setSOWStatus(sowStatusResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the sowStatus!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        fetchSowStatus();
     }, []);
 
     const handleSort = (property) => {
@@ -60,18 +55,14 @@ function SOWStatusList() {
     });
 
     const filteredSOWStatus = sortedSOWStatus.filter((SOWStatus) =>
+
+        SOWStatus.status && typeof SOWStatus.status === 'string' &&
         SOWStatus.status.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handleAdd = () => {
         setCurrentSOWStatus({
-            id: '',
-            status: '',
-            isActive: true,
-            createdBy: '',
-            createdDate: '',
-            updatedBy: '',
-            updatedDate: ''
+            status: ''
         });
         setOpen(true);
     };
@@ -92,6 +83,7 @@ function SOWStatusList() {
                 console.error('There was an error deleting the SOWStatus!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
@@ -100,9 +92,7 @@ function SOWStatusList() {
             //axios.put(`http://localhost:5041/api/SOWStatus/${currentSOWStatus.id}`, currentSOWStatus)
             axios.put(`http://172.17.31.61:5041/api/sowstatus/${currentSOWStatus.id}`, currentSOWStatus)
                 .then(response => {
-                    console.log(response)
                     //setSOWStatuss([...SOWStatuss, response.data]);
-                    // setSOWStatuss(response.data);
                     setSOWStatus(SOWStatus.map(tech => tech.id === currentSOWStatus.id ? response.data : tech));
                 })
                 .catch(error => {
@@ -283,46 +273,6 @@ function SOWStatusList() {
                         label="Status"
                         name="status"
                         value={currentSOWStatus.status}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentSOWStatus.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentSOWStatus.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentSOWStatus.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentSOWStatus.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentSOWStatus.updatedDate}
                         onChange={handleChange}
                         fullWidth
                     />

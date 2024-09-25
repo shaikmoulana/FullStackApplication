@@ -36,8 +36,8 @@ function WebinarList() {
     useEffect(() => {
         const fetchWebinars = async () => {
             try {
-                const webResponse = await axios.get('http://localhost:5517/api/Webinars');
-                // const webResponse = await axios.get('http://172.17.31.61:5017/api/webinars');
+                // const webResponse = await axios.get('http://localhost:5017/api/webinars');
+                const webResponse = await axios.get('http://172.17.31.61:5017/api/webinars');
                 setWebinars(webResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the webinars!', error);
@@ -48,8 +48,8 @@ function WebinarList() {
 
         const fetchSpeakers = async () => {
             try {
-                const speResponse = await axios.get('http://localhost:5733/api/employee');
-                // const speResponse = await axios.get('http://172.17.31.61:5633/api/employee');
+                // const speResponse = await axios.get('http://localhost:5733/api/employee');
+                const speResponse = await axios.get('http://172.17.31.61:5733/api/employee');
                 setEmployees(speResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the speakers!', error);
@@ -79,14 +79,14 @@ function WebinarList() {
     });
 
     const filteredWebinars = sortedWebinars.filter((webinar) =>
-        webinar.title && typeof webinar.title === 'string' &&
-        webinar.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (webinar.title && typeof webinar.title === 'string' &&
+            webinar.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        webinar.status && typeof webinar.status === 'string' &&
-        webinar.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (webinar.status && typeof webinar.status === 'string' &&
+            webinar.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        webinar.speaker && typeof webinar.speaker === 'string' &&
-        webinar.speaker.toLowerCase().includes(searchQuery.toLowerCase())
+        (webinar.speaker && typeof webinar.speaker === 'string' &&
+            webinar.speaker.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
@@ -107,8 +107,8 @@ function WebinarList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5517/api/Webinars/${id}`)
-        // axios.delete(`http://172.17.31.61:5017/api/webinars/${id}`)
+        // axios.delete(`http://localhost:5517/api/Webinars/${id}`)
+        axios.delete(`http://172.17.31.61:5017/api/webinars/${id}`)
             .then(response => {
                 setWebinars(Webinars.filter(tech => tech.id !== id));
             })
@@ -121,8 +121,8 @@ function WebinarList() {
 
     const handleSave = () => {
         if (currentWebinar.id) {
-            axios.put(`http://localhost:5517/api/Webinars/${currentWebinar.id}`, currentWebinar)
-            // axios.put(`http://172.17.31.61:5017/api/webinars/${currentWebinar.id}`, currentWebinar)
+            // axios.put(`http://localhost:5517/api/Webinars/${currentWebinar.id}`, currentWebinar)
+            axios.put(`http://172.17.31.61:5017/api/webinars/${currentWebinar.id}`, currentWebinar)
                 .then(response => {
                     console.log(response)
                     setWebinars(Webinars.map(tech => tech.id === currentWebinar.id ? response.data : tech));
@@ -133,8 +133,8 @@ function WebinarList() {
                 });
 
         } else {
-            axios.post('http://localhost:5517/api/Webinars', currentWebinar)
-            // axios.post('http://172.17.31.61:5017/api/webinars', currentWebinar)
+            // axios.post('http://localhost:5517/api/Webinars', currentWebinar)
+            axios.post('http://172.17.31.61:5017/api/webinars', currentWebinar)
                 .then(response => {
                     setWebinars([...Webinars, response.data]);
                 })

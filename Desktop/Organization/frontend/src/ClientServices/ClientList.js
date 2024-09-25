@@ -8,6 +8,7 @@ import PaginationComponent from '../Components/PaginationComponent'; // Import y
 
 function ClientList() {
     const [Clients, setClients] = useState([]);
+    const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -16,19 +17,13 @@ function ClientList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentClient, setCurrentClient] = useState({
-        id: '',
         name: '',
         lineofBusiness: '',
         salesEmployee: '',
         country: '',
         city: '',
         state: '',
-        address: '',
-        isActive: true,
-        createdBy: '',
-        createdDate: '',
-        updatedBy: '',
-        updatedDate: ''
+        address: ''
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
@@ -36,18 +31,31 @@ function ClientList() {
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
-        //axios.get('http://localhost:5142/api/Client')
-        axios.get('http://172.17.31.61:5142/api/client')
-            .then(response => {
-                setClients(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
+        const fetchClients = async () => {
+            try {
+                const clientResponse = await axios.get('http://172.17.31.61:5142/api/client');
+                setClients(clientResponse.data);
+            } catch (error) {
                 console.error('There was an error fetching the Clients!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        const fetchEmployees = async () => {
+            try {
+                const empResponse = await axios.get('http://172.17.31.61:5733/api/employee');
+                setEmployees(empResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the salesEmployes!', error);
+                setError(error);
+            }
+        };
+
+        fetchClients();
+        fetchEmployees();
     }, []);
+
 
     const handleSort = (property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -67,30 +75,31 @@ function ClientList() {
     });
 
     const filteredClients = sortedClients.filter((client) =>
-        client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.lineofBusiness.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.salesEmployee.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.address.toLowerCase().includes(searchQuery.toLowerCase())
+        (client.name && typeof client.name === 'string' &&
+            client.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (client.lineofBusiness && typeof client.lineofBusiness === 'string' &&
+            client.lineofBusiness.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (client.salesEmployee && typeof client.salesEmployee === 'string' &&
+            client.salesEmployee.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (client.country && typeof client.country === 'string' &&
+            client.country.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (client.city && typeof client.city === 'string' &&
+            client.city.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (client.state && typeof client.state === 'string' &&
+            client.state.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (client.address && typeof client.address === 'string' &&
+            client.address.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
         setCurrentClient({
-            id: '',
             name: '',
             lineofBusiness: '',
             salesEmployee: '',
             country: '',
             city: '',
             state: '',
-            address: '',
-            isActive: true,
-            createdBy: '',
-            createdDate: '',
-            updatedBy: '',
-            updatedDate: ''
+            address: ''
         });
         setOpen(true);
     };
@@ -111,17 +120,14 @@ function ClientList() {
                 console.error('There was an error deleting the Client!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
         if (currentClient.id) {
-            // Update existing Client
             //axios.put(`http://localhost:5142/api/Client/${currentClient.id}`, currentClient)
             axios.put(`http://172.17.31.61:5142/api/client/${currentClient.id}`, currentClient)
                 .then(response => {
-                    console.log(response)
-                    //setClients([...Clients, response.data]);
-                    // setClients(response.data);
                     setClients(Clients.map(tech => tech.id === currentClient.id ? response.data : tech));
                 })
                 .catch(error => {
@@ -130,7 +136,6 @@ function ClientList() {
                 });
 
         } else {
-            // Add new Client
             //axios.post('http://localhost:5142/api/Client', currentClient)
             axios.post('http://172.17.31.61:5142/api/client', currentClient)
                 .then(response => {
@@ -335,7 +340,7 @@ function ClientList() {
                                 <TableCell>{Client.createdBy}</TableCell>
                                 <TableCell>{new Date(Client.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{Client.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{Client.updatedDate ? new Date(Client.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(Client.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(Client)}>
                                         <EditIcon color="primary" />
@@ -376,14 +381,20 @@ function ClientList() {
                         onChange={handleChange}
                         fullWidth
                     />
-                    <TextField
+                    <InputLabel>SalesEmployee</InputLabel>
+                    <Select
                         margin="dense"
-                        label="SalesEmployee"
                         name="salesEmployee"
                         value={currentClient.salesEmployee}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {employees.map((employee) => (
+                            <MenuItem key={employee.id} value={employee.name}>
+                                {employee.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <TextField
                         margin="dense"
                         label="Country"
@@ -413,46 +424,6 @@ function ClientList() {
                         label="Address"
                         name="address"
                         value={currentClient.address}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentClient.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentClient.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentClient.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentClient.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentClient.updatedDate}
                         onChange={handleChange}
                         fullWidth
                     />

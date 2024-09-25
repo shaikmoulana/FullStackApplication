@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -16,31 +16,29 @@ function ContactTypeList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentContactType, setCurrentContactType] = useState({
-        id: '',
-        typeName: '',
-        isActive: true,
-        createdBy: '',
-        createdDate: '',
-        updatedBy: '',
-        updatedDate: ''
+        typeName: ''
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
+
+
     useEffect(() => {
-        //axios.get('http://localhost:5142/api/ContactType')
-        axios.get('http://172.17.31.61:5142/api/contactType')
-            .then(response => {
-                setcontactTypes(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the contactTypes!', error);
+        const fetchContactType = async () => {
+            try {
+                // const techResponse = await axios.get('http://172.17.31.61:5142/api/ContactType');
+                const contactTypeResponse = await axios.get('http://172.17.31.61:5142/api/contactType');
+                setcontactTypes(contactTypeResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the technologies!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        fetchContactType();
     }, []);
 
     const handleSort = (property) => {
@@ -61,18 +59,13 @@ function ContactTypeList() {
     });
 
     const filteredContactType = sortedContactType.filter((contactType) =>
-        contactType.typeName.toLowerCase().includes(searchQuery.toLowerCase()) 
+        contactType.typeName && typeof contactType.typeName === 'string' &&
+        contactType.typeName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handleAdd = () => {
         setCurrentContactType({
-            id: '',
-            typeName: '',
-            isActive: true,
-            createdBy: '',
-            createdDate: '',
-            updatedBy: '',
-            updatedDate: ''
+            typeName: ''
         });
         setOpen(true);
     };
@@ -93,6 +86,8 @@ function ContactTypeList() {
                 console.error('There was an error deleting the ContactType!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
+
     };
 
     const handleSave = () => {
@@ -257,7 +252,7 @@ function ContactTypeList() {
                                 <TableCell>{ContactType.createdBy}</TableCell>
                                 <TableCell>{new Date(ContactType.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{ContactType.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{ContactType.updatedDate ? new Date(ContactType.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(ContactType.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(ContactType)}>
                                         <EditIcon color="primary" />
@@ -287,46 +282,6 @@ function ContactTypeList() {
                         label="TypeName"
                         name="typeName"
                         value={currentContactType.typeName}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentContactType.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentContactType.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentContactType.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentContactType.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentContactType.updatedDate}
                         onChange={handleChange}
                         fullWidth
                     />

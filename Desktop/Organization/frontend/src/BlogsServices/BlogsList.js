@@ -37,8 +37,8 @@ function BlogsList() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                const blogResponse = await axios.get('http://localhost:5174/api/blogs');
-                //const blogResponse = await axios.get('http://172.17.31.61:5174/api/blogs');
+                // const blogResponse = await axios.get('http://localhost:5174/api/blogs');
+                const blogResponse = await axios.get('http://172.17.31.61:5174/api/blogs');
                 setBlogs(blogResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the Blogs!', error);
@@ -49,8 +49,8 @@ function BlogsList() {
 
         const fetchAuthor = async () => {
             try {
-                const authorResponse = await axios.get('http://localhost:5733/api/employee');
-                //const authorResponse = await axios.get('http://172.17.31.61:5633/api/employee');
+                // const authorResponse = await axios.get('http://localhost:5733/api/employee');
+                const authorResponse = await axios.get('http://172.17.31.61:5733/api/employee');
                 setEmployees(authorResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the speakers!', error);
@@ -80,14 +80,14 @@ function BlogsList() {
     });
 
     const filteredBlogs = sortedBlogs.filter((blog) =>
-        blog.title && typeof blog.title === 'string' &&
-        blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (blog.title && typeof blog.title === 'string' &&
+            blog.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        blog.author && typeof blog.author === 'string' &&
-        blog.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (blog.author && typeof blog.author === 'string' &&
+            blog.author.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        blog.status && typeof blog.status === 'string' &&
-        blog.status.toLowerCase().includes(searchQuery.toLowerCase())
+        (blog.status && typeof blog.status === 'string' &&
+            blog.status.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
@@ -109,8 +109,8 @@ function BlogsList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5147/api/Blogs/${id}`)
-            //axios.delete(`http://172.17.31.61:5174/api/blogs/${id}`)
+        // axios.delete(`http://localhost:5147/api/Blogs/${id}`)
+        axios.delete(`http://172.17.31.61:5174/api/blogs/${id}`)
             .then(response => {
                 setBlogs(blogs.filter(tech => tech.id !== id));
             })
@@ -123,8 +123,8 @@ function BlogsList() {
 
     const handleSave = () => {
         if (currentBlogs.id) {
-            axios.put(`http://localhost:5147/api/Blogs/${currentBlogs.id}`, currentBlogs)
-                //axios.put(`http://172.17.31.61:5174/api/blogs/${currentBlogs.id}`, currentBlogs)
+            // axios.put(`http://localhost:5147/api/Blogs/${currentBlogs.id}`, currentBlogs)
+            axios.put(`http://172.17.31.61:5174/api/blogs/${currentBlogs.id}`, currentBlogs)
                 .then(response => {
                     //setBlogs([...blogs, response.data]);
                     // setBlogs(response.data);
@@ -137,8 +137,8 @@ function BlogsList() {
 
         } else {
             // Add new Blogs
-            axios.post('http://localhost:5147/api/Blogs', currentBlogs)
-                //axios.post('http://172.17.31.61:5174/api/blogs', currentBlogs)
+            // axios.post('http://localhost:5147/api/Blogs', currentBlogs)
+            axios.post('http://172.17.31.61:5174/api/blogs', currentBlogs)
                 .then(response => {
                     setBlogs([...blogs, response.data]);
                 })
