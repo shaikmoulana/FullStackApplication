@@ -92,7 +92,8 @@ function TechnologyList() {
 
     const handleDelete = (id) => {
         // axios.delete(`http://localhost:5574/api/Technology/${id}`)
-        axios.delete(`http://172.17.31.61:5274/api/technology/${id}`)
+        // axios.delete(`http://172.17.31.61:5274/api/technology/${id}`)
+        axios.patch(`http://172.17.31.61:5274/api/technology/${id}`)
             .then(response => {
                 setTechnologies(technologies.filter(tech => tech.id !== id));
             })

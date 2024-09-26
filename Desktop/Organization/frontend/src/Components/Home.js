@@ -70,7 +70,7 @@ export default function Home() {
     } else if (view === 'sow') {
       setOpenSOW(!openSOW);
       //setOpenClient(false); // Close client menu when project menu is toggled
-    } 
+    }
     else {
       // setOpenEmployee(false);
       setOpenClient(false);
@@ -122,7 +122,7 @@ export default function Home() {
         <Toolbar sx={{ bgcolor: 'black', color: 'white' }}>Dashboard</Toolbar>
         <Divider />
         <List>
-          {['Home', 'Department', 'Designation', 'Employee','Technology', 'Webinar', 'Blogs'].map((text) => (
+          {['Home', 'Department', 'Designation', 'Employee', 'Technology', 'Webinar', 'Blogs'].map((text) => (
             <ListItem key={text} disablePadding>
               <ListItemButton
                 onClick={() => handleListItemClick(text.toLowerCase())}
@@ -135,28 +135,6 @@ export default function Home() {
               </ListItemButton>
             </ListItem>
           ))}
-          {/* <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => handleListItemClick('employee')}
-              sx={{
-                '&:hover': { bgcolor: '#d3d3d3' }, // Dark gray on hover
-                borderRadius: 1
-              }}
-            >
-              <ListItemText primary="Employee" />
-              {openEmployee ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openEmployee} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('employee')}>
-                <ListItemText primary="Employee List" />
-              </ListItem>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('employeetechnology')}>
-                <ListItemText primary="Employee Technology" />
-              </ListItem>
-            </List>
-          </Collapse> */}
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => handleListItemClick('client')}
@@ -203,36 +181,12 @@ export default function Home() {
               <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('projectemployee')}>
                 <ListItemText primary="Project Employee" />
               </ListItem>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('projecttechnology')}>
+              {/* <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('projecttechnology')}>
                 <ListItemText primary="Project Technology" />
-              </ListItem>
+              </ListItem> */}
             </List>
           </Collapse>
 
-          
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => handleListItemClick('interview')}
-              sx={{
-                '&:hover': { bgcolor: '#d3d3d3' }, // Dark gray on hover
-                borderRadius: 1
-              }}
-            >
-              <ListItemText primary="Interview" />
-              {openInterview ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openInterview} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('interview')}>
-                <ListItemText primary="Interview List" />
-              </ListItem>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('interviewstatus')}>
-                <ListItemText primary="Interview Status" />
-              </ListItem>
-            </List>
-          </Collapse>
-          
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => handleListItemClick('sow')}
@@ -260,7 +214,29 @@ export default function Home() {
                 <ListItemText primary="SOW Status" />
               </ListItem>
             </List>
-          </Collapse>      
+          </Collapse>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => handleListItemClick('interview')}
+              sx={{
+                '&:hover': { bgcolor: '#d3d3d3' }, // Dark gray on hover
+                borderRadius: 1
+              }}
+            >
+              <ListItemText primary="Interview" />
+              {openInterview ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
+            </ListItemButton>
+          </ListItem>
+          <Collapse in={openInterview} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('interview')}>
+                <ListItemText primary="Interview List" />
+              </ListItem>
+              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('interviewstatus')}>
+                <ListItemText primary="Interview Status" />
+              </ListItem>
+            </List>
+          </Collapse>
 
         </List>
         <Divider />

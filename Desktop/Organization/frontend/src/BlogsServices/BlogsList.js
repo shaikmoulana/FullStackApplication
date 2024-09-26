@@ -110,7 +110,8 @@ function BlogsList() {
 
     const handleDelete = (id) => {
         // axios.delete(`http://localhost:5147/api/Blogs/${id}`)
-        axios.delete(`http://172.17.31.61:5174/api/blogs/${id}`)
+        //axios.delete(`http://172.17.31.61:5174/api/blogs/${id}`)
+        axios.patch(`http://172.17.31.61:5174/api/blogs/${id}`)
             .then(response => {
                 setBlogs(blogs.filter(tech => tech.id !== id));
             })

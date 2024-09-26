@@ -78,7 +78,8 @@ function ContactTypeList() {
 
     const handleDelete = (id) => {
         //axios.delete(`http://localhost:5142/api/ContactType/${id}`)
-        axios.delete(`http://172.17.31.61:5142/api/contactType/${id}`)
+        // axios.delete(`http://172.17.31.61:5142/api/contactType/${id}`)
+        axios.patch(`http://172.17.31.61:5142/api/contactType/${id}`)
             .then(response => {
                 setcontactTypes(contactTypes.filter(tech => tech.id !== id));
             })

@@ -88,7 +88,8 @@ function SOWProposedTeamList() {
 
     const handleDelete = (id) => {
         //axios.delete(`http://localhost:5041/api/SOWProposedTeam/${id}`)
-        axios.delete(`http://172.17.31.61:5041/api/sowProposedTeam/${id}`)
+        // axios.delete(`http://172.17.31.61:5041/api/sowProposedTeam/${id}`)
+        axios.patch(`http://172.17.31.61:5041/api/sowProposedTeam/${id}`)
             .then(response => {
                 setSOWProposedTeams(SOWProposedTeams.filter(tech => tech.id !== id));
             })
@@ -262,7 +263,8 @@ function SOWProposedTeamList() {
                     </TableHead>
                     <TableBody>
                         {filteredSOWProposedTeams.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((SOWProposedTeam) => (
-                            <TableRow key={SOWProposedTeam.id}>
+                            <TableRow key={SOWProposedTeam.id}
+                                sx={{ backgroundColor: SOWProposedTeam.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{SOWProposedTeam.id}</TableCell> */}
                                 <TableCell>{SOWProposedTeam.sowRequirement}</TableCell>
                                 <TableCell>{SOWProposedTeam.employee}</TableCell>

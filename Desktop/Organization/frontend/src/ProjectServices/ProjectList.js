@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { ListItemText, Checkbox, Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -13,8 +13,9 @@ import '../App.css';
 
 function ProjectList() {
     const [Projects, setProjects] = useState([]);
-    const [Employeess, setEmployees] = useState([]);
+    const [Employees, setEmployees] = useState([]);
     const [Clients, setClients] = useState([]);
+    const [Technologies, setTechnologies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -31,7 +32,8 @@ function ProjectList() {
         sowSubmittedDate: '',
         sowSignedDate: '',
         sowValidTill: '',
-        sowLastExtendedDate: ''
+        sowLastExtendedDate: '',
+        technology: []
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
@@ -70,10 +72,21 @@ function ProjectList() {
                 setError(error);
             }
         };
+        const fetchTechnologies = async () => {
+            try {
+                const techResponse = await axios.get('http://172.17.31.61:5274/api/Technology');
+                setTechnologies(techResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the technologies!', error);
+                setError(error);
+            }
+        };
+
 
         fetchProjects();
         fetchClient();
         fetchEmployees();
+        fetchTechnologies();
     }, []);
 
     const handleSort = (property) => {
@@ -121,7 +134,8 @@ function ProjectList() {
             sowSubmittedDate: '',
             sowSignedDate: '',
             sowValidTill: '',
-            sowLastExtendedDate: ''
+            sowLastExtendedDate: '',
+            technology: []
         });
         setOpen(true);
     };
@@ -146,10 +160,18 @@ function ProjectList() {
     };
 
     const handleSave = () => {
+        const projectToSave = {
+            ...currentProject,
+            technology: currentProject.technology.map(tech => {
+                const selectedTech = Technologies.find(t => t.name === tech);
+                return selectedTech ? selectedTech.id : null;
+            }).filter(id => id !== null) // Convert technology names to IDs
+        };
+
         if (currentProject.id) {
             // Update existing Project
             //axios.put(`http://localhost:5151/api/Project/${currentProject.id}`, currentProject)
-            axios.put(`http://172.17.31.61:5151/api/project/${currentProject.id}`, currentProject)
+            axios.put(`http://172.17.31.61:5151/api/project/${currentProject.id}`, projectToSave)
                 .then(response => {
                     console.log(response)
                     //setProjects([...Projects, response.data]);
@@ -164,7 +186,7 @@ function ProjectList() {
         } else {
             // Add new Project
             //axios.post('http://localhost:5151/api/Project', currentProject)
-            axios.post('http://172.17.31.61:5151/api/project', currentProject)
+            axios.post('http://172.17.31.61:5151/api/project', projectToSave)
                 .then(response => {
                     setProjects([...Projects, response.data]);
                 })
@@ -233,7 +255,13 @@ function ProjectList() {
             sowLastExtendedDate: newDate ? newDate.toISOString() : "",
         }));
     };
-
+    const handleTechnologyChange = (event) => {
+        const { value } = event.target;
+        setCurrentProject({
+            ...currentProject,
+            technology: typeof value === 'string' ? value.split(',') : value  // Handle multiple selection
+        });
+    };
     if (loading) {
         return <p>Loading...</p>;
     }
@@ -466,6 +494,38 @@ function ProjectList() {
                         onChange={handleChange}
                         fullWidth
                     />
+                    <InputLabel id="demo-simple-select-label">Technology</InputLabel>
+                    <Select
+                        label="Technologies"
+                        //  placeholder="Technologies"
+                        name="technologies"
+                        multiple
+                        value={currentProject.technology}
+                        onChange={handleTechnologyChange}
+                        renderValue={(selected) => selected.join(', ')}
+                        fullWidth
+                    >
+                        {Technologies.map((tech) => (
+                            <MenuItem key={tech.id} value={tech.name}>
+                                <Checkbox checked={currentProject.technology.indexOf(tech.name) > -1} />
+                                <ListItemText primary={tech.name} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <InputLabel>SalesContact</InputLabel>
+                    <Select
+                        margin="dense"
+                        name="salesContact"
+                        value={currentProject.employee}
+                        onChange={handleChange}
+                        fullWidth
+                    >
+                        {Employees.map((employee) => (
+                            <MenuItem key={employee.id} value={employee.name}>
+                                {employee.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <InputLabel>TechnicalProjectManager</InputLabel>
                     <Select
                         margin="dense"
@@ -474,7 +534,7 @@ function ProjectList() {
                         onChange={handleChange}
                         fullWidth
                     >
-                        {Employeess.map((employee) => (
+                        {Employees.map((employee) => (
                             <MenuItem key={employee.id} value={employee.name}>
                                 {employee.name}
                             </MenuItem>
@@ -489,7 +549,7 @@ function ProjectList() {
                         onChange={handleChange}
                         fullWidth
                     >
-                        {Employeess.map((employee) => (
+                        {Employees.map((employee) => (
                             <MenuItem key={employee.id} value={employee.name}>
                                 {employee.name}
                             </MenuItem>
@@ -501,9 +561,10 @@ function ProjectList() {
                             value={currentProject.sowSubmittedDate ? dayjs(currentProject.sowSubmittedDate) : null}
                             onChange={handleSowSubmittedDateChange}
                             fullWidth
-                            renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
-                            )}
+                            // renderInput={(params) => (
+                            //     <TextField {...params} fullWidth margin="dense" />
+                            // )}
+                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" /> }}
                         />
                     </LocalizationProvider>
 
@@ -513,9 +574,8 @@ function ProjectList() {
                             value={currentProject.SOWSignedDate ? dayjs(currentProject.SOWSignedDate) : null}
                             onChange={handleSowSignedDateChange}
                             fullWidth
-                            renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
-                            )}
+                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" /> }}
+
                         />
                     </LocalizationProvider>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -524,9 +584,8 @@ function ProjectList() {
                             value={currentProject.SOWValidTill ? dayjs(currentProject.SOWValidTill) : null}
                             onChange={handleSowValidTillDateChange}
                             fullWidth
-                            renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
-                            )}
+                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" /> }}
+
                         />
                     </LocalizationProvider>
 
@@ -536,9 +595,8 @@ function ProjectList() {
                             value={currentProject.SOWLastExtendedDate ? dayjs(currentProject.SOWLastExtendedDate) : null}
                             onChange={handleSowLastExtendedDateChange}
                             fullWidth
-                            renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
-                            )}
+                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" /> }}
+
                         />
                     </LocalizationProvider>
                 </DialogContent>

@@ -112,7 +112,8 @@ function ProjectEmployeeList() {
 
     const handleDelete = (id) => {
         //axios.delete(`http://localhost:5151/api/ProjectEmployee/${id}`)
-        axios.delete(`http://172.17.31.61:5151/api/projectEmployee/${id}`)
+        // axios.delete(`http://172.17.31.61:5151/api/projectEmployee/${id}`)
+        axios.patch(`http://172.17.31.61:5151/api/projectEmployee/${id}`)
             .then(response => {
                 setProjectEmployees(ProjectEmployees.filter(tech => tech.id !== id));
             })
@@ -358,8 +359,8 @@ function ProjectEmployeeList() {
                         fullWidth
                     >
                         {Projects.map((project) => (
-                            <MenuItem key={project.id} value={project.name}>
-                                {project.name}
+                            <MenuItem key={project.id} value={project.projectName}>
+                                {project.projectName}
                             </MenuItem>
                         ))}
                     </Select>

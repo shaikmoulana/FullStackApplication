@@ -199,7 +199,8 @@ function EmployeeList() {
 
     const handleDelete = (id) => {
         // axios.delete(`http://localhost:5733/api/Employee/${id}`)
-        axios.delete(`http://172.17.31.61:5733/api/employee/${id}`)
+        // axios.delete(`http://172.17.31.61:5733/api/employee/${id}`)
+        axios.patch(`http://172.17.31.61:5733/api/employee/${id}`)
             .then(response => {
                 setEmployees(Employees.filter(tech => tech.id !== id));
             })

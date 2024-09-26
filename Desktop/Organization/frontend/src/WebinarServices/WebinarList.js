@@ -108,7 +108,8 @@ function WebinarList() {
 
     const handleDelete = (id) => {
         // axios.delete(`http://localhost:5517/api/Webinars/${id}`)
-        axios.delete(`http://172.17.31.61:5017/api/webinars/${id}`)
+        // axios.delete(`http://172.17.31.61:5017/api/webinars/${id}`)
+        axios.patch(`http://172.17.31.61:5017/api/webinars/${id}`)
             .then(response => {
                 setWebinars(Webinars.filter(tech => tech.id !== id));
             })

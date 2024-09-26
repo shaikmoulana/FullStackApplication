@@ -131,7 +131,8 @@ function SOWList() {
 
     const handleDelete = (id) => {
         //axios.delete(`http://localhost:5041/api/SOW/${id}`)
-        axios.delete(`http://172.17.31.61:5041/api/sow/${id}`)
+        // axios.delete(`http://172.17.31.61:5041/api/sow/${id}`)
+        axios.patch(`http://172.17.31.61:5041/api/sow/${id}`)
             .then(response => {
                 setSOWs(SOWs.filter(tech => tech.id !== id));
             })
