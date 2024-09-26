@@ -238,7 +238,8 @@ function InterviewStatusList() {
                     </TableHead>
                     <TableBody>
                         {filteredInterviewStatus.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((InterviewStatus) => (
-                            <TableRow key={InterviewStatus.id}>
+                            <TableRow key={InterviewStatus.id}
+                                sx={{ backgroundColor: InterviewStatus.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{InterviewStatus.id}</TableCell> */}
                                 <TableCell>{InterviewStatus.status}</TableCell>
                                 <TableCell>{InterviewStatus.isActive ? 'Active' : 'Inactive'}</TableCell>

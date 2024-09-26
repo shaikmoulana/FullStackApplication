@@ -341,7 +341,8 @@ function BlogsList() {
                     </TableHead>
                     <TableBody>
                         {filteredBlogs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Blogs) => (
-                            <TableRow key={Blogs.id}>
+                            <TableRow key={Blogs.id}
+                                sx={{ backgroundColor: Blogs.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{Blogs.id}</TableCell> */}
                                 <TableCell>{Blogs.title}</TableCell>
                                 <TableCell>{Blogs.author}</TableCell>

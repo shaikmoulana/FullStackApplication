@@ -240,7 +240,9 @@ function DesignationList() {
                     </TableHead>
                     <TableBody>
                         {filteredDesignation.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Designation) => (
-                            <TableRow key={Designation.id}>
+                            <TableRow key={Designation.id}
+                                sx={{ backgroundColor: Designation.isActive ? 'inherit' : '#FFCCCB' }} // Set background color conditionally
+>
                                 {/* <TableCell>{Designation.id}</TableCell> */}
                                 <TableCell>{Designation.name}</TableCell>
                                 <TableCell>{Designation.isActive ? 'Active' : 'Inactive'}</TableCell>

@@ -268,7 +268,8 @@ function DepartmentList() {
                     </TableHead>
                     <TableBody>
                         {filteredDepartments.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Department) => (
-                            <TableRow key={Department.id}>
+                            <TableRow key={Department.id}
+                                sx={{ backgroundColor: Department.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{Department.id}</TableCell> */}
                                 <TableCell>{Department.name}</TableCell>
                                 <TableCell>{Department.isActive ? 'Active' : 'Inactive'}</TableCell>

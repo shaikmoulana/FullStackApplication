@@ -319,7 +319,8 @@ function WebinarList() {
                     </TableHead>
                     <TableBody>
                         {filteredWebinars.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Webinar) => (
-                            <TableRow key={Webinar.id}>
+                            <TableRow key={Webinar.id}
+                                sx={{ backgroundColor: Webinar.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{Webinar.id}</TableCell> */}
                                 <TableCell>{Webinar.title}</TableCell>
                                 <TableCell>{Webinar.speaker}</TableCell>

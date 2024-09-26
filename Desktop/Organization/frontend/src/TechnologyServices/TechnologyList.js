@@ -261,7 +261,8 @@ function TechnologyList() {
                     </TableHead>
                     <TableBody>
                         {filteredTechnologies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((technology) => (
-                            <TableRow key={technology.id}>
+                            <TableRow key={technology.id}
+                                sx={{ backgroundColor: technology.isActive ? 'inherit' : '#FFCCCB' }} >
                                 <TableCell>{technology.name}</TableCell>
                                 <TableCell>{technology.department}</TableCell>
                                 <TableCell>{technology.isActive ? 'Yes' : 'No'}</TableCell>

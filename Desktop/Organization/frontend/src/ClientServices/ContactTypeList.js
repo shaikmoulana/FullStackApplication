@@ -245,7 +245,8 @@ function ContactTypeList() {
                     </TableHead>
                     <TableBody>
                         {filteredContactType.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((ContactType) => (
-                            <TableRow key={ContactType.id}>
+                            <TableRow key={ContactType.id}
+                                sx={{ backgroundColor: ContactType.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{ContactType.id}</TableCell> */}
                                 <TableCell>{ContactType.typeName}</TableCell>
                                 <TableCell>{ContactType.isActive ? 'Active' : 'Inactive'}</TableCell>

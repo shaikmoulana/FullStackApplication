@@ -402,7 +402,8 @@ function ProjectList() {
                     </TableHead>
                     <TableBody>
                         {filteredProjects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Project) => (
-                            <TableRow key={Project.id}>
+                            <TableRow key={Project.id}
+                                sx={{ backgroundColor: Project.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{Project.id}</TableCell> */}
                                 <TableCell>{Project.client}</TableCell>
                                 <TableCell>{Project.projectName}</TableCell>

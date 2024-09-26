@@ -314,7 +314,8 @@ function ProjectEmployeeList() {
                     </TableHead>
                     <TableBody>
                         {filteredProjectEmployees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((ProjectEmployee) => (
-                            <TableRow key={ProjectEmployee.id}>
+                            <TableRow key={ProjectEmployee.id}
+                                sx={{ backgroundColor: ProjectEmployee.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{ProjectEmployee.id}</TableCell> */}
                                 <TableCell>{ProjectEmployee.project}</TableCell>
                                 <TableCell>{ProjectEmployee.employee}</TableCell>

@@ -278,7 +278,8 @@ function ClientContactList() {
                     </TableHead>
                     <TableBody>
                         {filteredClientContact.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((ClientContact) => (
-                            <TableRow key={ClientContact.id}>
+                            <TableRow key={ClientContact.id}
+                                sx={{ backgroundColor: ClientContact.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{ClientContact.id}</TableCell> */}
                                 <TableCell>{ClientContact.client}</TableCell>
                                 <TableCell>{ClientContact.contactValue}</TableCell>

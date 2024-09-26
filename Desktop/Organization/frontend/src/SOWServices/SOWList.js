@@ -354,7 +354,8 @@ function SOWList() {
                     </TableHead>
                     <TableBody>
                         {filteredSOWs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((SOW) => (
-                            <TableRow key={SOW.id}>
+                            <TableRow key={SOW.id}
+                                sx={{ backgroundColor: SOW.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{SOW.id}</TableCell> */}
                                 <TableCell>{SOW.client}</TableCell>
                                 <TableCell>{SOW.project}</TableCell>

@@ -365,7 +365,8 @@ function InterviewList() {
                     </TableHead>
                     <TableBody>
                         {filteredInterviews.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Interview) => (
-                            <TableRow key={Interview.id}>
+                            <TableRow key={Interview.id}
+                                sx={{ backgroundColor: Interview.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{Interview.id}</TableCell> */}
                                 <TableCell>{Interview.sowRequirement}</TableCell>
                                 <TableCell>{Interview.name}</TableCell>
