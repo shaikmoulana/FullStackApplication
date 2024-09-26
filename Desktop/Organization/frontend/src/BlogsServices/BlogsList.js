@@ -33,6 +33,7 @@ function BlogsList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const options = ['Completed', 'Pending']; // Array of options for the dropdown
 
     useEffect(() => {
         const fetchBlogs = async () => {
@@ -402,14 +403,30 @@ function BlogsList() {
                         ))}
                     </Select>
 
-                    <TextField
+                    {/* <TextField
                         margin="dense"
                         label="Status"
                         name="status"
                         value={currentBlogs.status}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    /> */}
+
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                        margin="dense"
+                        label="Status"
+                        name="status"
+                        value={currentBlogs.status}
+                        onChange={handleChange} // Trigger onChange when user selects an option
+                        fullWidth
+                    >
+                        {options.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="TargetDate"
