@@ -37,6 +37,18 @@ function ProjectList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        client: '',       
+        projectName: '',
+        technicalProjectManager: '',
+        salesContact: '',
+        pmo: '',
+        sowSubmittedDate: '',
+        sowSignedDate: '',
+        sowValidTill: '',
+        sowLastExtendedDate: ''
+    }
+);
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -146,6 +158,49 @@ function ProjectList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentProject.client.trim()) {
+            validationErrors.projectName = "Project name cannot be empty or whitespace";
+        } else if (Projects.some(pro => pro.projectName.toLowerCase() === currentProject.projectName.toLowerCase() && pro.id !== currentProject.id)) {
+            validationErrors.projectName = "Project name must be unique";
+        }
+    
+        if (!currentProject.client) {
+            validationErrors.client = "Please select a client";
+        }
+        if (!currentProject.technicalProjectManager) {
+            validationErrors.technicalProjectManager = "Please select a technicalProjectManager";
+        }
+        if (!currentProject.salesContact) {
+            validationErrors.salesContact = "Please select a salesContact";
+        }
+        if (!currentProject.pmo) {
+            validationErrors.pmo = "Please select a pmo";
+        }
+        if (!currentProject.sowSubmittedDate) {
+            validationErrors.sowSubmittedDate = "Please select a sowSubmittedDate";
+        }
+        if (!currentProject.sowSignedDate) {
+            validationErrors.sowSignedDate = "Please select a sowSignedDate";
+        }
+        if (!currentProject.sowValidTill) {
+            validationErrors.sowValidTill = "Please select a sowValidTill";
+        }
+        if (!currentProject.sowLastExtendedDate) {
+            validationErrors.sowLastExtendedDate = "Please select a sowLastExtendedDate";
+        }
+    
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+    
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentProject.id) {
             // Update existing Project
             //axios.put(`http://localhost:5151/api/Project/${currentProject.id}`, currentProject)
@@ -180,6 +235,63 @@ function ProjectList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentProject({ ...currentProject, [name]: value });
+         // Real-time validation logic
+         if (name === "client") {
+            // Check if the title is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            } 
+            // Check for uniqueness
+            else if (Projects.some(pro => pro.client.toLowerCase() === value.toLowerCase() && pro.id !== currentProject.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            } 
+            // Clear the title error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            }
+        }
+    
+        if (name === "projectName") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, projectName: "" }));
+            }
+        }
+        if (name === "technicalProjectManager") {           
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, technicalProjectManager: "" }));
+            }
+        }
+              
+        if (name === "salesContact") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, salesContact: "" }));
+            }
+        }
+        if (name === "pmo") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, pmo: "" }));
+            }
+        }
+        if (name === "sowSubmittedDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, sowSubmittedDate: "" }));
+            }
+        }
+        if (name === "sowSignedDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, sowSignedDate: "" }));
+            }
+        }
+        if (name === "sowValidTill") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, sowValidTill: "" }));
+            }
+        }
+        if (name === "sowLastExtendedDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, sowLastExtendedDate: "" }));
+            }
+        }
     };
 
 
@@ -402,8 +514,7 @@ function ProjectList() {
                     </TableHead>
                     <TableBody>
                         {filteredProjects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Project) => (
-                            <TableRow key={Project.id}
-                                sx={{ backgroundColor: Project.isActive ? 'inherit' : '#FFCCCB' }} >
+                            <TableRow key={Project.id}>
                                 {/* <TableCell>{Project.id}</TableCell> */}
                                 <TableCell>{Project.client}</TableCell>
                                 <TableCell>{Project.projectName}</TableCell>
@@ -450,6 +561,7 @@ function ProjectList() {
                         value={currentProject.client}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.client} // Display error if exists                     
                     >
                         {Clients.map((client) => (
                             <MenuItem key={client.id} value={client.name}>
@@ -457,7 +569,7 @@ function ProjectList() {
                             </MenuItem>
                         ))}
                     </Select>
-
+                    {errors.client && <Typography color="error">{errors.client}</Typography>} 
                     <TextField
                         margin="dense"
                         label="ProjectName"
@@ -465,14 +577,17 @@ function ProjectList() {
                         value={currentProject.projectName}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.projectName} // Display error if exists
+                        helperText={errors.projectName} // Display error message
                     />
                     <InputLabel>TechnicalProjectManager</InputLabel>
                     <Select
                         margin="dense"
                         name="technicalProjectManager"
-                        value={currentProject.employee}
+                        value={currentProject.technicalProjectManager}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.technicalProjectManager} // Display error if exists
                     >
                         {Employeess.map((employee) => (
                             <MenuItem key={employee.id} value={employee.name}>
@@ -480,14 +595,15 @@ function ProjectList() {
                             </MenuItem>
                         ))}
                     </Select>
-
+                    {errors.technicalProjectManager && <Typography color="error">{errors.technicalProjectManager}</Typography>} 
                     <InputLabel>PMO</InputLabel>
                     <Select
                         margin="dense"
                         name="pmo"
-                        value={currentProject.employee}
+                        value={currentProject.pmo}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.pmo} // Display error if exists
                     >
                         {Employeess.map((employee) => (
                             <MenuItem key={employee.id} value={employee.name}>
@@ -495,6 +611,7 @@ function ProjectList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    {errors.pmo && <Typography color="error">{errors.pmo}</Typography>} 
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="SOWSubmittedDate"
@@ -502,7 +619,10 @@ function ProjectList() {
                             onChange={handleSowSubmittedDateChange}
                             fullWidth
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense"
+                                error={!!errors.sowSubmittedDate} // Display error if exists
+                                helperText={errors.sowSubmittedDate} // Display error message
+                                 />
                             )}
                         />
                     </LocalizationProvider>
@@ -510,22 +630,28 @@ function ProjectList() {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="SOWSignedDate"
-                            value={currentProject.SOWSignedDate ? dayjs(currentProject.SOWSignedDate) : null}
+                            value={currentProject.sowSignedDate ? dayjs(currentProject.SOWSignedDate) : null}
                             onChange={handleSowSignedDateChange}
                             fullWidth
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense" 
+                                error={!!errors.sowSignedDate} // Display error if exists
+                                helperText={errors.sowSignedDate} // Display error message
+                                />
                             )}
                         />
                     </LocalizationProvider>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="SOWValidTill"
-                            value={currentProject.SOWValidTill ? dayjs(currentProject.SOWValidTill) : null}
+                            value={currentProject.sowValidTill ? dayjs(currentProject.SOWValidTill) : null}
                             onChange={handleSowValidTillDateChange}
                             fullWidth
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense"
+                                error={!!errors.sowValidTill} // Display error if exists
+                                helperText={errors.sowValidTill} // Display error message
+                                />
                             )}
                         />
                     </LocalizationProvider>
@@ -533,11 +659,14 @@ function ProjectList() {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="SOWLastExtendedDate"
-                            value={currentProject.SOWLastExtendedDate ? dayjs(currentProject.SOWLastExtendedDate) : null}
+                            value={currentProject.sowLastExtendedDate ? dayjs(currentProject.SOWLastExtendedDate) : null}
                             onChange={handleSowLastExtendedDateChange}
                             fullWidth
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense" 
+                                error={!!errors.sowLastExtendedDate} // Display error if exists
+                                helperText={errors.sowLastExtendedDate} // Display error message
+                                />
                             )}
                         />
                     </LocalizationProvider>
