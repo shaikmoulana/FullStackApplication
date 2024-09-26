@@ -32,6 +32,7 @@ function WebinarList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const options = ['Completed', 'Planned'];
 
     useEffect(() => {
         const fetchWebinars = async () => {
@@ -366,14 +367,6 @@ function WebinarList() {
                         onChange={handleChange}
                         fullWidth
                     />
-                    {/* <TextField
-                        margin="dense"
-                        label="Speaker"
-                        name="speaker"
-                        value={currentWebinar.speaker}
-                        onChange={handleChange}
-                        fullWidth
-                    /> */}
                     <InputLabel>Speaker</InputLabel>
                     <Select
                         margin="dense"
@@ -388,36 +381,28 @@ function WebinarList() {
                             </MenuItem>
                         ))}
                     </Select>
-                    {/* 
-                        <InputLabel id="demo-simple-select-label">Status</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={currentWebinar.status}
-                            label="Status"
-                        onChange={handleChange}
-                        fullWidth
-                        >
-                            <MenuItem value={"Planned"}>Planned</MenuItem>
-                            <MenuItem value={"Completed"}>Completed</MenuItem>
-                        </Select> */}
-
-                    <TextField
+                    <InputLabel>Status</InputLabel>
+                    <Select
                         margin="dense"
                         label="Status"
                         name="status"
                         value={currentWebinar.status}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {options.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="WebinarDate"
                             value={currentWebinar.webinarDate ? dayjs(currentWebinar.webinarDate) : null}
                             onChange={handleWebinarDateChange}
-                            renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
-                            )}
+                            fullWidth
+                            slots={{ textField: (params) => <TextField {...params} /> }}
                         />
                     </LocalizationProvider>
 

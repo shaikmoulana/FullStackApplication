@@ -33,6 +33,7 @@ function BlogsList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const options = ['Completed', 'InProgress', 'InReview', 'Published'];
 
     useEffect(() => {
         const fetchBlogs = async () => {
@@ -403,15 +404,21 @@ function BlogsList() {
                             </MenuItem>
                         ))}
                     </Select>
-
-                    <TextField
+                    <InputLabel>Status</InputLabel>
+                    <Select
                         margin="dense"
                         label="Status"
                         name="status"
                         value={currentBlogs.status}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    >
+                        {options.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="TargetDate"
