@@ -12,7 +12,6 @@ import dayjs from 'dayjs';
 import '../App.css';
 // import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
-
 function EmployeeList() {
     const [Employees, setEmployees] = useState([]);
     const [departments, setDepartments] = useState([]);
@@ -20,6 +19,7 @@ function EmployeeList() {
     const [technologies, setTechnologies] = useState([]);
     const [reportingTo, setReporting] = useState([]);
     const [roles, setRoles] = useState([]);
+    const [selectedFile, setSelectedFile] = useState(null); // New state for file
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -211,43 +211,53 @@ function EmployeeList() {
         setConfirmOpen(false);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        try {
+            let profilePath = currentEmployee.profile; // Existing profile path (for updates)
 
-        const employeeToSave = {
-            ...currentEmployee,
-            technology: currentEmployee.technology.map(tech => {
-                const selectedTech = technologies.find(t => t.name === tech);
-                return selectedTech ? selectedTech.id : null;
-            }).filter(id => id !== null) // Convert technology names to IDs
-        };
+            // If a new file is selected, upload it
+            if (selectedFile) {
+                const formData = new FormData();
+                formData.append('profile', selectedFile);
+                formData.append('id', "");
 
-        if (currentEmployee.id) {
-            // axios.put(`http://localhost:5733/api/Employee/${currentEmployee.id}`, employeeToSave)
-            axios.put(`http://172.17.31.61:5733/api/employee/${currentEmployee.id}`, employeeToSave)
-                .then(response => {
-                    console.log(response)
-                    //setEmployees([...Employees, response.data]);
-                    // setEmployees(response.data);
-                    setEmployees(Employees.map(tech => tech.id === currentEmployee.id ? response.data : tech));
-                })
-                .catch(error => {
-                    console.error('There was an error updating the Employee!', error);
-                    setError(error);
+                const uploadResponse = await axios.post('http://localhost:5033/api/Employee/uploadFile', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
                 });
 
-        } else {
-            // axios.post('http://localhost:5733/api/Employee', employeeToSave)
-            axios.post('http://172.17.31.61:5733/api/employee', employeeToSave)
-                .then(response => {
-                    setEmployees([...Employees, response.data]);
-                })
-                .catch(error => {
-                    console.error('There was an error adding the Employee!', error);
-                    setError(error);
-                });
+                console.log("upload File", uploadResponse)
+                profilePath = uploadResponse.data; // Adjust based on your backend response
+            }
+
+            const employeeToSave = {
+                ...currentEmployee,
+                technology: currentEmployee.technology.map(tech => {
+                    const selectedTech = technologies.find(t => t.name === tech);
+                    return selectedTech ? selectedTech.id : null;
+                }).filter(id => id !== null) // Convert technology names to IDs
+            };
+
+            employeeToSave.profile = profilePath.path;
+            if (currentEmployee.id) {
+                // Update existing Employee
+                const response = await axios.put(`http://172.17.31.61:5733/api/employee/${currentEmployee.id}`, employeeToSave);
+                setEmployees(Employees.map(emp => emp.id === currentEmployee.id ? response.data : emp));
+            } else {
+                // Add new Employee
+                const response = axios.post('http://172.17.31.61:5733/api/employee', employeeToSave);
+                setEmployees([...Employees, response.data]);
+                console.log("emp res", response)
+            }
+
+            // Reset file input
+            setSelectedFile(null);
+            setOpen(false);
+        } catch (error) {
+            console.error('There was an error saving the Employee!', error);
+            setError(error);
         }
-        setOpen(false);
-
     };
 
     const handleChange = (e) => {
@@ -510,7 +520,7 @@ function EmployeeList() {
                                 <TableCell>{Employee.relievingDate}</TableCell>
                                 <TableCell>{Employee.projection}</TableCell>
                                 <TableCell>{Employee.phoneNo}</TableCell>
-                                <TableCell>{Employee.profile}</TableCell>
+                                {/* <TableCell>{Employee.profile}</TableCell> */}
                                 <TableCell>{Employee.role}</TableCell>
                                 <TableCell>{Employee.isActive ? 'Active' : 'Inactive'}</TableCell>
                                 <TableCell>{Employee.createdBy}</TableCell>
@@ -518,6 +528,15 @@ function EmployeeList() {
                                 <TableCell>{Employee.updatedBy || 'N/A'}</TableCell>
                                 <TableCell>{new Date(Employee.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 {/* <TableCell>{Employee.password}</TableCell> */}
+                                <TableCell>
+                                    {Employee.profile ? (
+                                        <>
+                                            <span>{Employee.profile.split('/').pop()}</span>
+                                        </>
+                                    ) : (
+                                        'N/A'
+                                    )}
+                                </TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(Employee)}>
                                         <EditIcon color="primary" />
@@ -599,14 +618,14 @@ function EmployeeList() {
                         //  placeholder="Technologies"
                         name="technologies"
                         multiple
-                        value={currentEmployee.technology}
+                        value={currentEmployee.technology || []}
                         onChange={handleTechnologyChange}
                         renderValue={(selected) => selected.join(', ')}
                         fullWidth
                     >
                         {technologies.map((tech) => (
                             <MenuItem key={tech.id} value={tech.name}>
-                                <Checkbox checked={currentEmployee.technology.indexOf(tech.name) > -1} />
+                                <Checkbox checked={Array.isArray(currentEmployee.technology) && currentEmployee.technology.indexOf(tech.name) > -1} />
                                 <ListItemText primary={tech.name} />
                             </MenuItem>
                         ))}
@@ -673,14 +692,14 @@ function EmployeeList() {
                         onChange={handleChange}
                         fullWidth
                     />
-                    <TextField
+                    {/* <TextField
                         margin="dense"
                         label="Profile"
                         name="profile"
                         value={currentEmployee.profile}
                         onChange={handleChange}
                         fullWidth
-                    />
+                    /> */}
                     <InputLabel>Role</InputLabel>
                     <Select
                         margin="dense"
@@ -707,6 +726,16 @@ function EmployeeList() {
                             multiple
                         />
                     </Button> */}
+                    <TextField
+                        type="file"
+                        margin="dense"
+                        name="profile"
+                        // value={currentEmployee.profile}
+                        onChange={(e) => setSelectedFile(e.target.files[0])}
+                        fullWidth
+                        required={!currentEmployee.id} // Make it required when adding a new employee
+                    />
+
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>
