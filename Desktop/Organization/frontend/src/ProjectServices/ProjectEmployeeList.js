@@ -32,6 +32,13 @@ function ProjectEmployeeList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        project: '',
+        employee: '',
+        startDate: '',
+        endDate: ''
+    }
+);
 
     useEffect(() => {
         const fetchProjectEmployees = async () => {
@@ -124,6 +131,32 @@ function ProjectEmployeeList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentProjectEmployee.project.trim()) {
+            validationErrors.project = "Please select a Project";
+        }             
+        if (!currentProjectEmployee.employee) {
+            validationErrors.employee = "Please select a employee";
+        }
+        if (!currentProjectEmployee.startDate) {
+            validationErrors.startDate = "Please select a startDate";
+        }
+        if (!currentProjectEmployee.endDate) {
+            validationErrors.endDate = "Please select a endDate";
+        }
+           
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+    
+        // Clear any previous errors if validation passes
+        setErrors({});
+     
+
         if (currentProjectEmployee.id) {
             // Update existing ProjectEmployee
             //axios.put(`http://localhost:5151/api/ProjectEmployee/${currentProjectEmployee.id}`, currentProjectEmployee)
@@ -155,6 +188,28 @@ function ProjectEmployeeList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentProjectEmployee({ ...currentProjectEmployee, [name]: value });
+        if (name === "project") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, project: "" }));
+            }
+        }
+        if (name === "employee") {           
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, employee: "" }));
+            }
+        }
+              
+        if (name === "startDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, startDate: "" }));
+            }
+        }
+        if (name === "endDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, endDate: "" }));
+            }
+        }
+        
     };
 
     const handlePageChange = (event, newPage) => {
@@ -185,7 +240,7 @@ function ProjectEmployeeList() {
             startDate: newDate ? newDate.toISOString() : "",
         }));
     };
-
+    
     const handleEndDateChange = (newDate) => {
         setCurrentProjectEmployee((prev) => ({
             ...prev,
@@ -356,13 +411,15 @@ function ProjectEmployeeList() {
                         value={currentProjectEmployee.project}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.project}
                     >
                         {Projects.map((project) => (
-                            <MenuItem key={project.id} value={project.name}>
-                                {project.name}
+                            <MenuItem key={project.id} value={project.projectName}>
+                                {project.projectName}
                             </MenuItem>
                         ))}
                     </Select>
+                    {errors.project && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.project}</Typography>} 
                     <InputLabel>Employee</InputLabel>
                     <Select
                         margin="dense"
@@ -370,6 +427,7 @@ function ProjectEmployeeList() {
                         value={currentProjectEmployee.employee}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.employee}
                     >
                         {Employees.map((employee) => (
                             <MenuItem key={employee.id} value={employee.name}>
@@ -377,16 +435,21 @@ function ProjectEmployeeList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    {errors.employee && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.employee}</Typography>} 
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="StartDate"
                             value={currentProjectEmployee.startDate ? dayjs(currentProjectEmployee.startDate) : null}
                             onChange={handleStartDateChange}
-                            fullWidth
+                            fullWidth                           
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense" 
+                                error={!!error.startDate} // Show error style
+                                helperText={error.startDate}                               
+                                />                              
                             )}
                         />
+                        {errors.startDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.startDate}</Typography>}
                     </LocalizationProvider>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
@@ -398,6 +461,7 @@ function ProjectEmployeeList() {
                                 <TextField {...params} fullWidth margin="dense" />
                             )}
                         />
+                          {errors.startDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.startDate}</Typography>}
                     </LocalizationProvider>
                 </DialogContent>
                 <DialogActions>

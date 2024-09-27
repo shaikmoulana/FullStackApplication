@@ -23,6 +23,11 @@ function TechnologyList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        name: '',
+        department: ''
+    }
+);
 
     useEffect(() => {
         const fetchTechnologies = async () => {
@@ -104,6 +109,29 @@ function TechnologyList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentTechnology.name.trim()) {
+            validationErrors.name = "Technology name cannot be empty or whitespace";
+        } else if (technologies.some(tech => tech.name.toLowerCase() === currentTechnology.name.toLowerCase() && tech.id !== currentTechnology.id)) {
+            validationErrors.name = "Technology name must be unique";
+        }
+    
+        // Department field validation 
+        if (!currentTechnology.department) {
+            validationErrors.department = "Please select a department";
+        }
+    
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+    
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentTechnology.id) {
             // axios.put(`http://localhost:5574/api/Technology/${currentTechnology.id}`, currentTechnology)
             axios.put(`http://172.17.31.61:5274/api/technology/${currentTechnology.id}`, currentTechnology)
@@ -131,6 +159,28 @@ function TechnologyList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentTechnology({ ...currentTechnology, [name]: value });
+        // Real-time validation logic
+        if (name === "name") {
+            // Check if the name is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            } 
+            // Check for uniqueness
+            else if (technologies.some(tech => tech.name.toLowerCase() === value.toLowerCase() && tech.id !== currentTechnology.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            } 
+            // Clear the name error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            }
+        }
+    
+        if (name === "department") {
+            // Clear the department error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, department: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -303,6 +353,8 @@ function TechnologyList() {
                         value={currentTechnology.name}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.name} // Display error if exists
+                        helperText={errors.name}
                     />
                     <InputLabel>Department</InputLabel>
                     <Select
@@ -311,6 +363,7 @@ function TechnologyList() {
                         value={currentTechnology.department}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.department}
                     >
                         {departments.map((department) => (
                             <MenuItem key={department.id} value={department.name}>
@@ -318,7 +371,7 @@ function TechnologyList() {
                             </MenuItem>
                         ))}
                     </Select>
-
+                    {errors.department && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.department}</Typography>}                 
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>

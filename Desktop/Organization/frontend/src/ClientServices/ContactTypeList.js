@@ -22,8 +22,10 @@ function ContactTypeList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
-
-
+    const [errors, setErrors] = useState({
+        typeName: '',       
+    }
+);
 
     useEffect(() => {
         const fetchContactType = async () => {
@@ -91,6 +93,24 @@ function ContactTypeList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentContactType.typeName.trim()) {
+            validationErrors.typeName = "TypeName cannot be empty or whitespace";
+        } else if (contactTypes.some(cont => cont.typeName.toLowerCase() === currentContactType.typeName.toLowerCase() && cont.id !== currentContactType.id)) {
+            validationErrors.typeName = "TypeName name must be unique";
+        }   
+        
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+    
+        // Clear any previous errors if validation passes
+        setErrors({});
+        
         if (currentContactType.id) {
             // Update existing ContactType
             //axios.put(`http://localhost:5142/api/ContactType/${currentContactType.id}`, currentContactType)
@@ -125,6 +145,21 @@ function ContactTypeList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentContactType({ ...currentContactType, [name]: value });
+         // Real-time validation logic
+         if (name === "typeName") {
+            // Check if the name is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, typeName: "" }));
+            } 
+            // Check for uniqueness
+            else if (contactTypes.some(cont => cont.typeName.toLowerCase() === value.toLowerCase() && cont.id !== currentContactType.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, typeName: "" }));
+            } 
+            // Clear the name error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, typeName: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -285,6 +320,8 @@ function ContactTypeList() {
                         value={currentContactType.typeName}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.typeName} // Display error if exists
+                        helperText={errors.typeName}
                     />
                 </DialogContent>
                 <DialogActions>

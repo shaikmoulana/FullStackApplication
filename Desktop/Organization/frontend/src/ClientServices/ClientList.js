@@ -29,6 +29,16 @@ function ClientList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        name: '',
+        lineofBusiness: '',
+        salesEmployee: '',
+        country: '',
+        city: '',
+        state: '',
+        address: ''
+    }
+);
 
     useEffect(() => {
         const fetchClients = async () => {
@@ -124,6 +134,43 @@ function ClientList() {
     };
 
     const handleSave = () => {
+let validationErrors = {};
+
+        // Name field validation
+        if (!currentClient.name.trim()) {
+            validationErrors.name = "Client name cannot be empty or whitespace";
+        } else if (Clients.some(cli => cli.name.toLowerCase() === currentClient.name.toLowerCase() && cli.id !== currentClient.id)) {
+            validationErrors.name = "Client name must be unique";
+        }
+    
+        if (!currentClient.lineofBusiness) {
+            validationErrors.lineofBusiness = "Please select a lineofBusiness";
+        }
+        if (!currentClient.salesEmployee) {
+            validationErrors.salesEmployee = "Please select a salesEmployee";
+        }
+        if (!currentClient.country) {
+            validationErrors.country = "Please select a country";
+        }
+        if (!currentClient.city) {
+            validationErrors.city = "Please select a city";
+        }
+        if (!currentClient.state) {
+            validationErrors.state = "Please select a state";
+        }
+        if (!currentClient.address) {
+            validationErrors.address = "Please select a address";
+        }
+    
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+    
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentClient.id) {
             //axios.put(`http://localhost:5142/api/Client/${currentClient.id}`, currentClient)
             axios.put(`http://172.17.31.61:5142/api/client/${currentClient.id}`, currentClient)
@@ -153,6 +200,59 @@ function ClientList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentClient({ ...currentClient, [name]: value });
+        // Real-time validation logic
+        if (name === "name") {
+            // Check if the title is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            } 
+            // Check for uniqueness
+            else if (Clients.some(cli => cli.name.toLowerCase() === value.toLowerCase() && cli.id !== currentClient.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            } 
+            // Clear the title error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            }
+        }
+    
+        if (name === "lineofBusiness") {
+            // Clear the lineofBusiness error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, lineofBusiness: "" }));
+            }
+        }
+        if (name === "salesEmployee") {
+            // Clear the salesEmployee error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, salesEmployee: "" }));
+            }
+        }
+              
+        if (name === "country") {
+            // Clear the country error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, country: "" }));
+            }
+        }
+        if (name === "city") {
+            // Clear the city error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, city: "" }));
+            }
+        }
+        if (name === "state") {
+            // Clear the state error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, state: "" }));
+            }
+        }
+        if (name === "address") {
+            // Clear the address error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, address: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -373,6 +473,8 @@ function ClientList() {
                         value={currentClient.name}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.name} // Display error if exists
+                        helperText={errors.name}
                     />
                     <TextField
                         margin="dense"
@@ -381,6 +483,8 @@ function ClientList() {
                         value={currentClient.lineofBusiness}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.lineofBusiness} // Display error if exists
+                        helperText={errors.lineofBusiness}
                     />
                     <InputLabel>SalesEmployee</InputLabel>
                     <Select
@@ -389,6 +493,7 @@ function ClientList() {
                         value={currentClient.salesEmployee}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.salesEmployee}
                     >
                         {employees.map((employee) => (
                             <MenuItem key={employee.id} value={employee.name}>
@@ -396,6 +501,7 @@ function ClientList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    {errors.salesEmployee && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.salesEmployee}</Typography>} 
                     <TextField
                         margin="dense"
                         label="Country"
@@ -403,6 +509,8 @@ function ClientList() {
                         value={currentClient.country}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.country} // Display error if exists
+                        helperText={errors.country}
                     />
                     <TextField
                         margin="dense"
@@ -411,6 +519,8 @@ function ClientList() {
                         value={currentClient.city}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.city} // Display error if exists
+                        helperText={errors.city}
                     />
                     <TextField
                         margin="dense"
@@ -419,6 +529,8 @@ function ClientList() {
                         value={currentClient.state}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.state} // Display error if exists
+                        helperText={errors.state} 
                     />
                     <TextField
                         margin="dense"
@@ -427,6 +539,8 @@ function ClientList() {
                         value={currentClient.address}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.address} // Display error if exists
+                        helperText={errors.address}
                     />
                 </DialogContent>
                 <DialogActions>

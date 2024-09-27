@@ -10,6 +10,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import '../App.css';
+// import {useForm} from "react-hook-form";
 
 function WebinarList() {
     const [Webinars, setWebinars] = useState([]);
@@ -32,6 +33,14 @@ function WebinarList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        title: '',
+        speaker: '',
+        status: '',
+        WebinarDate: '',
+        numberOfAudience: ''
+    }
+);
 
     useEffect(() => {
         const fetchWebinars = async () => {
@@ -120,6 +129,48 @@ function WebinarList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Title field validation
+        if (!currentWebinar.title.trim()) {
+            validationErrors.title = "Webinar title cannot be empty or whitespace";
+        } else if (Webinars.some(web => web.title.toLowerCase() === currentWebinar.title.toLowerCase() && web.id !== currentWebinar.id)) {
+            validationErrors.title = "Webinar title must be unique";
+        }
+    
+        // Speaker field validation
+        if (!currentWebinar.speaker) {
+            validationErrors.speaker = "Please select a speaker";
+        }
+        if (!currentWebinar.status) {
+            validationErrors.status = "Please select a status";
+        }
+        if (!currentWebinar.webinarDate) {
+            validationErrors.WebinarDate = "Please select a WebinarDate";
+        }
+        if (!currentWebinar.numberOfAudience) {
+            validationErrors.numberOfAudience = "Please select a numberOfAudience";
+        }
+    
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+    
+        // Clear any previous errors if validation passes
+        setErrors({});
+
+        const { webinarDate } = currentWebinar;
+
+        // Check if the webinarDate field is empty
+        if (!webinarDate) {
+            setErrors((prevErrors) => ({ ...prevErrors, webinarDate: "Please fill the datetime field" }));
+        } else {
+            // Proceed with saving the details (you can add more logic here)
+            console.log("Webinar Date:", webinarDate);
+        }
+
         if (currentWebinar.id) {
             // axios.put(`http://localhost:5517/api/Webinars/${currentWebinar.id}`, currentWebinar)
             axios.put(`http://172.17.31.61:5017/api/webinars/${currentWebinar.id}`, currentWebinar)
@@ -150,6 +201,41 @@ function WebinarList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentWebinar({ ...currentWebinar, [name]: value });
+         // Real-time validation logic
+         if (name === "title") {
+            // Check if the title is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
+            } 
+            // Check for uniqueness
+            else if (Webinars.some(web => web.title.toLowerCase() === value.toLowerCase() && web.id !== currentWebinar.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
+            } 
+            // Clear the title error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
+            }
+        }
+    
+        if (name === "speaker") {
+            // Clear the speaker error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, speaker: "" }));
+            }
+        }
+        if (name === "status") {
+            // Clear the status error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, status: "" }));
+            }
+        }
+              
+        if (name === "numberOfAudience") {
+            // Clear the numberOfAudience error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, numberOfAudience: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -364,6 +450,8 @@ function WebinarList() {
                         value={currentWebinar.title}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.title}                         
+                        helperText={errors.title} 
                     />
                     {/* <TextField
                         margin="dense"
@@ -380,6 +468,7 @@ function WebinarList() {
                         value={currentWebinar.employee}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.speaker}
                     >
                         {Employees.map((employee) => (
                             <MenuItem key={employee.id} value={employee.name}>
@@ -387,6 +476,7 @@ function WebinarList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    {errors.speaker && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.speaker}</Typography>} 
                     {/* 
                         <InputLabel id="demo-simple-select-label">Status</InputLabel>
                         <Select
@@ -408,6 +498,8 @@ function WebinarList() {
                         value={currentWebinar.status}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.status} // Display error if exists
+                        helperText={errors.status} 
                     />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
@@ -415,9 +507,14 @@ function WebinarList() {
                             value={currentWebinar.webinarDate ? dayjs(currentWebinar.webinarDate) : null}
                             onChange={handleWebinarDateChange}
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense" 
+                                // className={`w-96 text-3xl rounded-lg ${errors.date && "focus:border-red-500 focus:ring-red-500 border-red-500"}`}
+                                error={!!errors.WebinarDate} // Show error styling if there's an error
+                                helperText={errors.WebinarDate || ""}
+                                />
                             )}
                         />
+                          {errors.WebinarDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.WebinarDate}</Typography>}
                     </LocalizationProvider>
 
                     <TextField
@@ -427,6 +524,8 @@ function WebinarList() {
                         value={currentWebinar.numberOfAudience}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.numberOfAudience} // Display error if exists
+                        helperText={errors.numberOfAudience} 
                     />
                 </DialogContent>
                 <DialogActions>

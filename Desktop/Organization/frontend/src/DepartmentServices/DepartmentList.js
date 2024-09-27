@@ -22,6 +22,10 @@ function DepartmentList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        name: '',       
+    }
+);
 
     useEffect(() => {
         const fetchDepartments = async () => {
@@ -88,36 +92,24 @@ function DepartmentList() {
     };
 
     const handleSave = () => {
-        const nameRegex = /^[a-zA-Z0-9 ]+$/; // Allows letters, digits, and spaces
-        const minLength = 3; // Adjust according to your database constraint
-        const maxLength = 50; // Adjust according to your database constraint
+        let validationErrors = {};
 
-        // Null/empty value check
-        if (!currentDepartment.name || currentDepartment.name.trim() === '') {
-            alert('Department name cannot be empty.');
+        // Name field validation
+        if (!currentDepartment.name.trim()) {
+            validationErrors.name = "Department name cannot be empty or whitespace";
+        } else if (departments.some(dep => dep.name.toLowerCase() === currentDepartment.name.toLowerCase() && dep.id !== currentDepartment.id)) {
+            validationErrors.name = "Department name must be unique";
+        }   
+        
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
             return;
         }
+    
+        // Clear any previous errors if validation passes
+        setErrors({});
 
-        // Special character check
-        if (!nameRegex.test(currentDepartment.name)) {
-            alert('Department name contains invalid characters. Only letters, numbers, and spaces are allowed.');
-            return;
-        }
-
-        // Length validation
-        if (currentDepartment.name.length < minLength || currentDepartment.name.length > maxLength) {
-            alert(`Department name must be between ${minLength} and ${maxLength} characters.`);
-            return;
-        }
-
-        // Uniqueness check
-        const isNameDuplicate = departments.some(dept =>
-            dept.name.toLowerCase() === currentDepartment.name.toLowerCase() && dept.id !== currentDepartment.id
-        );
-        if (isNameDuplicate) {
-            alert('Department name must be unique.');
-            return;
-        }
         if (currentDepartment.id) {
             // axios.put(`http://localhost:5560/api/Department/${currentDepartment.id}`, currentDepartment)
             axios.put(`http://172.17.31.61:5160/api/department/${currentDepartment.id}`, currentDepartment)
@@ -147,6 +139,21 @@ function DepartmentList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentDepartment({ ...currentDepartment, [name]: value });
+         // Real-time validation logic
+         if (name === "name") {
+            // Check if the name is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            } 
+            // Check for uniqueness
+            else if (departments.some(dep => dep.name.toLowerCase() === value.toLowerCase() && dep.id !== currentDepartment.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            } 
+            // Clear the name error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -307,6 +314,8 @@ function DepartmentList() {
                         value={currentDepartment.name}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.name} // Display error if exists
+                        helperText={errors.name} 
                     />
                 </DialogContent>
                 <DialogActions>

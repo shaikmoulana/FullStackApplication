@@ -514,7 +514,8 @@ function ProjectList() {
                     </TableHead>
                     <TableBody>
                         {filteredProjects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Project) => (
-                            <TableRow key={Project.id}>
+                             <TableRow key={Project.id}
+                             sx={{ backgroundColor: Project.isActive ? 'inherit' : '#FFCCCB' }} >                            
                                 {/* <TableCell>{Project.id}</TableCell> */}
                                 <TableCell>{Project.client}</TableCell>
                                 <TableCell>{Project.projectName}</TableCell>
@@ -569,7 +570,7 @@ function ProjectList() {
                             </MenuItem>
                         ))}
                     </Select>
-                    {errors.client && <Typography color="error">{errors.client}</Typography>} 
+                    {errors.client && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.client}</Typography>} 
                     <TextField
                         margin="dense"
                         label="ProjectName"
@@ -595,7 +596,7 @@ function ProjectList() {
                             </MenuItem>
                         ))}
                     </Select>
-                    {errors.technicalProjectManager && <Typography color="error">{errors.technicalProjectManager}</Typography>} 
+                    {errors.technicalProjectManager && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.technicalProjectManager}</Typography>} 
                     <InputLabel>PMO</InputLabel>
                     <Select
                         margin="dense"
@@ -611,7 +612,7 @@ function ProjectList() {
                             </MenuItem>
                         ))}
                     </Select>
-                    {errors.pmo && <Typography color="error">{errors.pmo}</Typography>} 
+                    {errors.pmo && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.pmo}</Typography>} 
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="SOWSubmittedDate"
@@ -625,6 +626,7 @@ function ProjectList() {
                                  />
                             )}
                         />
+                        {errors.sowSubmittedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.sowSubmittedDate}</Typography>}
                     </LocalizationProvider>
 
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -640,6 +642,7 @@ function ProjectList() {
                                 />
                             )}
                         />
+                        {errors.sowSignedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.sowSignedDate}</Typography>}
                     </LocalizationProvider>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
@@ -654,6 +657,7 @@ function ProjectList() {
                                 />
                             )}
                         />
+                        {errors.sowValidTill && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.sowValidTill}</Typography>}
                     </LocalizationProvider>
 
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -669,6 +673,7 @@ function ProjectList() {
                                 />
                             )}
                         />
+                        {errors.sowLastExtendedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.sowLastExtendedDate}</Typography>}
                     </LocalizationProvider>
                 </DialogContent>
                 <DialogActions>

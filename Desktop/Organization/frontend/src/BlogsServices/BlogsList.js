@@ -33,6 +33,15 @@ function BlogsList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        title: '',
+        author: '',
+        status: '',
+        targetDate: '',
+        completedDate: '',
+        publishedDate: ''
+    }
+);
 
     useEffect(() => {
         const fetchBlogs = async () => {
@@ -122,6 +131,50 @@ function BlogsList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Title field validation
+        if (!currentBlogs.title.trim()) {
+            validationErrors.title = "Blogs title cannot be empty or whitespace";
+        } else if (blogs.some(blog => blog.title.toLowerCase() === currentBlogs.title.toLowerCase() && blog.id !== currentBlogs.id)) {
+            validationErrors.title = "Blogs title must be unique";
+        }
+    
+        if (!currentBlogs.author) {
+            validationErrors.author = "Please select a author";
+        }
+        if (!currentBlogs.status) {
+            validationErrors.status = "Please select a status";
+        }
+        if (!currentBlogs.targetDate) {
+            validationErrors.targetDate = "Please select a targetDate";
+        }
+        if (!currentBlogs.completedDate) {
+            validationErrors.completedDate = "Please select a completedDate";
+        }
+        if (!currentBlogs.publishedDate) {
+            validationErrors.publishedDate = "Please select a publishedDate";
+        }
+
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+    
+        // Clear any previous errors if validation passes
+        setErrors({});
+
+        const { blogDate } = currentBlogs;
+
+        // Check if the webinarDate field is empty
+        if (!blogDate) {
+            setErrors((prevErrors) => ({ ...prevErrors, blogDate: "Please fill the datetime field" }));
+        } else {
+            // Proceed with saving the details (you can add more logic here)
+            console.log("Webinar Date:", blogDate);
+        }
+
         if (currentBlogs.id) {
             // axios.put(`http://localhost:5147/api/Blogs/${currentBlogs.id}`, currentBlogs)
             axios.put(`http://172.17.31.61:5174/api/blogs/${currentBlogs.id}`, currentBlogs)
@@ -154,6 +207,48 @@ function BlogsList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentBlogs({ ...currentBlogs, [name]: value });
+        // Real-time validation logic
+        if (name === "title") {
+            // Check if the title is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
+            } 
+            // Check for uniqueness
+            else if (blogs.some(web => web.title.toLowerCase() === value.toLowerCase() && web.id !== currentBlogs.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
+            } 
+            // Clear the title error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
+            }
+        }
+    
+        if (name === "author") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, author: "" }));
+            }
+        }
+        if (name === "status") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, status: "" }));
+            }
+        }
+              
+        if (name === "targetDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, targetDate: "" }));
+            }
+        }
+        if (name === "completedDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, completedDate: "" }));
+            }
+        }
+        if (name === "publishedDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, publishedDate: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -386,6 +481,8 @@ function BlogsList() {
                         value={currentBlogs.title}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.title}                         
+                        helperText={errors.title}
                     />
                     <InputLabel>Author</InputLabel>
                     <Select
@@ -395,6 +492,7 @@ function BlogsList() {
                         value={currentBlogs.employee}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.author} 
                     >
                         {Employees.map((employee) => (
                             <MenuItem key={employee.id} value={employee.name}>
@@ -402,7 +500,7 @@ function BlogsList() {
                             </MenuItem>
                         ))}
                     </Select>
-
+                    {errors.author && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.author}</Typography>} 
                     <TextField
                         margin="dense"
                         label="Status"
@@ -410,6 +508,8 @@ function BlogsList() {
                         value={currentBlogs.status}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.status}                         
+                        helperText={errors.status}
                     />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
@@ -417,9 +517,13 @@ function BlogsList() {
                             value={currentBlogs.targetDate ? dayjs(currentBlogs.targetDate) : null}
                             onChange={handleTargetDateChange}
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense" 
+                                error={!!errors.targetDate}                         
+                        helperText={errors.targetDate}
+                                />
                             )}
                         />
+                        {errors.targetDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.targetDate}</Typography>}
                     </LocalizationProvider>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
@@ -427,9 +531,13 @@ function BlogsList() {
                             value={currentBlogs.completedDate ? dayjs(currentBlogs.completedDate) : null}
                             onChange={handleCompletedDateChange}
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense"
+                                error={!!errors.completedDate}                         
+                                helperText={errors.completedDate}
+                                />
                             )}
                         />
+                        {errors.completedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.completedDate}</Typography>}
                     </LocalizationProvider>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
@@ -437,9 +545,13 @@ function BlogsList() {
                             value={currentBlogs.publishedDate ? dayjs(currentBlogs.publishedDate) : null}
                             onChange={handlePublishedDateChange}
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense" 
+                                error={!!errors.publishedDate}                         
+                        helperText={errors.publishedDate} 
+                                />
                             )}
                         />
+                         {errors.publishedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.publishedDate}</Typography>}
                     </LocalizationProvider>
                 </DialogContent>
                 <DialogActions>

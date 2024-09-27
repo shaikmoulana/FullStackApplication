@@ -22,6 +22,10 @@ function DesignationList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        name: '',       
+    }
+);
 
     useEffect(() => {
         const fetchDesignations = async () => {
@@ -88,6 +92,24 @@ function DesignationList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentDesignation.name.trim()) {
+            validationErrors.name = "Designation name cannot be empty or whitespace";
+        } else if (designations.some(dep => dep.name.toLowerCase() === currentDesignation.name.toLowerCase() && dep.id !== currentDesignation.id)) {
+            validationErrors.name = "Designation name must be unique";
+        }   
+        
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+    
+        // Clear any previous errors if validation passes
+        setErrors({});
+        
         if (currentDesignation.id) {
             // Update existing Designation
             // axios.put(`http://localhost:5501/api/Designation/${currentDesignation.id}`, currentDesignation)
@@ -120,6 +142,21 @@ function DesignationList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentDesignation({ ...currentDesignation, [name]: value });
+         // Real-time validation logic
+         if (name === "name") {
+            // Check if the name is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            } 
+            // Check for uniqueness
+            else if (designations.some(des => des.name.toLowerCase() === value.toLowerCase() && des.id !== currentDesignation.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            } 
+            // Clear the name error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -280,6 +317,8 @@ function DesignationList() {
                         value={currentDesignation.name}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.name} // Display error if exists
+                        helperText={errors.name} 
                     />
                 </DialogContent>
                 <DialogActions>
