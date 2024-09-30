@@ -40,7 +40,7 @@ function WebinarList() {
         WebinarDate: '',
         numberOfAudience: ''
     }
-);
+    );
 
     useEffect(() => {
         const fetchWebinars = async () => {
@@ -137,7 +137,7 @@ function WebinarList() {
         } else if (Webinars.some(web => web.title.toLowerCase() === currentWebinar.title.toLowerCase() && web.id !== currentWebinar.id)) {
             validationErrors.title = "Webinar title must be unique";
         }
-    
+
         // Speaker field validation
         if (!currentWebinar.speaker) {
             validationErrors.speaker = "Please select a speaker";
@@ -151,13 +151,13 @@ function WebinarList() {
         if (!currentWebinar.numberOfAudience) {
             validationErrors.numberOfAudience = "Please select a numberOfAudience";
         }
-    
+
         // If there are validation errors, update the state and prevent save
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             return;
         }
-    
+
         // Clear any previous errors if validation passes
         setErrors({});
 
@@ -201,22 +201,22 @@ function WebinarList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentWebinar({ ...currentWebinar, [name]: value });
-         // Real-time validation logic
-         if (name === "title") {
+        // Real-time validation logic
+        if (name === "title") {
             // Check if the title is empty or only whitespace
             if (!value.trim()) {
                 setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
-            } 
+            }
             // Check for uniqueness
             else if (Webinars.some(web => web.title.toLowerCase() === value.toLowerCase() && web.id !== currentWebinar.id)) {
                 setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
-            } 
+            }
             // Clear the title error if valid
             else {
                 setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
             }
         }
-    
+
         if (name === "speaker") {
             // Clear the speaker error if the user selects a value
             if (value) {
@@ -229,7 +229,7 @@ function WebinarList() {
                 setErrors((prevErrors) => ({ ...prevErrors, status: "" }));
             }
         }
-              
+
         if (name === "numberOfAudience") {
             // Clear the numberOfAudience error if the user selects a value
             if (value) {
@@ -450,8 +450,8 @@ function WebinarList() {
                         value={currentWebinar.title}
                         onChange={handleChange}
                         fullWidth
-                        error={!!errors.title}                         
-                        helperText={errors.title} 
+                        error={!!errors.title}
+                        helperText={errors.title}
                     />
                     {/* <TextField
                         margin="dense"
@@ -476,7 +476,7 @@ function WebinarList() {
                             </MenuItem>
                         ))}
                     </Select>
-                    {errors.speaker && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.speaker}</Typography>} 
+                    {errors.speaker && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.speaker}</Typography>}
                     {/* 
                         <InputLabel id="demo-simple-select-label">Status</InputLabel>
                         <Select
@@ -499,25 +499,24 @@ function WebinarList() {
                         onChange={handleChange}
                         fullWidth
                         error={!!errors.status} // Display error if exists
-                        helperText={errors.status} 
+                        helperText={errors.status}
                     />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="WebinarDate"
                             value={currentWebinar.webinarDate ? dayjs(currentWebinar.webinarDate) : null}
                             onChange={handleWebinarDateChange}
+                            minDate={dayjs()}
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" 
-                                // className={`w-96 text-3xl rounded-lg ${errors.date && "focus:border-red-500 focus:ring-red-500 border-red-500"}`}
-                                error={!!errors.WebinarDate} // Show error styling if there's an error
-                                helperText={errors.WebinarDate || ""}
+                                <TextField {...params} fullWidth margin="dense"
                                 />
                             )}
                         />
-                          {errors.WebinarDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.WebinarDate}</Typography>}
+                        {errors.WebinarDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.WebinarDate}</Typography>}
                     </LocalizationProvider>
 
                     <TextField
+                        type='number'
                         margin="dense"
                         label="NumberOfAudience"
                         name="numberOfAudience"
@@ -525,7 +524,7 @@ function WebinarList() {
                         onChange={handleChange}
                         fullWidth
                         error={!!errors.numberOfAudience} // Display error if exists
-                        helperText={errors.numberOfAudience} 
+                        helperText={errors.numberOfAudience}
                     />
                 </DialogContent>
                 <DialogActions>

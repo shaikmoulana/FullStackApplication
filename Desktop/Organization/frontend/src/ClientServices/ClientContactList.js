@@ -420,6 +420,7 @@ function ClientContactList() {
                         helperText={errors.contactValue}
                     />
                     <TextField
+                    type='number'
                         margin="dense"
                         label="ContactType"
                         name="contactType"

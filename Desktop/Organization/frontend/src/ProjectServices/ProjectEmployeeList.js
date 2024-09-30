@@ -443,9 +443,7 @@ function ProjectEmployeeList() {
                             onChange={handleStartDateChange}
                             fullWidth                           
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" 
-                                error={!!error.startDate} // Show error style
-                                helperText={error.startDate}                               
+                                <TextField {...params} fullWidth margin="dense"                                                           
                                 />                              
                             )}
                         />

@@ -436,6 +436,7 @@ function InterviewList() {
                         />
                     </LocalizationProvider>
                     <TextField
+                        type='number'
                         margin="dense"
                         label="YearsOfExperience"
                         name="yearsOfExperience"

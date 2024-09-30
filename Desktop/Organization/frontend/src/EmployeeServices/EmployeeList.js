@@ -563,6 +563,7 @@ function EmployeeList() {
                         ))}
                     </Select>
                     <TextField
+                       type='number'
                         margin="dense"
                         label="EmployeeId"
                         name="employeeId"
@@ -657,6 +658,7 @@ function EmployeeList() {
                         fullWidth
                     />
                     <TextField
+                    type='password'
                         margin="dense"
                         label="Password"
                         name="password"
@@ -665,6 +667,7 @@ function EmployeeList() {
                         fullWidth
                     />
                     <TextField
+                    type='number'
                         margin="dense"
                         label="PhoneNumber"
                         name="phoneNo"
@@ -673,8 +676,9 @@ function EmployeeList() {
                         fullWidth
                     />
                     <TextField
+                    type='file'
                         margin="dense"
-                        label="Profile"
+                        // label="Profile"
                         name="profile"
                         value={currentEmployee.profile}
                         onChange={handleChange}

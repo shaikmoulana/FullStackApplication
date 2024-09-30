@@ -38,7 +38,7 @@ function ProjectList() {
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
     const [errors, setErrors] = useState({
-        client: '',       
+        client: '',
         projectName: '',
         technicalProjectManager: '',
         salesContact: '',
@@ -48,7 +48,7 @@ function ProjectList() {
         sowValidTill: '',
         sowLastExtendedDate: ''
     }
-);
+    );
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -166,7 +166,7 @@ function ProjectList() {
         } else if (Projects.some(pro => pro.projectName.toLowerCase() === currentProject.projectName.toLowerCase() && pro.id !== currentProject.id)) {
             validationErrors.projectName = "Project name must be unique";
         }
-    
+
         if (!currentProject.client) {
             validationErrors.client = "Please select a client";
         }
@@ -191,13 +191,13 @@ function ProjectList() {
         if (!currentProject.sowLastExtendedDate) {
             validationErrors.sowLastExtendedDate = "Please select a sowLastExtendedDate";
         }
-    
+
         // If there are validation errors, update the state and prevent save
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             return;
         }
-    
+
         // Clear any previous errors if validation passes
         setErrors({});
 
@@ -235,33 +235,33 @@ function ProjectList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentProject({ ...currentProject, [name]: value });
-         // Real-time validation logic
-         if (name === "client") {
+        // Real-time validation logic
+        if (name === "client") {
             // Check if the title is empty or only whitespace
             if (!value.trim()) {
                 setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
-            } 
+            }
             // Check for uniqueness
             else if (Projects.some(pro => pro.client.toLowerCase() === value.toLowerCase() && pro.id !== currentProject.id)) {
                 setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
-            } 
+            }
             // Clear the title error if valid
             else {
                 setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
             }
         }
-    
+
         if (name === "projectName") {
             if (value) {
                 setErrors((prevErrors) => ({ ...prevErrors, projectName: "" }));
             }
         }
-        if (name === "technicalProjectManager") {           
+        if (name === "technicalProjectManager") {
             if (value) {
                 setErrors((prevErrors) => ({ ...prevErrors, technicalProjectManager: "" }));
             }
         }
-              
+
         if (name === "salesContact") {
             if (value) {
                 setErrors((prevErrors) => ({ ...prevErrors, salesContact: "" }));
@@ -514,8 +514,8 @@ function ProjectList() {
                     </TableHead>
                     <TableBody>
                         {filteredProjects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Project) => (
-                             <TableRow key={Project.id}
-                             sx={{ backgroundColor: Project.isActive ? 'inherit' : '#FFCCCB' }} >                            
+                            <TableRow key={Project.id}
+                                sx={{ backgroundColor: Project.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{Project.id}</TableCell> */}
                                 <TableCell>{Project.client}</TableCell>
                                 <TableCell>{Project.projectName}</TableCell>
@@ -570,7 +570,7 @@ function ProjectList() {
                             </MenuItem>
                         ))}
                     </Select>
-                    {errors.client && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.client}</Typography>} 
+                    {errors.client && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.client}</Typography>}
                     <TextField
                         margin="dense"
                         label="ProjectName"
@@ -596,7 +596,7 @@ function ProjectList() {
                             </MenuItem>
                         ))}
                     </Select>
-                    {errors.technicalProjectManager && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.technicalProjectManager}</Typography>} 
+                    {errors.technicalProjectManager && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.technicalProjectManager}</Typography>}
                     <InputLabel>PMO</InputLabel>
                     <Select
                         margin="dense"
@@ -612,7 +612,7 @@ function ProjectList() {
                             </MenuItem>
                         ))}
                     </Select>
-                    {errors.pmo && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.pmo}</Typography>} 
+                    {errors.pmo && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.pmo}</Typography>}
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="SOWSubmittedDate"
@@ -620,10 +620,8 @@ function ProjectList() {
                             onChange={handleSowSubmittedDateChange}
                             fullWidth
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense"
-                                error={!!errors.sowSubmittedDate} // Display error if exists
-                                helperText={errors.sowSubmittedDate} // Display error message
-                                 />
+                                <TextField {...params} fullWidth margin="dense"                                    
+                                />
                             )}
                         />
                         {errors.sowSubmittedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.sowSubmittedDate}</Typography>}
@@ -636,9 +634,7 @@ function ProjectList() {
                             onChange={handleSowSignedDateChange}
                             fullWidth
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" 
-                                error={!!errors.sowSignedDate} // Display error if exists
-                                helperText={errors.sowSignedDate} // Display error message
+                                <TextField {...params} fullWidth margin="dense"                                  
                                 />
                             )}
                         />
@@ -652,8 +648,6 @@ function ProjectList() {
                             fullWidth
                             renderInput={(params) => (
                                 <TextField {...params} fullWidth margin="dense"
-                                error={!!errors.sowValidTill} // Display error if exists
-                                helperText={errors.sowValidTill} // Display error message
                                 />
                             )}
                         />
@@ -667,10 +661,7 @@ function ProjectList() {
                             onChange={handleSowLastExtendedDateChange}
                             fullWidth
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" 
-                                error={!!errors.sowLastExtendedDate} // Display error if exists
-                                helperText={errors.sowLastExtendedDate} // Display error message
-                                />
+                                <TextField {...params} fullWidth margin="dense" />
                             )}
                         />
                         {errors.sowLastExtendedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.sowLastExtendedDate}</Typography>}

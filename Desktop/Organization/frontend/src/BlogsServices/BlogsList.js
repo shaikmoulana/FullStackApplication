@@ -10,6 +10,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import '../App.css';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 
 function BlogsList() {
     const [blogs, setBlogs] = useState([]);
@@ -135,11 +136,8 @@ function BlogsList() {
 
         // Title field validation
         if (!currentBlogs.title.trim()) {
-            validationErrors.title = "Blogs title cannot be empty or whitespace";
-        } else if (blogs.some(blog => blog.title.toLowerCase() === currentBlogs.title.toLowerCase() && blog.id !== currentBlogs.id)) {
-            validationErrors.title = "Blogs title must be unique";
-        }
-    
+            validationErrors.title = "Please add the Blogs title";
+        }   
         if (!currentBlogs.author) {
             validationErrors.author = "Please select a author";
         }
@@ -512,7 +510,9 @@ function BlogsList() {
                         helperText={errors.status}
                     />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer components={['DatePicker','DatePicker','DatePicker']}>
                         <DatePicker
+                        className='datetime'
                             label="TargetDate"
                             value={currentBlogs.targetDate ? dayjs(currentBlogs.targetDate) : null}
                             onChange={handleTargetDateChange}
@@ -524,23 +524,27 @@ function BlogsList() {
                             )}
                         />
                         {errors.targetDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.targetDate}</Typography>}
-                    </LocalizationProvider>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    {/* </LocalizationProvider>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}> */}
                         <DatePicker
+                         className='datetime'
                             label="CompletedDate"
                             value={currentBlogs.completedDate ? dayjs(currentBlogs.completedDate) : null}
                             onChange={handleCompletedDateChange}
                             renderInput={(params) => (
                                 <TextField {...params} fullWidth margin="dense"
-                                error={!!errors.completedDate}                         
-                                helperText={errors.completedDate}
+                                // error={!!errors.completedDate}                         
+                                // helperText={errors.completedDate}
+                                {...error}
+                                helperText={error ? error.message : null}
                                 />
                             )}
                         />
                         {errors.completedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.completedDate}</Typography>}
-                    </LocalizationProvider>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    {/* </LocalizationProvider>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}> */}
                         <DatePicker
+                            className='datetime'
                             label="PublishedDate"
                             value={currentBlogs.publishedDate ? dayjs(currentBlogs.publishedDate) : null}
                             onChange={handlePublishedDateChange}
@@ -552,6 +556,7 @@ function BlogsList() {
                             )}
                         />
                          {errors.publishedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.publishedDate}</Typography>}
+                         </DemoContainer>
                     </LocalizationProvider>
                 </DialogContent>
                 <DialogActions>
