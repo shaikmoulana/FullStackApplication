@@ -522,12 +522,6 @@ function EmployeeList() {
                                 <TableCell>{Employee.phoneNo}</TableCell>
                                 {/* <TableCell>{Employee.profile}</TableCell> */}
                                 <TableCell>{Employee.role}</TableCell>
-                                <TableCell>{Employee.isActive ? 'Active' : 'Inactive'}</TableCell>
-                                <TableCell>{Employee.createdBy}</TableCell>
-                                <TableCell>{new Date(Employee.createdDate).toLocaleString()}</TableCell>
-                                <TableCell>{Employee.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{new Date(Employee.updatedDate).toLocaleString() || 'N/A'}</TableCell>
-                                {/* <TableCell>{Employee.password}</TableCell> */}
                                 <TableCell>
                                     {Employee.profile ? (
                                         <>
@@ -537,6 +531,13 @@ function EmployeeList() {
                                         'N/A'
                                     )}
                                 </TableCell>
+                                <TableCell>{Employee.isActive ? 'Active' : 'Inactive'}</TableCell>
+                                <TableCell>{Employee.createdBy}</TableCell>
+                                <TableCell>{new Date(Employee.createdDate).toLocaleString()}</TableCell>
+                                <TableCell>{Employee.updatedBy || 'N/A'}</TableCell>
+                                <TableCell>{new Date(Employee.updatedDate).toLocaleString() || 'N/A'}</TableCell>
+                                {/* <TableCell>{Employee.password}</TableCell> */}
+                                
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(Employee)}>
                                         <EditIcon color="primary" />

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -40,24 +40,28 @@ const drawerWidth = 240;
 
 export default function Home() {
   const [view, setView] = useState('home');
-  // const [openEmployee, setOpenEmployee] = useState(false);
   const [openClient, setOpenClient] = useState(false);
   const [openProject, setOpenProject] = useState(false);
   const [openInterview, setOpenInterview] = useState(false);
   const [openSOW, setOpenSOW] = useState(false);
+  const [role, setRole] = useState('');
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Assume the role is stored in localStorage after login
+    const userRole = localStorage.getItem('userRole');
+    setRole(userRole);
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem('oauth2');
+    localStorage.removeItem('userRole');
     navigate('/');
   };
 
   const handleListItemClick = (view) => {
-    // if (view === 'employee') {
-    //   setOpenEmployee(!openEmployee);
-    //   setOpenClient(false); // Close client menu when employee menu is toggled
-    // }
+
     if (view === 'client') {
       setOpenClient(!openClient);
       // setOpenProject(false); // Close employee menu when client menu is toggled
@@ -66,7 +70,7 @@ export default function Home() {
       setOpenClient(false); // Close client menu when project menu is toggled
     } else if (view === 'interview') {
       setOpenInterview(!openInterview);
-      //setOpenProject(false); 
+      //setOpenProject(false);
     } else if (view === 'sow') {
       setOpenSOW(!openSOW);
       //setOpenClient(false); // Close client menu when project menu is toggled
@@ -80,6 +84,127 @@ export default function Home() {
       setView(view);
     }
   };
+
+  const renderAdminForms = () => (
+    <>
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('department')}>
+          <ListItemText primary="Department" />
+        </ListItemButton>
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('designation')}>
+          <ListItemText primary="Designation" />
+        </ListItemButton>
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('technology')}>
+          <ListItemText primary="Technology" />
+        </ListItemButton>
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('employee')}>
+          <ListItemText primary="Employee" />
+        </ListItemButton>
+      </ListItem>
+    </>
+  );
+
+  const renderOtherRoleForms = () => (
+    <>
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('employee')}>
+          <ListItemText primary="Employee" />
+        </ListItemButton>
+      </ListItem>
+
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('client')}>
+          <ListItemText primary="Client" />
+          {openClient ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
+        </ListItemButton>
+      </ListItem>
+      <Collapse in={openClient} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('client')}>
+            <ListItemText primary="Client List" />
+          </ListItem>
+          <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('clientcontact')}>
+            <ListItemText primary="Client Contact" />
+          </ListItem>
+          <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('contacttype')}>
+            <ListItemText primary="Contact Type" />
+          </ListItem>
+        </List>
+      </Collapse>
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('project')}>
+          <ListItemText primary="Project" />
+          {openProject ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
+        </ListItemButton>
+      </ListItem>
+      <Collapse in={openProject} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('project')}>
+            <ListItemText primary="Project List" />
+          </ListItem>
+          <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('projectemployee')}>
+            <ListItemText primary="Project Employee" />
+          </ListItem>
+        </List>
+      </Collapse>
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('sow')}>
+          <ListItemText primary="SOW" />
+          {openSOW ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
+        </ListItemButton>
+      </ListItem>
+      <Collapse in={openSOW} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('sow')}>
+            <ListItemText primary="SOW List" />
+          </ListItem>
+          <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('sowproposedteam')}>
+            <ListItemText primary="SOW ProposedTeam" />
+          </ListItem>
+          <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('sowrequirement')}>
+            <ListItemText primary="SOW Requirement" />
+          </ListItem>
+          <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('sowstatus')}>
+            <ListItemText primary="SOW Status" />
+          </ListItem>
+        </List>
+      </Collapse>
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('interview')}>
+          <ListItemText primary="Interview" />
+          {openInterview ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
+        </ListItemButton>
+      </ListItem>
+      <Collapse in={openInterview} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('interview')}>
+            <ListItemText primary="Interview List" />
+          </ListItem>
+          <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('interviewstatus')}>
+            <ListItemText primary="Interview Status" />
+          </ListItem>
+        </List>
+      </Collapse>
+
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('blogs')}>
+          <ListItemText primary="Blogs" />
+        </ListItemButton>
+      </ListItem>
+
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('webinar')}>
+          <ListItemText primary="Webinar" />
+        </ListItemButton>
+      </ListItem>
+    </>
+  );
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -122,122 +247,7 @@ export default function Home() {
         <Toolbar sx={{ bgcolor: 'black', color: 'white' }}>Dashboard</Toolbar>
         <Divider />
         <List>
-          {['Home', 'Department', 'Designation', 'Employee', 'Technology', 'Webinar', 'Blogs'].map((text) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton
-                onClick={() => handleListItemClick(text.toLowerCase())}
-                sx={{
-                  '&:hover': { bgcolor: '#d3d3d3' }, // Dark gray on hover
-                  borderRadius: 1
-                }}
-              >
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => handleListItemClick('client')}
-              sx={{
-                '&:hover': { bgcolor: '#d3d3d3' }, // Dark gray on hover
-                borderRadius: 1
-              }}
-            >
-              <ListItemText primary="Client" />
-              {openClient ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openClient} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('client')}>
-                <ListItemText primary="Client List" />
-              </ListItem>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('clientcontact')}>
-                <ListItemText primary="Client Contact" />
-              </ListItem>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('contacttype')}>
-                <ListItemText primary="Contact Type" />
-              </ListItem>
-            </List>
-          </Collapse>
-
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => handleListItemClick('project')}
-              sx={{
-                '&:hover': { bgcolor: '#d3d3d3' }, // Dark gray on hover
-                borderRadius: 1
-              }}
-            >
-              <ListItemText primary="Project" />
-              {openProject ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openProject} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('project')}>
-                <ListItemText primary="Project List" />
-              </ListItem>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('projectemployee')}>
-                <ListItemText primary="Project Employee" />
-              </ListItem>
-              {/* <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('projecttechnology')}>
-                <ListItemText primary="Project Technology" />
-              </ListItem> */}
-            </List>
-          </Collapse>
-
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => handleListItemClick('sow')}
-              sx={{
-                '&:hover': { bgcolor: '#d3d3d3' }, // Dark gray on hover
-                borderRadius: 1
-              }}
-            >
-              <ListItemText primary="SOW" />
-              {openSOW ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openSOW} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('sow')}>
-                <ListItemText primary="SOW List" />
-              </ListItem>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('sowproposedteam')}>
-                <ListItemText primary="SOW ProposedTeam" />
-              </ListItem>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('sowrequirement')}>
-                <ListItemText primary="SOW Requirement" />
-              </ListItem>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('sowstatus')}>
-                <ListItemText primary="SOW Status" />
-              </ListItem>
-            </List>
-          </Collapse>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => handleListItemClick('interview')}
-              sx={{
-                '&:hover': { bgcolor: '#d3d3d3' }, // Dark gray on hover
-                borderRadius: 1
-              }}
-            >
-              <ListItemText primary="Interview" />
-              {openInterview ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openInterview} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('interview')}>
-                <ListItemText primary="Interview List" />
-              </ListItem>
-              <ListItem button sx={{ pl: 4, bgcolor: '#d3d3d3', '&:hover': { bgcolor: '#b0b0b0' } }} onClick={() => setView('interviewstatus')}>
-                <ListItemText primary="Interview Status" />
-              </ListItem>
-            </List>
-          </Collapse>
-
+          {role === 'Admin' ? renderAdminForms() : renderOtherRoleForms()}
         </List>
         <Divider />
       </Drawer>
