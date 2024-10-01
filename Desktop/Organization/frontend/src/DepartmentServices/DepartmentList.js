@@ -5,6 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import ClientList from '../ClientServices/ClientList';
 
 function DepartmentList() {
     const [departments, setDepartments] = useState([]);
@@ -22,6 +23,10 @@ function DepartmentList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        name: '',
+    }
+    );
 
     useEffect(() => {
         const fetchDepartments = async () => {
@@ -89,36 +94,24 @@ function DepartmentList() {
     };
 
     const handleSave = () => {
-        const nameRegex = /^[a-zA-Z0-9 ]+$/; // Allows letters, digits, and spaces
-        const minLength = 3; // Adjust according to your database constraint
-        const maxLength = 50; // Adjust according to your database constraint
+        let validationErrors = {};
 
-        // Null/empty value check
-        if (!currentDepartment.name || currentDepartment.name.trim() === '') {
-            alert('Department name cannot be empty.');
+        // Name field validation
+        if (!currentDepartment.name.trim()) {
+            validationErrors.name = "Department name cannot be empty or whitespace";
+        } else if (departments.some(dep => dep.name.toLowerCase() === currentDepartment.name.toLowerCase() && dep.id !== currentDepartment.id)) {
+            validationErrors.name = "Department name must be unique";
+        }
+
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
             return;
         }
 
-        // Special character check
-        if (!nameRegex.test(currentDepartment.name)) {
-            alert('Department name contains invalid characters. Only letters, numbers, and spaces are allowed.');
-            return;
-        }
+        // Clear any previous errors if validation passes
+        setErrors({});
 
-        // Length validation
-        if (currentDepartment.name.length < minLength || currentDepartment.name.length > maxLength) {
-            alert(`Department name must be between ${minLength} and ${maxLength} characters.`);
-            return;
-        }
-
-        // Uniqueness check
-        const isNameDuplicate = departments.some(dept =>
-            dept.name.toLowerCase() === currentDepartment.name.toLowerCase() && dept.id !== currentDepartment.id
-        );
-        if (isNameDuplicate) {
-            alert('Department name must be unique.');
-            return;
-        }
         if (currentDepartment.id) {
             // axios.put(`http://localhost:5560/api/Department/${currentDepartment.id}`, currentDepartment)
             axios.put(`http://172.17.31.61:5160/api/department/${currentDepartment.id}`, currentDepartment)
@@ -148,6 +141,58 @@ function DepartmentList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentDepartment({ ...currentDepartment, [name]: value });
+        if (name === "name") {
+            // Check if the title is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            }
+            // Check for uniqueness
+            else if (ClientList.some(cli => cli.name.toLowerCase() === value.toLowerCase() && cli.id !== currentDepartment.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            }
+            // Clear the title error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            }
+        }
+
+        if (name === "lineofBusiness") {
+            // Clear the lineofBusiness error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, lineofBusiness: "" }));
+            }
+        }
+        if (name === "salesEmployee") {
+            // Clear the salesEmployee error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, salesEmployee: "" }));
+            }
+        }
+
+        if (name === "country") {
+            // Clear the country error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, country: "" }));
+            }
+        }
+        if (name === "city") {
+            // Clear the city error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, city: "" }));
+            }
+        }
+        if (name === "state") {
+            // Clear the state error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, state: "" }));
+            }
+        }
+        if (name === "address") {
+            // Clear the address error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, address: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -308,6 +353,8 @@ function DepartmentList() {
                         value={currentDepartment.name}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.name} // Display error if exists
+                        helperText={errors.name}
                     />
                 </DialogContent>
                 <DialogActions>

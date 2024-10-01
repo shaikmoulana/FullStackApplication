@@ -25,6 +25,12 @@ function ClientContactList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        client: '',
+        contactValue: '',
+        contactType: ''
+    }
+    );
 
     useEffect(() => {
         const fetchClientContacts = async () => {
@@ -108,6 +114,40 @@ function ClientContactList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentClientContact.contactValue.trim()) {
+            validationErrors.contactValue = "ContactValue cannot be empty or whitespace";
+        } else if (ClientContact.some(conval => conval.contactValue.toLowerCase() === currentClientContact.contactValue.toLowerCase() && conval.id !== currentClientContact.id)) {
+            validationErrors.contactValue = "ContactValue must be unique";
+        }
+        else {
+            setErrors('');
+        }
+
+        if (!currentClientContact.contactType.trim()) {
+            validationErrors.contactType = "contactType cannot be empty or whitespace";
+        } else if (ClientContact.some(conval => conval.contactType === currentClientContact.contactType && conval.id !== currentClientContact.id)) {
+            validationErrors.contactType = "contactType must be unique";
+        }
+        else {
+            setErrors('');
+        }
+
+        if (!currentClientContact.client) {
+            validationErrors.client = "Please select a client";
+        }
+
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentClientContact.id) {
             // Update existing ClientContact
             //axios.put(`http://localhost:5142/api/ClientContact/${currentClientContact.id}`, currentClientContact)
@@ -142,6 +182,44 @@ function ClientContactList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentClientContact({ ...currentClientContact, [name]: value });
+        if (name === "contactValue") {
+            // Check if the name is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, contactValue: "Contact value cannot be empty" }));
+            }
+            // Check for uniqueness
+            else if (ClientContact.some(conval => conval.contactValue && conval.contactValue.toLowerCase() === value.toLowerCase() && conval.id !== currentClientContact.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, contactValue: "Contact value must be unique" }));
+            }
+            // Clear the name error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, contactValue: "" }));
+            }
+        }
+
+        // Real-time validation logic for contactType
+        if (name === "contactType") {
+            // Check if the name is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, contactType: "Contact type cannot be empty" }));
+            }
+            // Check for uniqueness
+            else if (Clients.some(contyp => contyp.contactType && contyp.contactType.toLowerCase() === value.toLowerCase() && contyp.id !== currentClientContact.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, contactType: "Contact type must be unique" }));
+            }
+            // Clear the name error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, contactType: "" }));
+            }
+        }
+
+        // Real-time validation logic for client
+        if (name === "client") {
+            // Clear the client error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -322,6 +400,7 @@ function ClientContactList() {
                         value={currentClientContact.client}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.client}
                     >
                         {Clients.map((client) => (
                             <MenuItem key={client.id} value={client.name}>
@@ -329,6 +408,7 @@ function ClientContactList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    {errors.client && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.client}</Typography>}
                     <TextField
                         margin="dense"
                         label="ContactValue"
@@ -336,6 +416,8 @@ function ClientContactList() {
                         value={currentClientContact.contactValue}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.contactValue} // Display error if exists
+                        helperText={errors.contactValue}
                     />
                     <TextField
                         margin="dense"
@@ -344,6 +426,8 @@ function ClientContactList() {
                         value={currentClientContact.contactType}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.contactType} // Display error if exists
+                        helperText={errors.contactType}
                     />
                 </DialogContent>
                 <DialogActions>

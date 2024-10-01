@@ -22,7 +22,10 @@ function ContactTypeList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
-
+    const [errors, setErrors] = useState({
+        typeName: '',
+    }
+    );
 
 
     useEffect(() => {
@@ -92,6 +95,24 @@ function ContactTypeList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentContactType.typeName.trim()) {
+            validationErrors.typeName = "TypeName cannot be empty or whitespace";
+        } else if (contactTypes.some(cont => cont.typeName.toLowerCase() === currentContactType.typeName.toLowerCase() && cont.id !== currentContactType.id)) {
+            validationErrors.typeName = "TypeName name must be unique";
+        }
+
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentContactType.id) {
             // Update existing ContactType
             //axios.put(`http://localhost:5142/api/ContactType/${currentContactType.id}`, currentContactType)
@@ -126,6 +147,58 @@ function ContactTypeList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentContactType({ ...currentContactType, [name]: value });
+        if (name === "name") {
+            // Check if the title is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            }
+            // Check for uniqueness
+            else if (ContactTypeList.some(cli => cli.name.toLowerCase() === value.toLowerCase() && cli.id !== currentContactType.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            }
+            // Clear the title error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            }
+        }
+
+        if (name === "lineofBusiness") {
+            // Clear the lineofBusiness error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, lineofBusiness: "" }));
+            }
+        }
+        if (name === "salesEmployee") {
+            // Clear the salesEmployee error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, salesEmployee: "" }));
+            }
+        }
+
+        if (name === "country") {
+            // Clear the country error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, country: "" }));
+            }
+        }
+        if (name === "city") {
+            // Clear the city error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, city: "" }));
+            }
+        }
+        if (name === "state") {
+            // Clear the state error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, state: "" }));
+            }
+        }
+        if (name === "address") {
+            // Clear the address error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, address: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -286,6 +359,8 @@ function ContactTypeList() {
                         value={currentContactType.typeName}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.typeName} // Display error if exists
+                        helperText={errors.typeName}
                     />
                 </DialogContent>
                 <DialogActions>

@@ -5,6 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import PaginationComponent from '../Components/PaginationComponent'; // Import your PaginationComponent
+import ProjectList from '../ProjectServices/ProjectList';
 
 function TechnologyList() {
     const [technologies, setTechnologies] = useState([]);
@@ -23,6 +24,11 @@ function TechnologyList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        name: '',
+        department: ''
+    }
+    );
 
     useEffect(() => {
         const fetchTechnologies = async () => {
@@ -105,6 +111,29 @@ function TechnologyList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentTechnology.name.trim()) {
+            validationErrors.name = "Technology name cannot be empty or whitespace";
+        } else if (technologies.some(tech => tech.name.toLowerCase() === currentTechnology.name.toLowerCase() && tech.id !== currentTechnology.id)) {
+            validationErrors.name = "Technology name must be unique";
+        }
+
+        // Department field validation 
+        if (!currentTechnology.department) {
+            validationErrors.department = "Please select a department";
+        }
+
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentTechnology.id) {
             // axios.put(`http://localhost:5574/api/Technology/${currentTechnology.id}`, currentTechnology)
             axios.put(`http://172.17.31.61:5274/api/technology/${currentTechnology.id}`, currentTechnology)
@@ -132,6 +161,62 @@ function TechnologyList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentTechnology({ ...currentTechnology, [name]: value });
+        if (name === "client") {
+            // Check if the title is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            }
+            // Check for uniqueness
+            else if (ProjectList.some(pro => pro.client.toLowerCase() === value.toLowerCase() && pro.id !== currentTechnology.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            }
+            // Clear the title error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            }
+        }
+
+        if (name === "projectName") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, projectName: "" }));
+            }
+        }
+        if (name === "technicalProjectManager") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, technicalProjectManager: "" }));
+            }
+        }
+
+        if (name === "salesContact") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, salesContact: "" }));
+            }
+        }
+        if (name === "pmo") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, pmo: "" }));
+            }
+        }
+        if (name === "sowSubmittedDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, sowSubmittedDate: "" }));
+            }
+        }
+        if (name === "sowSignedDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, sowSignedDate: "" }));
+            }
+        }
+        if (name === "sowValidTill") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, sowValidTill: "" }));
+            }
+        }
+        if (name === "sowLastExtendedDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, sowLastExtendedDate: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -304,6 +389,8 @@ function TechnologyList() {
                         value={currentTechnology.name}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.name} // Display error if exists
+                        helperText={errors.name}
                     />
                     <InputLabel>Department</InputLabel>
                     <Select
@@ -312,6 +399,7 @@ function TechnologyList() {
                         value={currentTechnology.department}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.department}
                     >
                         {departments.map((department) => (
                             <MenuItem key={department.id} value={department.name}>
@@ -319,7 +407,7 @@ function TechnologyList() {
                             </MenuItem>
                         ))}
                     </Select>
-
+                    {errors.department && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.department}</Typography>}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>

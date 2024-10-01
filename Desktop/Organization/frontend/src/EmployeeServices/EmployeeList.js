@@ -537,7 +537,7 @@ function EmployeeList() {
                                 <TableCell>{Employee.updatedBy || 'N/A'}</TableCell>
                                 <TableCell>{new Date(Employee.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 {/* <TableCell>{Employee.password}</TableCell> */}
-                                
+
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(Employee)}>
                                         <EditIcon color="primary" />
@@ -584,6 +584,7 @@ function EmployeeList() {
                         ))}
                     </Select>
                     <TextField
+                        type='number'
                         margin="dense"
                         label="EmployeeId"
                         name="employeeId"
@@ -678,6 +679,7 @@ function EmployeeList() {
                         fullWidth
                     />
                     <TextField
+                        type='password'
                         margin="dense"
                         label="Password"
                         name="password"
@@ -686,6 +688,7 @@ function EmployeeList() {
                         fullWidth
                     />
                     <TextField
+                        type='number'
                         margin="dense"
                         label="PhoneNumber"
                         name="phoneNo"
