@@ -33,6 +33,7 @@ function WebinarList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+
     const [errors, setErrors] = useState({
         title: '',
         speaker: '',
@@ -41,6 +42,8 @@ function WebinarList() {
         numberOfAudience: ''
     }
     );
+
+    const options = ['Completed', 'Planned'];
 
     useEffect(() => {
         const fetchWebinars = async () => {
@@ -117,7 +120,8 @@ function WebinarList() {
 
     const handleDelete = (id) => {
         // axios.delete(`http://localhost:5517/api/Webinars/${id}`)
-        axios.delete(`http://172.17.31.61:5017/api/webinars/${id}`)
+        // axios.delete(`http://172.17.31.61:5017/api/webinars/${id}`)
+        axios.patch(`http://172.17.31.61:5017/api/webinars/${id}`)
             .then(response => {
                 setWebinars(Webinars.filter(tech => tech.id !== id));
             })
@@ -453,14 +457,6 @@ function WebinarList() {
                         error={!!errors.title}
                         helperText={errors.title}
                     />
-                    {/* <TextField
-                        margin="dense"
-                        label="Speaker"
-                        name="speaker"
-                        value={currentWebinar.speaker}
-                        onChange={handleChange}
-                        fullWidth
-                    /> */}
                     <InputLabel>Speaker</InputLabel>
                     <Select
                         margin="dense"
@@ -476,6 +472,7 @@ function WebinarList() {
                             </MenuItem>
                         ))}
                     </Select>
+
                     {errors.speaker && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.speaker}</Typography>}
                     {/* 
                         <InputLabel id="demo-simple-select-label">Status</InputLabel>
@@ -491,7 +488,11 @@ function WebinarList() {
                             <MenuItem value={"Completed"}>Completed</MenuItem>
                         </Select> */}
 
-                    <TextField
+                
+
+                    <InputLabel>Status</InputLabel>
+                    <Select
+
                         margin="dense"
                         label="Status"
                         name="status"
@@ -499,8 +500,14 @@ function WebinarList() {
                         onChange={handleChange}
                         fullWidth
                         error={!!errors.status} // Display error if exists
-                        helperText={errors.status}
-                    />
+                        helperText={errors.status}                
+                    >
+                        {options.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="WebinarDate"
@@ -511,6 +518,8 @@ function WebinarList() {
                                 <TextField {...params} fullWidth margin="dense"
                                 />
                             )}
+                            fullWidth
+                            slots={{ textField: (params) => <TextField {...params} /> }}
                         />
                         {errors.WebinarDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.WebinarDate}</Typography>}
                     </LocalizationProvider>

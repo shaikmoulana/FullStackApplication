@@ -44,6 +44,8 @@ function BlogsList() {
     }
 );
 
+    const options = ['Completed', 'InProgress', 'InReview', 'Published'];
+
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
@@ -120,7 +122,8 @@ function BlogsList() {
 
     const handleDelete = (id) => {
         // axios.delete(`http://localhost:5147/api/Blogs/${id}`)
-        axios.delete(`http://172.17.31.61:5174/api/blogs/${id}`)
+        //axios.delete(`http://172.17.31.61:5174/api/blogs/${id}`)
+        axios.patch(`http://172.17.31.61:5174/api/blogs/${id}`)
             .then(response => {
                 setBlogs(blogs.filter(tech => tech.id !== id));
             })
@@ -498,8 +501,13 @@ function BlogsList() {
                             </MenuItem>
                         ))}
                     </Select>
+
                     {errors.author && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.author}</Typography>} 
-                    <TextField
+           
+
+                    <InputLabel>Status</InputLabel>
+                    <Select
+
                         margin="dense"
                         label="Status"
                         name="status"
@@ -507,8 +515,14 @@ function BlogsList() {
                         onChange={handleChange}
                         fullWidth
                         error={!!errors.status}                         
-                        helperText={errors.status}
-                    />
+                        helperText={errors.status}            
+                    >
+                        {options.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DemoContainer components={['DatePicker','DatePicker','DatePicker']}>
                         <DatePicker

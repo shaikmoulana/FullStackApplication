@@ -80,7 +80,8 @@ function DepartmentList() {
 
     const handleDelete = (id) => {
         // axios.delete(`http://localhost:5560/api/Department/${id}`)
-        axios.delete(`http://172.17.31.61:5160/api/department/${id}`)
+        // axios.delete(`http://172.17.31.61:5160/api/department/${id}`)
+        axios.patch(`http://172.17.31.61:5160/api/department/${id}`)
             .then(response => {
                 setDepartments(departments.filter(dept => dept.id !== id));
             })

@@ -133,7 +133,8 @@ function InterviewList() {
 
     const handleDelete = (id) => {
         //axios.delete(`http://localhost:5200/api/Interview/${id}`)
-        axios.delete(`http://172.17.31.61:5200/api/interview/${id}`)
+        // axios.delete(`http://172.17.31.61:5200/api/interview/${id}`)
+        axios.patch(`http://172.17.31.61:5200/api/interview/${id}`)
             .then(response => {
                 setInterviews(Interviews.filter(tech => tech.id !== id));
             })

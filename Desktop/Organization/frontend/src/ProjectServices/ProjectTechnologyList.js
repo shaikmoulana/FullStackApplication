@@ -87,7 +87,8 @@ function ProjectTechnologyList() {
 
     const handleDelete = (id) => {
         //axios.delete(`http://localhost:5151/api/ProjectTechnology/${id}`)
-        axios.delete(`http://172.17.31.61:5151/api/projectTechnology/${id}`)
+        // axios.delete(`http://172.17.31.61:5151/api/projectTechnology/${id}`)
+        axios.patch(`http://172.17.31.61:5151/api/projectTechnology/${id}`)
             .then(response => {
                 setProjectTechnologys(ProjectTechnologys.filter(tech => tech.id !== id));
             })

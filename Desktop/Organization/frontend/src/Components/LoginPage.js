@@ -29,29 +29,30 @@ const LoginPage = (props) => {
         setEmailError('');
         setPasswordError('');
         setError('');
-
         // Validate email
         if (!validateEmail(email)) {
             setEmailError('Invalid email format.');
             isValid = false;
         }
-
         // Validate password
         if (!validatePassword(password)) {
             setPasswordError('Password must be at least 4 characters.');
             isValid = false;
         }
-
         if (!isValid) {
             return; // Stop the form submission if validation fails
         }
-
         try {
             //const response = await axios.post(`http://localhost:5107/api/Login?emailId=${email}&password=${password}`);
             const response = await axios.post(`http://172.17.31.61:5107/api/Login?emailId=${email}&password=${password}`);
-
             if (response.status === 200) {
-                localStorage.setItem('oauth2', response.data);
+                localStorage.setItem('oauth2', response.data.token);
+                localStorage.setItem('userRole', response.data.role);
+
+                // Now you can retrieve the role
+                const userRole = response.data.role;
+                console.log('User role:', userRole);
+
                 navigate('/home');
             }
         } catch (err) {

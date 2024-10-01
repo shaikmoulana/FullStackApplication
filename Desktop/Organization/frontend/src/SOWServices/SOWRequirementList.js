@@ -110,7 +110,8 @@ function SOWRequirementList() {
 
     const handleDelete = (id) => {
         //axios.delete(`http://localhost:5041/api/SOWRequirement/${id}`)
-        axios.delete(`http://172.17.31.61:5041/api/sowRequirement/${id}`)
+        // axios.delete(`http://172.17.31.61:5041/api/sowRequirement/${id}`)
+        axios.patch(`http://172.17.31.61:5041/api/sowRequirement/${id}`)
             .then(response => {
                 setSOWRequirements(SOWRequirements.filter(tech => tech.id !== id));
             })
@@ -301,7 +302,8 @@ function SOWRequirementList() {
                     </TableHead>
                     <TableBody>
                         {filteredSOWRequirements.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((SOWRequirement) => (
-                            <TableRow key={SOWRequirement.id}>
+                            <TableRow key={SOWRequirement.id}
+                                sx={{ backgroundColor: SOWRequirement.isActive ? 'inherit' : '#FFCCCB' }} >
                                 {/* <TableCell>{SOWRequirement.id}</TableCell> */}
                                 <TableCell>{SOWRequirement.sow}</TableCell>
                                 <TableCell>{SOWRequirement.designation}</TableCell>

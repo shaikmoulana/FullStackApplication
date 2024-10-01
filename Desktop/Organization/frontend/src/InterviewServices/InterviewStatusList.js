@@ -74,7 +74,8 @@ function InterviewStatusList() {
 
     const handleDelete = (id) => {
         //axios.delete(`http://localhost:5200/api/InterviewStatus/${id}`)
-        axios.delete(`http://172.17.31.61:5200/api/interviewStatus/${id}`)
+        // axios.delete(`http://172.17.31.61:5200/api/interviewStatus/${id}`)
+        axios.patch(`http://172.17.31.61:5200/api/interviewStatus/${id}`)
             .then(response => {
                 setInterviewStatus(InterviewStatus.filter(tech => tech.id !== id));
             })

@@ -122,7 +122,8 @@ function ClientList() {
 
     const handleDelete = (id) => {
         //axios.delete(`http://localhost:5142/api/Client/${id}`)
-        axios.delete(`http://172.17.31.61:5142/api/client/${id}`)
+        // axios.delete(`http://172.17.31.61:5142/api/client/${id}`)
+        axios.patch(`http://172.17.31.61:5142/api/client/${id}`)
             .then(response => {
                 setClients(Clients.filter(tech => tech.id !== id));
             })

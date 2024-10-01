@@ -101,7 +101,8 @@ function ClientContactList() {
 
     const handleDelete = (id) => {
         //axios.delete(`http://localhost:5142/api/ClientContact/${id}`)
-        axios.delete(`http://172.17.31.61:5142/api/clientContact/${id}`)
+        // axios.delete(`http://172.17.31.61:5142/api/clientContact/${id}`)
+        axios.patch(`http://172.17.31.61:5142/api/clientContact/${id}`)
             .then(response => {
                 setClientContact(ClientContact.filter(tech => tech.id !== id));
             })
@@ -109,6 +110,7 @@ function ClientContactList() {
                 console.error('There was an error deleting the ClientContact!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
