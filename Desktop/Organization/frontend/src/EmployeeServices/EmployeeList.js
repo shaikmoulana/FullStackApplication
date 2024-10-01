@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { styled, ListItemText, Checkbox, Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { styled, ListItemText, Checkbox, Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, FormHelperText } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -47,6 +47,8 @@ function EmployeeList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [validationErrors, setValidationErrors] = useState({}); // State for validation errors
+
 
     useEffect(() => {
         const fetchEmployees = async () => {
@@ -210,7 +212,154 @@ function EmployeeList() {
         setConfirmOpen(false);
     };
 
+    // Validation logic for the form
+    const validateForm = () => {
+        let errors = {};
+        // const errors = { name: '', designation: '', employeeID: '' };
+
+        // Regex for validating the name field
+        const nameValidationRegex = /^[a-zA-Z\s]+$/;
+
+        if (!currentEmployee.name) {
+            errors.name = "Name is required";
+        } else if (!nameValidationRegex.test(currentEmployee.name)) {
+            errors.name = "Name should only contain letters and spaces";
+        }
+
+        if (!currentEmployee.designation) {
+            errors.designation = "Designation is required";
+        }
+
+        // // Log currentEmployee to debug
+        console.log("Current Employee:", currentEmployee);
+
+        // Ensure currentEmployee.employeeID is a string and trim it
+        //const employeeID = currentEmployee.employeeID || '';  // Default to empty string
+
+        const employeeIdPattern = /^\d+$/;
+        // Check if EmployeeID is provided
+        if (!currentEmployee.employeeID || !currentEmployee.employeeID.trim()) {
+            errors.employeeID = "Employee ID is required";  // Check if Employee ID is empty or just whitespace
+        }
+        // Check if EmployeeID contains only digits
+        else if (!employeeIdPattern.test(currentEmployee.employeeID)) {
+            errors.employeeID = "Employee ID must contain digits only";  // Validate for numeric values
+        }
+        // Check if EmployeeID is unique
+        else if (
+            Employees.some(emp =>
+                emp.employeeID === currentEmployee.employeeID && emp.id !== currentEmployee.id
+            )
+        ) {
+            errors.employeeID = "Employee ID must be unique";  // Check for uniqueness
+        }
+
+        // Email validation
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@miraclesoft\.com$/;  // Email must end with @miraclesoft.com
+        const emailId = currentEmployee.emailId || '';  // Ensure emailId is a string
+        if (!emailId.trim()) {
+            errors.emailId = "Email ID is required";  // Check if Email ID is empty
+        } else if (!emailPattern.test(emailId)) {
+            errors.emailId = "Email ID must be in the format @miraclesoft.com";  // Validate email format
+        } else if (
+            Employees.some(emp => emp.emailId === emailId && emp.id !== currentEmployee.id)) {
+            errors.emailId = "Email ID must be unique";  // Check for uniqueness
+        }
+
+        // Designation validation
+        if (!currentEmployee.department) {
+            errors.department = "Department is required";  // Check if Department is not selected
+        }
+
+        // Technology validation
+        if (!currentEmployee.technology) {
+            errors.technology = "Technology is required";  // Check if Department is not selected
+        }
+
+        // Reporting validation
+        if (!currentEmployee.reportingTo) {
+            errors.reportingTo = "Reporting is required";  // Check if Department is not selected
+        }
+
+        // Role validation
+        if (!currentEmployee.role) {
+            errors.role = "Role is required";  // Check if Department is not selected
+        }
+
+        // Password validation
+        const password = currentEmployee.password || '';  // Ensure password is a string
+        if (!password.trim()) {
+            errors.password = "Password is required";  // Check if Password is empty
+        } else if (password.length < 8) {
+            errors.password = "Password must be at least 8 characters long";  // Minimum length requirement
+        } else if (!/[a-zA-Z]/.test(password) || !/\d/.test(password) || !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)
+        ) {
+            errors.password = "Password must contain both letters and numbers";  // Check for letters and numbers
+        }
+
+        // Phone number validation pattern (digits only)
+        const phonePattern = /^\d+$/;  // Phone number must contain digits only
+
+        const phoneNo = currentEmployee.phoneNo || '';
+        if (!phoneNo.trim()) {
+            errors.phoneNo = "Phone number is required";  // Check if Phone number is empty
+        } else if (!phonePattern.test(phoneNo)) {
+            errors.phoneNo = "Phone number must contain digits only";  // Validate phone number for numeric values
+        }
+
+        // Date Validations
+        const { joiningDate, relievingDate } = setCurrentEmployee;
+
+        // Check for empty dates
+        if (!joiningDate) {
+            errors.joiningDate = 'Joining Date cannot be left selected';
+        }
+        if (!relievingDate) {
+            errors.relievingDate = 'Relieving Date cannot be left selected';
+        }
+
+        // Check if joining and relieving dates are the same
+        if (joiningDate && relievingDate && dayjs(joiningDate).isSame(dayjs(relievingDate), 'day')) {
+            errors.joiningDate = "Joining date and relieving date cannot be the same"; // Add validation error
+        }
+
+        // // Projection Validation Suggestion - 1 
+        // const projectionValidationRegex = /^[a-zA-Z\s]+$/;
+
+        // if (!currentEmployee.projection) {
+        //     errors.projection = "Projection is required";
+        // } else if (!projectionValidationRegex.test(currentEmployee.projection)) {
+        //     errors.projection = "Projection should only contain letters and spaces";
+        // }
+
+
+        // Projection Validation Suggestion - 2
+        const projectionPattern = /^[a-zA-Z\s]+$/;
+        const projection = currentEmployee.projection || '';
+        if (!projection.trim()) {
+            errors.projection = "Projection is required";
+        } else if (!projectionPattern.test(projection)) {
+            errors.projection = "Projection must contain only letters and spaces";
+        } else if (
+            Employees.some(emp =>
+                emp.projection === projection && emp.id !== currentEmployee.id
+            )
+        ) {
+            errors.projection = "Projection must be unique";
+        }
+
+        setValidationErrors(errors);
+
+        // Return true if no errors
+        return Object.keys(errors).length === 0;
+    };
+
     const handleSave = () => {
+
+        // Validate the form before saving
+        if (!validateForm()) {
+            return; // If validation fails, stop execution
+        }
 
         const employeeToSave = {
             ...currentEmployee,
@@ -545,14 +694,19 @@ function EmployeeList() {
                         name="name"
                         value={currentEmployee.name}
                         onChange={handleChange}
+                        error={!!validationErrors.name}
                         fullWidth
                     />
+                    <FormHelperText error={!!validationErrors.name}>
+                        {validationErrors.name}
+                    </FormHelperText>
                     <InputLabel>Designation</InputLabel>
                     <Select
                         margin="dense"
                         name="designation"
                         value={currentEmployee.designation}
                         onChange={handleChange}
+                        error={!!validationErrors.designation}
                         fullWidth
                     >
                         {designations.map((designation) => (
@@ -561,28 +715,40 @@ function EmployeeList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    <FormHelperText error={!!validationErrors.designation}>
+                        {validationErrors.designation}
+                    </FormHelperText>
                     <TextField
                         margin="dense"
                         label="EmployeeId"
                         name="employeeId"
                         value={currentEmployee.employeeID}
                         onChange={handleChange}
+                        error={!!validationErrors.employeeID}
                         fullWidth
                     />
+                    <FormHelperText error={!!validationErrors.employeeID}>
+                        {validationErrors.employeeID}
+                    </FormHelperText>
                     <TextField
                         margin="dense"
                         label="Email"
                         name="emailId"
                         value={currentEmployee.emailId}
                         onChange={handleChange}
+                        error={!!validationErrors.emailId}
                         fullWidth
                     />
+                    <FormHelperText error={!!validationErrors.emailId}>
+                        {validationErrors.emailId}
+                    </FormHelperText>
                     <InputLabel>Department</InputLabel>
                     <Select
                         margin="dense"
                         name="department"
                         value={currentEmployee.department}
                         onChange={handleChange}
+                        error={!!validationErrors.department}
                         fullWidth
                     >
                         {departments.map((department) => (
@@ -591,6 +757,9 @@ function EmployeeList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    <FormHelperText error={!!validationErrors.department}>
+                        {validationErrors.department}
+                    </FormHelperText>
                     <InputLabel id="demo-simple-select-label">Technology</InputLabel>
                     <Select
                         label="Technologies"
@@ -616,6 +785,7 @@ function EmployeeList() {
                         name="reportingTo"
                         value={currentEmployee.reportingTo}
                         onChange={handleChange}
+                        error={!!validationErrors.reportingTo}
                         fullWidth
                     >
                         {reportingTo.map((report) => (
@@ -624,17 +794,23 @@ function EmployeeList() {
                             </MenuItem>
                         ))}
                     </Select>
-
+                    <FormHelperText error={!!validationErrors.reportingTo}>
+                        {validationErrors.reportingTo}
+                    </FormHelperText>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="Joining Date"
                             value={currentEmployee.joiningDate ? dayjs(currentEmployee.joiningDate) : null}
                             onChange={handleJoiningDateChange}
+                            error={!!validationErrors.joiningDate}
                             renderInput={(params) => (
                                 <TextField {...params} fullWidth margin="dense" />
                             )}
                         />
                     </LocalizationProvider>
+                    <FormHelperText error={!!validationErrors.joiningDate}>
+                        {validationErrors.joiningDate}
+                    </FormHelperText>
 
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
@@ -653,24 +829,36 @@ function EmployeeList() {
                         name="projection"
                         value={currentEmployee.projection}
                         onChange={handleChange}
+                        error={!!validationErrors.projection}
                         fullWidth
                     />
+                    <FormHelperText error={!!validationErrors.projection}>
+                        {validationErrors.projection}
+                    </FormHelperText>
                     <TextField
                         margin="dense"
                         label="Password"
                         name="password"
                         value={currentEmployee.password}
                         onChange={handleChange}
+                        error={!!validationErrors.password}
                         fullWidth
                     />
+                    <FormHelperText error={!!validationErrors.password}>
+                        {validationErrors.password}
+                    </FormHelperText>
                     <TextField
                         margin="dense"
                         label="PhoneNumber"
                         name="phoneNo"
                         value={currentEmployee.phoneNo}
                         onChange={handleChange}
+                        error={!!validationErrors.phoneNo}
                         fullWidth
                     />
+                    <FormHelperText error={!!validationErrors.phoneNo}>
+                        {validationErrors.phoneNo}
+                    </FormHelperText>
                     <TextField
                         margin="dense"
                         label="Profile"
@@ -685,6 +873,7 @@ function EmployeeList() {
                         name="role"
                         value={currentEmployee.role}
                         onChange={handleChange}
+                        error={!!validationErrors.role}
                         fullWidth
                     >
                         {roles.map((role) => (
@@ -693,6 +882,9 @@ function EmployeeList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    <FormHelperText error={!!validationErrors.role}>
+                        {validationErrors.role}
+                    </FormHelperText>
                     {/* <Button
                         component="label"
                         variant="contained"
