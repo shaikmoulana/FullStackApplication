@@ -49,8 +49,8 @@ function BlogsList() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                 const blogResponse = await axios.get('http://localhost:5547/api/blogs');
-                //const blogResponse = await axios.get('http://172.17.31.61:5174/api/blogs');
+                //  const blogResponse = await axios.get('http://localhost:5547/api/blogs');
+                const blogResponse = await axios.get('http://172.17.31.61:5174/api/blogs');
                 setBlogs(blogResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the Blogs!', error);
@@ -83,8 +83,8 @@ function BlogsList() {
     const handleToggleActive = async (blog) => {
         try {
             const updatedBlog = { ...blog, isActive: !blog.isActive };
-            await axios.put(`http://localhost:5547/api/blogs/${blog.id}`, updatedBlog);
-            // await axios.put(`http://172.17.31.61:5174/api/blogs/${blog.id}`, updatedBlog);
+            // await axios.put(`http://localhost:5547/api/blogs/${blog.id}`, updatedBlog);
+            await axios.put(`http://172.17.31.61:5174/api/blogs/${blog.id}`, updatedBlog);
             setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)));
         } catch (error) {
             console.error('There was an error updating the active status!', error);

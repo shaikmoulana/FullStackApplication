@@ -8,6 +8,8 @@ import PaginationComponent from '../Components/PaginationComponent'; // Import y
 
 function SOWProposedTeamList() {
     const [SOWProposedTeams, setSOWProposedTeams] = useState([]);
+    const [SOWRequirements, setSOWRequirements] = useState([]);
+    const [Employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -16,32 +18,51 @@ function SOWProposedTeamList() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentSOWProposedTeam, setCurrentSOWProposedTeam] = useState({
-        id: '',
         sowRequirement: '',
-        employee: '',
-        isActive: true,
-        createdBy: '',
-        createdDate: '',
-        updatedBy: '',
-        updatedDate: ''
+        employee: ''
     });
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
-
     useEffect(() => {
-        //axios.get('http://localhost:5041/api/SOWProposedTeam')
-        axios.get('http://172.17.31.61:5041/api/sowProposedTeam')
-            .then(response => {
-                setSOWProposedTeams(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the SOWProposedTeams!', error);
+        const fetchSOWProposedTeam = async () => {
+            try {
+                // const sowProTeamResponse = await axios.get('http://localhost:5041/api/sowProposedTeam');
+                const sowProTeamResponse = await axios.get('http://172.17.31.61:5041/api/sowProposedTeam');
+                setSOWProposedTeams(sowProTeamResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the soeProposedTeams!', error);
                 setError(error);
-                setLoading(false);
-            });
+            }
+            setLoading(false);
+        };
+
+        const fetchSOWRequirements = async () => {
+            try {
+                // const sowReqResponse = await axios.get('http://localhost:5041/api/SOWRequirement');
+                const sowReqResponse = await axios.get('http://172.17.31.61:5041/api/sowRequirement');
+                setSOWRequirements(sowReqResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the sowReqResponse!', error);
+                setError(error);
+            }
+        };
+
+        const fetchEmployees = async () => {
+            try {
+                // const empResponse = await axios.get('http://localhost:5733/api/Employee');
+                const empResponse = await axios.get('http://172.17.31.61:5733/api/employee');
+                setEmployees(empResponse.data);
+            } catch (error) {
+                console.error('There was an error fetching the employees!', error);
+                setError(error);
+            }
+        };
+
+        fetchSOWProposedTeam();
+        fetchSOWRequirements();
+        fetchEmployees();
     }, []);
 
     const handleSort = (property) => {
@@ -62,20 +83,17 @@ function SOWProposedTeamList() {
     });
 
     const filteredSOWProposedTeams = sortedSOWProposedTeams.filter((SOWProposedTeam) =>
-        SOWProposedTeam.sowRequirement.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        SOWProposedTeam.employee.toLowerCase().includes(searchQuery.toLowerCase())
+        (SOWProposedTeam.sowRequirement && typeof SOWProposedTeam.sowRequirement === 'string' &&
+            SOWProposedTeam.sowRequirement.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (SOWProposedTeam.employee && typeof SOWProposedTeam.employee === 'string' &&
+            SOWProposedTeam.employee.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
         setCurrentSOWProposedTeam({
-            id: '',
             sowRequirement: '',
-            employee: '',
-            isActive: true,
-            createdBy: '',
-            createdDate: '',
-            updatedBy: '',
-            updatedDate: ''
+            employee: ''
         });
         setOpen(true);
     };
@@ -97,6 +115,7 @@ function SOWProposedTeamList() {
                 console.error('There was an error deleting the SOWProposedTeam!', error);
                 setError(error);
             });
+        setConfirmOpen(false);
     };
 
     const handleSave = () => {
@@ -272,7 +291,7 @@ function SOWProposedTeamList() {
                                 <TableCell>{SOWProposedTeam.createdBy}</TableCell>
                                 <TableCell>{new Date(SOWProposedTeam.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{SOWProposedTeam.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{SOWProposedTeam.updatedDate ? new Date(SOWProposedTeam.updatedDate).toLocaleString() : 'N/A'}</TableCell>
+                                <TableCell>{new Date(SOWProposedTeam.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
                                     <IconButton onClick={() => handleUpdate(SOWProposedTeam)}>
                                         <EditIcon color="primary" />
@@ -296,62 +315,34 @@ function SOWProposedTeamList() {
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{currentSOWProposedTeam.id ? 'Update SOWProposedTeam' : 'Add SOWProposedTeam'}</DialogTitle>
                 <DialogContent>
-                    <TextField
+                    <InputLabel>SOWRequirement</InputLabel>
+                    <Select
                         margin="dense"
-                        label="SowRequirement"
                         name="sowRequirement"
                         value={currentSOWProposedTeam.sowRequirement}
                         onChange={handleChange}
                         fullWidth
-                    />
-                    <TextField
+                    >
+                        {SOWRequirements.map((sowRequirement) => (
+                            <MenuItem key={sowRequirement.id} value={sowRequirement.teamSize}>
+                                {sowRequirement.teamSize}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <InputLabel>Employee</InputLabel>
+                    <Select
                         margin="dense"
-                        label="Employee"
                         name="employee"
                         value={currentSOWProposedTeam.employee}
                         onChange={handleChange}
                         fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Is Active"
-                        name="isActive"
-                        value={currentSOWProposedTeam.isActive}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created By"
-                        name="createdBy"
-                        value={currentSOWProposedTeam.createdBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Created Date"
-                        name="createdDate"
-                        value={currentSOWProposedTeam.createdDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated By"
-                        name="updatedBy"
-                        value={currentSOWProposedTeam.updatedBy}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Updated Date"
-                        name="updatedDate"
-                        value={currentSOWProposedTeam.updatedDate}
-                        onChange={handleChange}
-                        fullWidth
-                    />
+                    >
+                        {Employees.map((employee) => (
+                            <MenuItem key={employee.id} value={employee.name}>
+                                {employee.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>

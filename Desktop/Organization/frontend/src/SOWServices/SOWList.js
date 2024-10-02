@@ -415,8 +415,8 @@ function SOWList() {
                         fullWidth
                     >
                         {Projects.map((project) => (
-                            <MenuItem key={project.id} value={project.name}>
-                                {project.name}
+                            <MenuItem key={project.id} value={project.projectName}>
+                                {project.projectName}
                             </MenuItem>
                         ))}
                     </Select>
