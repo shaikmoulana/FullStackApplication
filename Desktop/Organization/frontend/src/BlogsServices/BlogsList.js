@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, Switch } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -21,13 +21,15 @@ function BlogsList() {
     const [deleteTechId, setDeleteTechId] = useState(null);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [isAdmin, setIsAdmin] = useState(true); // Assume isAdmin is determined by login/auth
     const [currentBlogs, setCurrentBlogs] = useState({
         title: '',
         author: '',
         status: '',
         targetDate: '',
         completedDate: '',
-        publishedDate: ''
+        publishedDate: '',
+        isActive: false // New field to track isActive status
     });
 
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
@@ -47,8 +49,8 @@ function BlogsList() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                // const blogResponse = await axios.get('http://localhost:5174/api/blogs');
-                const blogResponse = await axios.get('http://172.17.31.61:5174/api/blogs');
+                 const blogResponse = await axios.get('http://localhost:5547/api/blogs');
+                //const blogResponse = await axios.get('http://172.17.31.61:5174/api/blogs');
                 setBlogs(blogResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the Blogs!', error);
@@ -76,6 +78,17 @@ function BlogsList() {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
+    };
+
+    const handleToggleActive = async (blog) => {
+        try {
+            const updatedBlog = { ...blog, isActive: !blog.isActive };
+            await axios.put(`http://localhost:5547/api/blogs/${blog.id}`, updatedBlog);
+            // await axios.put(`http://172.17.31.61:5174/api/blogs/${blog.id}`, updatedBlog);
+            setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)));
+        } catch (error) {
+            console.error('There was an error updating the active status!', error);
+        }
     };
 
     const sortedBlogs = [...blogs].sort((a, b) => {
@@ -443,13 +456,23 @@ function BlogsList() {
                                 <TableCell>{Blogs.targetDate}</TableCell>
                                 <TableCell>{Blogs.completedDate}</TableCell>
                                 <TableCell>{Blogs.publishedDate}</TableCell>
-                                <TableCell>{Blogs.isActive ? 'Active' : 'Inactive'}</TableCell>
+                                {/* <TableCell>{Blogs.isActive ? 'Active' : 'Inactive'}</TableCell> */}
+                                <TableCell>
+                                    {isAdmin && (
+                                        <Switch
+                                            checked={Blogs.isActive}
+                                            onChange={() => handleToggleActive(Blogs)}
+                                            color="primary"
+                                        />
+                                    )}
+                                </TableCell>
                                 <TableCell>{Blogs.createdBy}</TableCell>
                                 <TableCell>{new Date(Blogs.createdDate).toLocaleString()}</TableCell>
                                 <TableCell>{Blogs.updatedBy || 'N/A'}</TableCell>
                                 <TableCell>{new Date(Blogs.updatedDate).toLocaleString() || 'N/A'}</TableCell>
                                 <TableCell >
-                                    <IconButton onClick={() => handleUpdate(Blogs)}>
+                                    {/* <IconButton onClick={() => handleUpdate(Blogs)}> */}
+                                    <IconButton onClick={() => setOpen(true)}>
                                         <EditIcon color="primary" />
                                     </IconButton>
                                     <IconButton onClick={() => confirmDelete(Blogs.id)}>
