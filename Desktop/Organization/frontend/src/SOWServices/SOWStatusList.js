@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, Autocomplete } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -21,6 +21,8 @@ function SOWStatusList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const statusOptions = [{ label: 'Active', value: 'active' },{ label: 'Inactive', value: 'inactive' },{ label: 'Pending', value: 'pending' },
+    ];
 
     useEffect(() => {
         const fetchSowStatus = async () => {
@@ -268,13 +270,22 @@ function SOWStatusList() {
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{currentSOWStatus.id ? 'Update SOWStatus' : 'Add SOWStatus'}</DialogTitle>
                 <DialogContent>
-                    <TextField
+                    {/* <TextField
                         margin="dense"
                         label="Status"
                         name="status"
                         value={currentSOWStatus.status}
                         onChange={handleChange}
                         fullWidth
+                    /> */}
+                    <Autocomplete
+                        options={statusOptions}
+                        getOptionLabel={(option) => option.label}
+                        value={statusOptions.find(option => option.label === currentSOWStatus.status) || null}
+                        onChange={handleChange}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Status" variant="outlined" />
+                        )}
                     />
                 </DialogContent>
                 <DialogActions>

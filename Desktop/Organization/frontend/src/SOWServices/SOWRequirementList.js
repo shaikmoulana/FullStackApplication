@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, Autocomplete } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -338,7 +338,7 @@ function SOWRequirementList() {
                 <DialogTitle>{currentSOWRequirement.id ? 'Update SOWRequirement' : 'Add SOWRequirement'}</DialogTitle>
                 <DialogContent>
                     <InputLabel>SOW</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="sow"
                         value={currentSOWRequirement.sow}
@@ -350,9 +350,22 @@ function SOWRequirementList() {
                                 {sow.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    {/* Autocomplete for SOW */}
+                    <Autocomplete
+                        options={SOWs}  // Use SOWs as options for the autocomplete
+                        getOptionLabel={(option) => option.sowName || ''}  // Set how each option is displayed
+                        value={SOWs.find((sow) => sow.sowName === currentSOWRequirement.sow) || null}  // Set current value
+                        // onChange={(event, newValue) => {
+                        //     setCurrentSOWRequirement({ ...currentSOWRequirement, sow: newValue ? newValue.sowName : '' });
+                        // }}
+                        onChange={handleChange}
+                        renderInput={(params) => (
+                            <TextField {...params} variant="outlined" />
+                        )}
+                    />
                     <InputLabel>Designation</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="designation"
                         value={currentSOWRequirement.designation}
@@ -364,7 +377,17 @@ function SOWRequirementList() {
                                 {designation.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    {/* Autocomplete for Designation */}
+                    <Autocomplete
+                        options={Designations}
+                        getOptionLabel={(option) => option.name || ""}
+                        value={currentSOWRequirement.designation}
+                        onChange={handleChange}
+                        renderInput={(params) => (
+                            <TextField {...params} variant="outlined" />
+                        )}
+                    />
                     <TextField
                         margin="dense"
                         label="Technologies"

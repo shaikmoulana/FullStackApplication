@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, Autocomplete } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -351,7 +351,7 @@ function ProjectEmployeeList() {
                 <DialogTitle>{currentProjectEmployee.id ? 'Update ProjectEmployee' : 'Add ProjectEmployee'}</DialogTitle>
                 <DialogContent>
                     <InputLabel>Project</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="project"
                         value={currentProjectEmployee.project}
@@ -363,9 +363,20 @@ function ProjectEmployeeList() {
                                 {project.projectName}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    <Autocomplete
+                        options={Projects} // Assuming Projects is an array of project objects
+                        getOptionLabel={(option) => option.projectName} // Adjust this based on your data structure
+                        value={Projects.find((project) => project.id === currentProjectEmployee.project) || null} // Get the selected project
+                        onChange={(event, newValue) => {
+                            setCurrentProjectEmployee({ ...currentProjectEmployee, project: newValue ? newValue.id : '' });
+                        }}
+                        renderInput={(params) => (
+                            <TextField {...params} variant="outlined" margin="dense" fullWidth />
+                        )}
+                    />
                     <InputLabel>Employee</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="employee"
                         value={currentProjectEmployee.employee}
@@ -377,7 +388,14 @@ function ProjectEmployeeList() {
                                 {employee.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    <Autocomplete
+                        options={Employees}
+                        getOptionLabel={(option) => option.name || ''}
+                        value={currentProjectEmployee.employee || null}
+                        onChange={(event, newValue) => handleChange(event, newValue, 'employee')}
+                        renderInput={(params) => <TextField {...params} variant="outlined" />}
+                    />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="StartDate"

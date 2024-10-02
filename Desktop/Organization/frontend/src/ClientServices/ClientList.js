@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, Autocomplete } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -154,6 +154,11 @@ function ClientList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentClient({ ...currentClient, [name]: value });
+    };
+
+    const handleAutocompleteChange = (event, newValue) => {
+        // Update the currentClient's salesEmployee when a new value is selected in the Autocomplete
+        setCurrentClient({ ...currentClient, salesEmployee: newValue });
     };
 
     const handlePageChange = (event, newPage) => {
@@ -384,7 +389,7 @@ function ClientList() {
                         fullWidth
                     />
                     <InputLabel>SalesEmployee</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="salesEmployee"
                         value={currentClient.salesEmployee}
@@ -396,7 +401,16 @@ function ClientList() {
                                 {employee.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    {/* Autocomplete for Sales Employee */}
+                    <Autocomplete
+                        value={currentClient.salesEmployee}
+                        onChange={handleAutocompleteChange}
+                        options={employees.map((employee) => employee.name)} // Assuming employee names are used as options
+                        renderInput={(params) => (
+                            <TextField {...params} fullWidth />
+                        )}
+                    />
                     <TextField
                         margin="dense"
                         label="Country"

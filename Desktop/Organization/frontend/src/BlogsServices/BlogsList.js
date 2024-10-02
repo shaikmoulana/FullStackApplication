@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, Autocomplete } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -156,6 +156,10 @@ function BlogsList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentBlogs({ ...currentBlogs, [name]: value });
+    };
+
+    const handleAuthorChange = (event, newValue) => {
+        setCurrentBlogs({ ...currentBlogs, author: newValue });
     };
 
     const handlePageChange = (event, newPage) => {
@@ -390,7 +394,7 @@ function BlogsList() {
                         fullWidth
                     />
                     <InputLabel>Author</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="author"
                         label="Author"
@@ -403,8 +407,21 @@ function BlogsList() {
                                 {employee.name}
                             </MenuItem>
                         ))}
-                    </Select>
-                    <InputLabel>Status</InputLabel>
+                    </Select> */}
+
+                    {/* Autocomplete for Author */}
+                    <Autocomplete
+                        options={Employees.map((employee) => employee.name)}
+                        value={currentBlogs.author}
+                        onChange={handleAuthorChange}
+                        renderInput={(params) => (
+                            <TextField {...params} variant="outlined" />
+                        )}
+                        fullWidth
+                        style={{ marginBottom: '20px' }}
+                    />
+
+                    {/* <InputLabel>Status</InputLabel>
                     <Select
                         margin="dense"
                         label="Status"
@@ -418,7 +435,20 @@ function BlogsList() {
                                 {option}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    {/* Replace the Select for Status with Autocomplete */}
+                    <InputLabel>Status</InputLabel>
+                    <Autocomplete
+                        options={options}
+                        value={currentBlogs.status}
+                        onChange={(event, newValue) => {
+                            setCurrentBlogs({ ...currentBlogs, status: newValue });
+                        }}
+                        renderInput={(params) => (
+                            <TextField {...params} variant="outlined" />
+                        )}
+                        fullWidth
+                    />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="TargetDate"

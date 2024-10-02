@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, Autocomplete } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -316,7 +316,7 @@ function ClientContactList() {
                 <DialogTitle>{currentClientContact.id ? 'Update ClientContact' : 'Add ClientContact'}</DialogTitle>
                 <DialogContent>
                     <InputLabel>Client</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="client"
                         value={currentClientContact.client}
@@ -328,7 +328,23 @@ function ClientContactList() {
                                 {client.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    <Autocomplete
+                        options={Clients} // Your array of client objects
+                        getOptionLabel={(option) => option.name} // How to display the option
+                        value={Clients.find(client => client.name === currentClientContact.client) || null} // Current selected client
+                        onChange={(event, newValue) => {
+                            handleChange({ target: { name: 'client', value: newValue ? newValue.name : '' } });
+                        }}
+                        renderInput={(params) => (
+                            <TextField {...params} margin="dense" fullWidth />
+                        )}
+                        renderOption={(props, option) => (
+                            <li {...props} key={option.id}>
+                                {option.name}
+                            </li>
+                        )}
+                    />
                     <TextField
                         margin="dense"
                         label="ContactValue"

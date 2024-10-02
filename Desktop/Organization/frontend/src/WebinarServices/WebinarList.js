@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, Autocomplete } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -368,7 +368,7 @@ function WebinarList() {
                         fullWidth
                     />
                     <InputLabel>Speaker</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="speaker"
                         value={currentWebinar.employee}
@@ -380,9 +380,17 @@ function WebinarList() {
                                 {employee.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    <Autocomplete
+                        options={Employees.map(emp => emp.name)}
+                        value={currentWebinar.speaker || ''}
+                        onChange={(event, newValue) => {
+                            setCurrentWebinar({ ...currentWebinar, speaker: newValue });
+                        }}
+                        renderInput={(params) => <TextField {...params} margin="normal" fullWidth />}
+                    />
                     <InputLabel>Status</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         label="Status"
                         name="status"
@@ -395,7 +403,16 @@ function WebinarList() {
                                 {option}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                
+                    <Autocomplete
+                        options={options}
+                        value={currentWebinar.status || ''}
+                        onChange={(event, newValue) => {
+                            setCurrentWebinar({ ...currentWebinar, status: newValue });
+                        }}
+                        renderInput={(params) => <TextField {...params} margin="normal" fullWidth />}
+                    />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="WebinarDate"
