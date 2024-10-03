@@ -10,12 +10,11 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import '../App.css';
+import ProjectList from '../ProjectServices/ProjectList';
 
-function SOWList() {
-    const [SOWs, setSOWs] = useState([]);
+function POCList() {
+    const [POCs, setPOCs] = useState([]);
     const [Clients, setClients] = useState([]);
-    const [Projects, setProjects] = useState([]);
-    const [SOWStatus, setSOWStatus] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -23,26 +22,35 @@ function SOWList() {
     const [deleteTechId, setDeleteTechId] = useState(null);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [currentSOW, setCurrentSOW] = useState({
+    const [currentPOC, setCurrentPOC] = useState({
         title: '',
         client: '',
-        project: '',
-        preparedDate: '',
-        submittedDate: '',
         status: '',
-        comments: ''
+        targetDate: '',
+        comletedDate: '',
+        document: ''
     });
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        title: '',
+        client: '',
+        status: '',
+        targetDate: '',
+        comletedDate: '',
+        document: ''
+    }
+    );
 
     useEffect(() => {
-        const fetchSOWs = async () => {
+        const fetchPOCs = async () => {
             try {
-                const sowResponse = await axios.get('http://172.17.31.61:5041/api/sow');
-                setSOWs(sowResponse.data);
+                // const pocResponse = await axios.get('http://localhost:5254/api/POC');
+                const pocResponse = await axios.get('http://172.17.31.61:5254/api/poc');
+                setPOCs(pocResponse.data);
             } catch (error) {
-                console.error('There was an error fetching the sows!', error);
+                console.error('There was an error fetching the pocs!', error);
                 setError(error);
             }
             setLoading(false);
@@ -50,38 +58,17 @@ function SOWList() {
 
         const fetchClients = async () => {
             try {
+                // const clientResponse = await axios.get('http://localhost:5142/api/Client');
                 const clientResponse = await axios.get('http://172.17.31.61:5142/api/client');
                 setClients(clientResponse.data);
             } catch (error) {
-                console.error('There was an error fetching the Clients!', error);
+                console.error('There was an error fetching the departments!', error);
                 setError(error);
             }
         };
 
-        const fetchProjects = async () => {
-            try {
-                const projectResponse = await axios.get('http://172.17.31.61:5151/api/project');
-                setProjects(projectResponse.data);
-            } catch (error) {
-                console.error('There was an error fetching the Projects!', error);
-                setError(error);
-            }
-        };
-
-        const fetchSowStatus = async () => {
-            try {
-                const sowStatusResponse = await axios.get('http://172.17.31.61:5041/api/sowstatus');
-                setSOWStatus(sowStatusResponse.data);
-            } catch (error) {
-                console.error('There was an error fetching the sowStatus!', error);
-                setError(error);
-            }
-        };
-
-        fetchSOWs();
+        fetchPOCs();
         fetchClients();
-        fetchProjects();
-        fetchSowStatus();
     }, []);
 
     const handleSort = (property) => {
@@ -90,7 +77,7 @@ function SOWList() {
         setOrderBy(property);
     };
 
-    const sortedSOWs = [...SOWs].sort((a, b) => {
+    const sortedPOCs = [...POCs].sort((a, b) => {
         const valueA = a[orderBy] || '';
         const valueB = b[orderBy] || '';
 
@@ -101,87 +88,161 @@ function SOWList() {
         }
     });
 
-    const filteredSOWs = sortedSOWs.filter((SOW) =>
-        (SOW.client && typeof SOW.client === 'string' &&
-            SOW.client.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (SOW.title && typeof SOW.title === 'string' &&
-            SOW.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (SOW.project && typeof SOW.project === 'string' &&
-            SOW.project.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (SOW.status && typeof SOW.status === 'string' &&
-            SOW.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (SOW.comments && typeof SOW.comments === 'string' &&
-            SOW.comments.toLowerCase().includes(searchQuery.toLowerCase()))
+    const filteredPOCs = sortedPOCs.filter((poc) =>
+        (poc.title && typeof poc.title === 'string' &&
+            poc.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (poc.client && typeof poc.client === 'string' &&
+            poc.client.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (poc.project && typeof poc.project === 'string' &&
+            poc.project.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (poc.status && typeof poc.status === 'string' &&
+            poc.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (poc.comments && typeof poc.comments === 'string' &&
+            poc.comments.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
-        setCurrentSOW({
+        setCurrentPOC({
             title: '',
             client: '',
-            project: '',
-            preparedDate: '',
-            submittedDate: '',
             status: '',
-            comments: ''
+            targetDate: '',
+            completedDate: '',
+            document: ''
         });
         setOpen(true);
     };
 
-    const handleUpdate = (SOW) => {
-        setCurrentSOW(SOW);
+    const handleUpdate = (poc) => {
+        setCurrentPOC(poc);
         setOpen(true);
-
     };
 
     const handleDelete = (id) => {
-        //axios.delete(`http://localhost:5041/api/SOW/${id}`)
-        // axios.delete(`http://172.17.31.61:5041/api/sow/${id}`)
-        axios.patch(`http://172.17.31.61:5041/api/sow/${id}`)
+        // axios.delete(`http://localhost:5254/api/POC/${id}`)
+        // axios.delete(`http://172.17.31.61:5254/api/poc/${id}`)
+        axios.patch(`http://172.17.31.61:5254/api/poc/${id}`)
             .then(response => {
-                setSOWs(SOWs.filter(tech => tech.id !== id));
+                setPOCs(POCs.filter(tech => tech.id !== id));
             })
             .catch(error => {
-                console.error('There was an error deleting the SOW!', error);
+                console.error('There was an error deleting the poc!', error);
                 setError(error);
             });
         setConfirmOpen(false);
     };
 
     const handleSave = () => {
-        if (currentSOW.id) {
-            // Update existing SOW
-            //axios.put(`http://localhost:5041/api/SOW/${currentSOW.id}`, currentSOW)
-            axios.put(`http://172.17.31.61:5041/api/sow/${currentSOW.id}`, currentSOW)
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentPOC.title.trim()) {
+            validationErrors.title = "POC title cannot be empty or whitespace";
+        } else if (POCs.some(tech => tech.title.toLowerCase() === currentPOC.title.toLowerCase() && tech.id !== currentPOC.id)) {
+            validationErrors.title = "POC title must be unique";
+        }
+
+        // Department field validation 
+        if (!currentPOC.client) {
+            validationErrors.client = "Please select a client";
+        }
+
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // Clear any previous errors if validation passes
+        setErrors({});
+
+        if (currentPOC.id) {
+            // axios.put(`http://localhost:5254/api/poc/${currentPOC.id}`, currentPOC)
+            axios.put(`http://172.17.31.61:5254/api/poc/${currentPOC.id}`, currentPOC)
                 .then(response => {
-                    console.log(response)
-                    //setSOWs([...SOWs, response.data]);
-                    // setSOWs(response.data);
-                    setSOWs(SOWs.map(tech => tech.id === currentSOW.id ? response.data : tech));
+                    setPOCs(POCs.map(tech => tech.id === currentPOC.id ? response.data : tech));
                 })
                 .catch(error => {
-                    console.error('There was an error updating the SOW!', error);
+                    console.error('There was an error updating the poc!', error);
                     setError(error);
                 });
-
         } else {
-            // Add new SOW
-            //axios.post('http://localhost:5041/api/SOW', currentSOW)
-            axios.post('http://172.17.31.61:5041/api/sow', currentSOW)
+            // axios.post('http://localhost:5254/api/poc', currentPOC)
+            axios.post('http://172.17.31.61:5254/api/poc', currentPOC)
                 .then(response => {
-                    setSOWs([...SOWs, response.data]);
+                    setPOCs([...POCs, response.data]);
                 })
                 .catch(error => {
-                    console.error('There was an error adding the SOW!', error);
+                    console.error('There was an error adding the poc!', error);
                     setError(error);
                 });
         }
         setOpen(false);
-
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setCurrentSOW({ ...currentSOW, [name]: value });
+        const { title, value } = e.target;
+        setCurrentPOC({ ...currentPOC, [title]: value });
+        if (title === "client") {
+            // Check if the title is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            }
+            // Check for uniqueness
+            else if (ProjectList.some(pro => pro.client.toLowerCase() === value.toLowerCase() && pro.id !== currentPOC.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            }
+            // Clear the title error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            }
+        }
+
+        // if (name === "projectName") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, projectName: "" }));
+        //     }
+        // }
+        // if (name === "technicalProjectManager") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, technicalProjectManager: "" }));
+        //     }
+        // }
+
+        // if (name === "salesContact") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, salesContact: "" }));
+        //     }
+        // }
+        // if (name === "pmo") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, pmo: "" }));
+        //     }
+        // }
+        // if (name === "sowSubmittedDate") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, sowSubmittedDate: "" }));
+        //     }
+        // }
+        // if (name === "sowSignedDate") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, sowSignedDate: "" }));
+        //     }
+        // }
+        // if (name === "sowValidTill") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, sowValidTill: "" }));
+        //     }
+        // }
+        // if (name === "sowLastExtendedDate") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, sowLastExtendedDate: "" }));
+        //     }
+        // }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -205,19 +266,20 @@ function SOWList() {
     const handleConfirmYes = () => {
         handleDelete(deleteTechId);
     };
+    const handleTargetDateChange = (newDate) => {
+        setCurrentPOC((prevPOCs) => ({
+            ...prevPOCs,
+            targetDate: newDate ? newDate.toISOString() : "",
+        }));
+    };
 
-    const handlePreparedDateChange = (newDate) => {
-        setCurrentSOW((prev) => ({
+    const handleCompletedDateChange = (newDate) => {
+        setCurrentPOC((prev) => ({
             ...prev,
-            preparedDate: newDate ? newDate.toISOString() : "",
+            completedDate: newDate ? newDate.toISOString() : "",
         }));
     };
-    const handleSubmittedDateChange = (newDate) => {
-        setCurrentSOW((prev) => ({
-            ...prev,
-            submittedDate: newDate ? newDate.toISOString() : "",
-        }));
-    };
+
 
     if (loading) {
         return <p>Loading...</p>;
@@ -230,7 +292,7 @@ function SOWList() {
     return (
         <div>
             <div style={{ display: 'flex' }}>
-                <h3>SOW Table List</h3>
+                <h3>POC Table List</h3>
             </div>
             <div style={{ display: 'flex', marginBottom: '20px' }}>
                 <TextField
@@ -249,12 +311,14 @@ function SOWList() {
                     }}
                     style={{ marginRight: '20px', width: '90%' }}
                 />
-                <Button variant="contained" color="primary" onClick={handleAdd}>Add SOW</Button>
+                <Button variant="contained" color="primary" onClick={handleAdd}>Add POC</Button>
             </div>
+
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
+                            {/* Sorting logic */}
                             <TableCell>
                                 <TableSortLabel
                                     active={orderBy === 'title'}
@@ -275,33 +339,6 @@ function SOWList() {
                             </TableCell>
                             <TableCell>
                                 <TableSortLabel
-                                    active={orderBy === 'project'}
-                                    direction={orderBy === 'project' ? order : 'asc'}
-                                    onClick={() => handleSort('project')}
-                                >
-                                    Project
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell>
-                                <TableSortLabel
-                                    active={orderBy === 'preparedDate'}
-                                    direction={orderBy === 'preparedDate' ? order : 'asc'}
-                                    onClick={() => handleSort('preparedDate')}
-                                >
-                                    PreparedDate
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell>
-                                <TableSortLabel
-                                    active={orderBy === 'submittedDate'}
-                                    direction={orderBy === 'submittedDate' ? order : 'asc'}
-                                    onClick={() => handleSort('submittedDate')}
-                                >
-                                    SubmittedDate
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell>
-                                <TableSortLabel
                                     active={orderBy === 'status'}
                                     direction={orderBy === 'status' ? order : 'asc'}
                                     onClick={() => handleSort('status')}
@@ -311,11 +348,29 @@ function SOWList() {
                             </TableCell>
                             <TableCell>
                                 <TableSortLabel
-                                    active={orderBy === 'comments'}
-                                    direction={orderBy === 'comments' ? order : 'asc'}
-                                    onClick={() => handleSort('comments')}
+                                    active={orderBy === 'targetDate'}
+                                    direction={orderBy === 'targetDate' ? order : 'asc'}
+                                    onClick={() => handleSort('targetDate')}
                                 >
-                                    Comments
+                                    TargetDate
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'completedDate'}
+                                    direction={orderBy === 'completedDate' ? order : 'asc'}
+                                    onClick={() => handleSort('completedDate')}
+                                >
+                                    CompletedDate
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell>
+                                <TableSortLabel
+                                    active={orderBy === 'document'}
+                                    direction={orderBy === 'document' ? order : 'asc'}
+                                    onClick={() => handleSort('document')}
+                                >
+                                    Document
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -367,27 +422,25 @@ function SOWList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredSOWs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((SOW) => (
-                            <TableRow key={SOW.id}
-                                sx={{ backgroundColor: SOW.isActive ? 'inherit' : '#FFCCCB' }} >
-                                {/* <TableCell>{SOW.id}</TableCell> */}
-                                <TableCell>{SOW.title}</TableCell>
-                                <TableCell>{SOW.client}</TableCell>
-                                <TableCell>{SOW.project}</TableCell>
-                                <TableCell>{SOW.preparedDate}</TableCell>
-                                <TableCell>{SOW.submittedDate}</TableCell>
-                                <TableCell>{SOW.status}</TableCell>
-                                <TableCell>{SOW.comments}</TableCell>
-                                <TableCell>{SOW.isActive ? 'Active' : 'Inactive'}</TableCell>
-                                <TableCell>{SOW.createdBy}</TableCell>
-                                <TableCell>{new Date(SOW.createdDate).toLocaleString()}</TableCell>
-                                <TableCell>{SOW.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{new Date(SOW.updatedDate).toLocaleString() || 'N/A'}</TableCell>
+                        {filteredPOCs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((poc) => (
+                            <TableRow key={poc.id}
+                                sx={{ backgroundColor: poc.isActive ? 'inherit' : '#FFCCCB' }} >
+                                <TableCell>{poc.title}</TableCell>
+                                <TableCell>{poc.client}</TableCell>
+                                <TableCell>{poc.status}</TableCell>
+                                <TableCell>{poc.targetDate}</TableCell>
+                                <TableCell>{poc.completedDate}</TableCell>
+                                <TableCell>{poc.document}</TableCell>
+                                <TableCell>{poc.isActive ? 'Yes' : 'No'}</TableCell>
+                                <TableCell>{poc.createdBy}</TableCell>
+                                <TableCell>{new Date(poc.createdDate).toLocaleDateString()}</TableCell>
+                                <TableCell>{poc.updatedBy || 'N/A'}</TableCell>
+                                <TableCell>{new Date(poc.updatedDate).toLocaleDateString()}</TableCell>
                                 <TableCell >
-                                    <IconButton onClick={() => handleUpdate(SOW)}>
+                                    <IconButton onClick={() => handleUpdate(poc)}>
                                         <EditIcon color="primary" />
                                     </IconButton>
-                                    <IconButton onClick={() => confirmDelete(SOW.id)}>
+                                    <IconButton onClick={() => confirmDelete(poc.id)}>
                                         <DeleteIcon color="error" />
                                     </IconButton>
                                 </TableCell>
@@ -395,32 +448,38 @@ function SOWList() {
                         ))}
                     </TableBody>
                 </Table>
+                {/* Pagination Component */}
                 <PaginationComponent
-                    count={filteredSOWs.length}
+                    count={filteredPOCs.length}
                     page={page}
                     rowsPerPage={rowsPerPage}
                     handlePageChange={handlePageChange}
                     handleRowsPerPageChange={handleRowsPerPageChange}
                 />
             </TableContainer>
+
+            {/* Dialogs for adding/editing and confirming delete */}
             <Dialog open={open} onClose={() => setOpen(false)}>
-                <DialogTitle>{currentSOW.id ? 'Update SOW' : 'Add SOW'}</DialogTitle>
+                <DialogTitle>{currentPOC.id ? 'Update POC' : 'Add POC'}</DialogTitle>
                 <DialogContent>
                     <TextField
                         margin="dense"
-                        label="Title"
                         name="title"
-                        value={currentSOW.title}
+                        label="POC Title"
+                        value={currentPOC.title}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.title} // Display error if exists
+                        helperText={errors.title}
                     />
                     <InputLabel>Client</InputLabel>
                     <Select
                         margin="dense"
                         name="client"
-                        value={currentSOW.client}
+                        value={currentPOC.client}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.client}
                     >
                         {Clients.map((client) => (
                             <MenuItem key={client.id} value={client.name}>
@@ -428,67 +487,46 @@ function SOWList() {
                             </MenuItem>
                         ))}
                     </Select>
-                    <InputLabel>Project</InputLabel>
-                    <Select
-                        margin="dense"
-                        name="project"
-                        value={currentSOW.project}
-                        onChange={handleChange}
-                        fullWidth
-                    >
-                        {Projects.map((project) => (
-                            <MenuItem key={project.id} value={project.projectName}>
-                                {project.projectName}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                    {errors.client && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.client}</Typography>}
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
-                            label="PreparedDate"
-                            value={currentSOW.preparedDate ? dayjs(currentSOW.preparedDate) : null}
-                            onChange={handlePreparedDateChange}
+                            label="TargetDate"
+                            value={currentPOC.targetDate ? dayjs(currentPOC.targetDate) : null}
+                            onChange={handleTargetDateChange}
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense"
+                                    error={!!errors.targetDate} />
                             )}
                         />
                     </LocalizationProvider>
+                    {errors.targetDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.targetDate}</Typography>}
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
-                            label="SubmittedDate"
-                            value={currentSOW.submittedDate ? dayjs(currentSOW.submittedDate) : null}
-                            onChange={handleSubmittedDateChange}
+                            label="CompletedDate"
+                            value={currentPOC.completedDate ? dayjs(currentPOC.completedDate) : null}
+                            onChange={handleCompletedDateChange}
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense"
+                                    error={!!errors.completedDate} />
                             )}
                         />
                     </LocalizationProvider>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                        margin="dense"
-                        name="status"
-                        value={currentSOW.Sowstatus}
-                        onChange={handleChange}
-                        fullWidth
-                    >
-                        {SOWStatus.map((Sowstatus) => (
-                            <MenuItem key={Sowstatus.id} value={Sowstatus.status}>
-                                {Sowstatus.status}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                    {errors.completedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.completedDate}</Typography>}
                     <TextField
                         margin="dense"
-                        label="Comments"
-                        name="comments"
-                        value={currentSOW.comments}
+                        name="document"
+                        label="POC Document"
+                        value={currentPOC.document}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.document} // Display error if exists
+                        helperText={errors.document}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>
                     <Button onClick={handleSave} color="primary">
-                        {currentSOW.id ? 'Update' : 'Save'}
+                        {currentPOC.id ? 'Update' : 'Save'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -496,7 +534,7 @@ function SOWList() {
             <Dialog open={confirmOpen} onClose={handleConfirmClose}>
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
-                    <Typography>Are you sure you want to delete this SOW?</Typography>
+                    <Typography>Are you sure you want to delete this POC?</Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleConfirmClose}>No</Button>
@@ -507,4 +545,5 @@ function SOWList() {
     );
 }
 
-export default SOWList;
+export default POCList;
+

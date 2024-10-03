@@ -346,8 +346,8 @@ function SOWRequirementList() {
                         fullWidth
                     >
                         {SOWs.map((sow) => (
-                            <MenuItem key={sow.id} value={sow.name}>
-                                {sow.name}
+                            <MenuItem key={sow.id} value={sow.title}>
+                                {sow.title}
                             </MenuItem>
                         ))}
                     </Select>

@@ -35,6 +35,7 @@ import SOWList from '../SOWServices/SOWList';
 import SOWProposedTeamList from '../SOWServices/SOWProposedTeamList';
 import SOWRequirementList from '../SOWServices/SOWRequirementList';
 import SOWStatusList from '../SOWServices/SOWStatusList';
+import POCList from '../POCServices/POCList';
 
 const drawerWidth = 240;
 
@@ -112,7 +113,6 @@ export default function Home() {
           <ListItemText primary="Technology" />
         </ListItemButton>
       </ListItem>
-      {renderEmployeeForm()}
       {renderOtherRoleForms()}
 
     </>
@@ -207,6 +207,12 @@ export default function Home() {
           <ListItemText primary="Webinar" />
         </ListItemButton>
       </ListItem>
+
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => handleListItemClick('poc')}>
+          <ListItemText primary="POC" />
+        </ListItemButton>
+      </ListItem>
     </>
   );
 
@@ -281,6 +287,7 @@ export default function Home() {
         {view === 'sowproposedteam' && <SOWProposedTeamList />}
         {view === 'sowrequirement' && <SOWRequirementList />}
         {view === 'sowstatus' && <SOWStatusList />}
+        {view === 'poc' && <POCList />}
       </Box>
     </Box>
   );
