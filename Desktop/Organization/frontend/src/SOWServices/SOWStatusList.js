@@ -284,7 +284,7 @@ function SOWStatusList() {
                         value={statusOptions.find(option => option.label === currentSOWStatus.status) || null}
                         onChange={handleChange}
                         renderInput={(params) => (
-                            <TextField {...params} label="Status" variant="outlined" />
+                            <TextField {...params} variant="outlined" />
                         )}
                     />
                 </DialogContent>

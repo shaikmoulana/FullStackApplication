@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, Autocomplete } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -306,7 +306,7 @@ function TechnologyList() {
                         fullWidth
                     />
                     <InputLabel>Department</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="department"
                         value={currentTechnology.department}
@@ -318,7 +318,20 @@ function TechnologyList() {
                                 {department.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                       <Autocomplete
+                        options={departments}
+                        getOptionLabel={(option) => option.name || ""}
+                        value={currentTechnology.department}
+                        onChange={(event, newValue) => setCurrentTechnology({ ...currentTechnology, department: newValue.name })}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                margin="dense"
+                                fullWidth
+                            />
+                        )}
+                    />
 
                 </DialogContent>
                 <DialogActions>

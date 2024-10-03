@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { ListItemText, Checkbox, Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { ListItemText, Checkbox, Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, Autocomplete } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -472,7 +472,7 @@ function ProjectList() {
                 <DialogTitle>{currentProject.id ? 'Update Project' : 'Add Project'}</DialogTitle>
                 <DialogContent>
                     <InputLabel>Client</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="client"
                         value={currentProject.client}
@@ -484,8 +484,22 @@ function ProjectList() {
                                 {client.name}
                             </MenuItem>
                         ))}
-                    </Select>
-
+                    </Select> */}
+                    <Autocomplete
+                        options={Clients.map((client) => client.name)} // Map Clients to an array of client names
+                        value={currentProject.client || ''} // Set value to client name
+                        onChange={(event, newValue) =>
+                            handleChange({ target: { name: 'client', value: newValue } })
+                        } // Pass only the client name to handleChange
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                margin="dense"
+                                variant="outlined"
+                                fullWidth
+                            />
+                        )}
+                    />
                     <TextField
                         margin="dense"
                         label="ProjectName"
@@ -495,7 +509,7 @@ function ProjectList() {
                         fullWidth
                     />
                     <InputLabel id="demo-simple-select-label">Technology</InputLabel>
-                    <Select
+                    {/* <Select
                         label="Technologies"
                         //  placeholder="Technologies"
                         name="technologies"
@@ -511,9 +525,30 @@ function ProjectList() {
                                 <ListItemText primary={tech.name} />
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    <Autocomplete
+                        multiple
+                        options={Technologies.map((tech) => tech.name)} // Map Technologies to an array of technology names
+                        value={currentProject.technology || []} // Set selected technologies
+                        onChange={(event, newValue) =>
+                            handleTechnologyChange({ target: { name: 'technologies', value: newValue } })
+                        } // Pass selected technologies to handleTechnologyChange
+                        disableCloseOnSelect
+                        renderOption={(props, option, { selected }) => (
+                            <li {...props}>
+                                <Checkbox
+                                    checked={selected}
+                                    style={{ marginRight: 8 }}
+                                />
+                                <ListItemText primary={option} />
+                            </li>
+                        )}
+                        renderInput={(params) => (
+                            <TextField {...params} margin="dense" variant="outlined" fullWidth />
+                        )}
+                    />
                     <InputLabel>SalesContact</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="salesContact"
                         value={currentProject.employee}
@@ -525,9 +560,24 @@ function ProjectList() {
                                 {employee.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    <Autocomplete
+                        options={Employees.map((employee) => employee.name)} // Extract employee names as options
+                        value={currentProject.employee || ''} // Set current employee value
+                        onChange={(event, newValue) =>
+                            handleChange({ target: { name: 'salesContact', value: newValue } })
+                        } // Pass selected employee's name to handleChange
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                margin="dense"
+                                variant="outlined"
+                                fullWidth
+                            />
+                        )}
+                    />
                     <InputLabel>TechnicalProjectManager</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="technicalProjectManager"
                         value={currentProject.employee}
@@ -539,10 +589,25 @@ function ProjectList() {
                                 {employee.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    <Autocomplete
+                        options={Employees.map((employee) => employee.name)} // Map Employees to an array of employee names
+                        value={currentProject.employee || ''} // Set the value to the selected employee name
+                        onChange={(event, newValue) =>
+                            handleChange({ target: { name: 'technicalProjectManager', value: newValue } })
+                        } // Pass the selected employee name to handleChange
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                margin="dense"
+                                variant="outlined"
+                                fullWidth
+                            />
+                        )}
+                    />
 
                     <InputLabel>PMO</InputLabel>
-                    <Select
+                    {/* <Select
                         margin="dense"
                         name="pmo"
                         value={currentProject.employee}
@@ -554,7 +619,22 @@ function ProjectList() {
                                 {employee.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    <Autocomplete
+                        options={Employees.map((employee) => employee.name)} // Extract employee names
+                        value={currentProject.employee || ''} // Set the selected employee name
+                        onChange={(event, newValue) =>
+                            handleChange({ target: { name: 'pmo', value: newValue } })
+                        } // Keep handleChange format unchanged
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                margin="dense"
+                                variant="outlined"
+                                fullWidth
+                            />
+                        )}
+                    />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="SOWSubmittedDate"
