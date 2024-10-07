@@ -147,7 +147,7 @@ function DepartmentList() {
                 setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
             }
             // Check for uniqueness
-            else if (ClientList.some(cli => cli.name.toLowerCase() === value.toLowerCase() && cli.id !== currentDepartment.id)) {
+            else if (departments.some(dep => dep.name.toLowerCase() === value.toLowerCase() && dep.id !== currentDepartment.id)) {
                 setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
             }
             // Clear the title error if valid
@@ -250,7 +250,7 @@ function DepartmentList() {
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add Department</Button>
             </div>
             <TableContainer component={Paper}>
-                <Table>
+                <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                         <TableRow>
                             {/* Sorting logic */}
@@ -260,7 +260,7 @@ function DepartmentList() {
                                     direction={orderBy === 'name' ? order : 'asc'}
                                     onClick={() => handleSort('name')}
                                 >
-                                    Name
+                                    <b>Name</b>
                                 </TableSortLabel>
                             </TableCell>
                             {/* <TableCell>Name</TableCell> */}
@@ -270,7 +270,7 @@ function DepartmentList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -279,7 +279,7 @@ function DepartmentList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -288,7 +288,7 @@ function DepartmentList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -297,7 +297,7 @@ function DepartmentList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -306,10 +306,10 @@ function DepartmentList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

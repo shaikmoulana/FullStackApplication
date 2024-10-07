@@ -28,7 +28,17 @@ function SOWProposedTeamList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
-
+    const [errors, setErrors] = useState({
+        id: '',
+        sowRequirement: '',
+        employee: '',
+        isActive: true,
+        createdBy: '',
+        createdDate: '',
+        updatedBy: '',
+        updatedDate: ''
+    }
+    );
 
     useEffect(() => {
         //axios.get('http://localhost:5041/api/SOWProposedTeam')
@@ -100,6 +110,25 @@ function SOWProposedTeamList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentSOWProposedTeam.sowRequirement.trim()) {
+            validationErrors.sowRequirement = "Please select a sowRequirement";
+        }
+        if (!currentSOWProposedTeam.employee) {
+            validationErrors.employee = "Please select a employee";
+        }        
+
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentSOWProposedTeam.id) {
             // Update existing SOWProposedTeam
             //axios.put(`http://localhost:5041/api/SOWProposedTeam/${currentSOWProposedTeam.id}`, currentSOWProposedTeam)
@@ -134,6 +163,16 @@ function SOWProposedTeamList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentSOWProposedTeam({ ...currentSOWProposedTeam, [name]: value });
+        if (name === "sowRequirement") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, sowRequirement: "" }));
+            }
+        }
+        if (name === "employee") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, employee: "" }));
+            }
+        }        
     };
 
     const handlePageChange = (event, newPage) => {
@@ -191,7 +230,7 @@ function SOWProposedTeamList() {
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add SOWProposedTeam</Button>
             </div>
             <TableContainer component={Paper}>
-                <Table>
+                <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                         <TableRow>
                             {/* <TableCell>ID</TableCell> */}
@@ -201,7 +240,7 @@ function SOWProposedTeamList() {
                                     direction={orderBy === 'sowRequirement' ? order : 'asc'}
                                     onClick={() => handleSort('sowRequirement')}
                                 >
-                                    SOWRequirement
+                                    <b>SOWRequirement</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -210,7 +249,7 @@ function SOWProposedTeamList() {
                                     direction={orderBy === 'employee' ? order : 'asc'}
                                     onClick={() => handleSort('employee')}
                                 >
-                                    Employee
+                                    <b>Employee</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -219,7 +258,7 @@ function SOWProposedTeamList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -228,7 +267,7 @@ function SOWProposedTeamList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -237,7 +276,7 @@ function SOWProposedTeamList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -246,7 +285,7 @@ function SOWProposedTeamList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -255,10 +294,10 @@ function SOWProposedTeamList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -303,6 +342,8 @@ function SOWProposedTeamList() {
                         value={currentSOWProposedTeam.sowRequirement}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.sowRequirement} // Display error if exists
+                        helperText={errors.sowRequirement}
                     />
                     <TextField
                         margin="dense"
@@ -311,6 +352,8 @@ function SOWProposedTeamList() {
                         value={currentSOWProposedTeam.employee}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.employee} // Display error if exists
+                        helperText={errors.employee}
                     />
                     <TextField
                         margin="dense"

@@ -118,7 +118,7 @@ function EmployeeTechnologyList() {
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add EmployeeTechnology</Button>
             </div>
             <TableContainer component={Paper}>
-                <Table>
+                <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                         <TableRow>
                             {/* <TableCell>ID</TableCell> */}

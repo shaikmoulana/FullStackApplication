@@ -238,6 +238,9 @@ function ProjectEmployeeList() {
             ...prev,
             startDate: newDate ? newDate.toISOString() : "",
         }));
+        if(newDate) {
+            setErrors((prevErrors) => ({ ...prevErrors, startDate: ""}));
+        }
     };
 
     const handleEndDateChange = (newDate) => {
@@ -245,6 +248,11 @@ function ProjectEmployeeList() {
             ...prev,
             endDate: newDate ? newDate.toISOString() : "",
         }));
+        if(newDate) {
+            setErrors((prevErrors) => ({
+                ...prevErrors, endDate: ""
+            }));
+        }
     };
 
     if (loading) {
@@ -280,7 +288,7 @@ function ProjectEmployeeList() {
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add ProjectEmployee</Button>
             </div>
             <TableContainer component={Paper}>
-                <Table>
+                <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                         <TableRow>
                             <TableCell>
@@ -289,7 +297,7 @@ function ProjectEmployeeList() {
                                     direction={orderBy === 'project' ? order : 'asc'}
                                     onClick={() => handleSort('project')}
                                 >
-                                    Project
+                                    <b>Project</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -298,7 +306,7 @@ function ProjectEmployeeList() {
                                     direction={orderBy === 'employee' ? order : 'asc'}
                                     onClick={() => handleSort('employee')}
                                 >
-                                    Employee
+                                    <b>Employee</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -307,7 +315,7 @@ function ProjectEmployeeList() {
                                     direction={orderBy === 'startDate' ? order : 'asc'}
                                     onClick={() => handleSort('startDate')}
                                 >
-                                    StartDate
+                                    <b>StartDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -316,7 +324,7 @@ function ProjectEmployeeList() {
                                     direction={orderBy === 'endDate' ? order : 'asc'}
                                     onClick={() => handleSort('endDate')}
                                 >
-                                    EndDate
+                                    <b>EndDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -325,7 +333,7 @@ function ProjectEmployeeList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -334,7 +342,7 @@ function ProjectEmployeeList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -343,7 +351,7 @@ function ProjectEmployeeList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -352,7 +360,7 @@ function ProjectEmployeeList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -361,7 +369,7 @@ function ProjectEmployeeList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
                         </TableRow>

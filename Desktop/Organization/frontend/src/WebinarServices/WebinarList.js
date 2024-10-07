@@ -254,6 +254,12 @@ function WebinarList() {
             ...prevWebinar,
             webinarDate: newDate ? newDate.toISOString() : "",
         }));
+        if (newDate) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                WebinarDate: "", 
+            }));
+        }
     };
 
 
@@ -294,7 +300,7 @@ function WebinarList() {
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add Webinar</Button>
             </div>
             <TableContainer component={Paper}>
-                <Table>
+                <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                         <TableRow>
                             {/* <TableCell>Id</TableCell> */}
@@ -306,7 +312,7 @@ function WebinarList() {
                                     direction={orderBy === 'title' ? order : 'asc'}
                                     onClick={() => handleSort('title')}
                                 >
-                                    Title
+                                    <b>Title</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -315,7 +321,7 @@ function WebinarList() {
                                     direction={orderBy === 'speaker' ? order : 'asc'}
                                     onClick={() => handleSort('speaker')}
                                 >
-                                    Speaker
+                                    <b>Speaker</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -324,7 +330,7 @@ function WebinarList() {
                                     direction={orderBy === 'status' ? order : 'asc'}
                                     onClick={() => handleSort('status')}
                                 >
-                                    Status
+                                    <b>Status</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -333,7 +339,7 @@ function WebinarList() {
                                     direction={orderBy === 'webinarDate' ? order : 'asc'}
                                     onClick={() => handleSort('webinarDate')}
                                 >
-                                    WebinarDate
+                                    <b>WebinarDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -342,7 +348,7 @@ function WebinarList() {
                                     direction={orderBy === 'numberOfAudience' ? order : 'asc'}
                                     onClick={() => handleSort('numberOfAudience')}
                                 >
-                                    NumberOfAudience
+                                    <b>NumberOfAudience</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -351,7 +357,7 @@ function WebinarList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -360,7 +366,7 @@ function WebinarList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -369,7 +375,7 @@ function WebinarList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -378,7 +384,7 @@ function WebinarList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -387,10 +393,10 @@ function WebinarList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -476,16 +482,19 @@ function WebinarList() {
                         ))}
                     </Select>
                     {errors.status && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.status}</Typography>}
+
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="WebinarDate"
                             value={currentWebinar.webinarDate ? dayjs(currentWebinar.webinarDate) : null}
                             onChange={handleWebinarDateChange}
-                            fullWidth
-                            slots={{ textField: (params) => <TextField {...params} /> }}
+                            fullWidth                           
+                            slots={{ textField: (params) => <TextField {...params} 
+                            errors = {!!errors.WebinarDate}                           
+                            /> }}
                         />
-                    </LocalizationProvider>
-                    {errors.WebinarDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.WebinarDate}</Typography>}
+                        {errors.WebinarDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.WebinarDate}</Typography>}
+                    </LocalizationProvider> 
                     <TextField
                         type='number'
                         margin="dense"

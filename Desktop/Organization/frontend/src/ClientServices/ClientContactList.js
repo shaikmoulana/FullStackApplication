@@ -287,7 +287,7 @@ function ClientContactList() {
                                     direction={orderBy === 'client' ? order : 'asc'}
                                     onClick={() => handleSort('client')}
                                 >
-                                    Client
+                                    <b>Client</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -296,7 +296,7 @@ function ClientContactList() {
                                     direction={orderBy === 'contactValue' ? order : 'asc'}
                                     onClick={() => handleSort('contactValue')}
                                 >
-                                    ContactValue
+                                    <b>ContactValue</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -305,7 +305,7 @@ function ClientContactList() {
                                     direction={orderBy === 'contactType' ? order : 'asc'}
                                     onClick={() => handleSort('contactType')}
                                 >
-                                    ContactType
+                                    <b>ContactType</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -314,7 +314,7 @@ function ClientContactList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -323,7 +323,7 @@ function ClientContactList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -332,7 +332,7 @@ function ClientContactList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -341,7 +341,7 @@ function ClientContactList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -350,10 +350,10 @@ function ClientContactList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

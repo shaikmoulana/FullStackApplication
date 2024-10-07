@@ -190,7 +190,7 @@ function ProjectTechnologyList() {
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add ProjectTechnology</Button>
             </div>
             <TableContainer component={Paper}>
-                <Table>
+                <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                         <TableRow>
                             {/* <TableCell>Id</TableCell> */}
@@ -200,7 +200,7 @@ function ProjectTechnologyList() {
                                     direction={orderBy === 'project' ? order : 'asc'}
                                     onClick={() => handleSort('project')}
                                 >
-                                    Project
+                                    <b>Project</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -209,7 +209,7 @@ function ProjectTechnologyList() {
                                     direction={orderBy === 'technology' ? order : 'asc'}
                                     onClick={() => handleSort('technology')}
                                 >
-                                    Technology
+                                    <b>Technology</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -218,7 +218,7 @@ function ProjectTechnologyList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -227,7 +227,7 @@ function ProjectTechnologyList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -236,7 +236,7 @@ function ProjectTechnologyList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -245,7 +245,7 @@ function ProjectTechnologyList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -254,10 +254,10 @@ function ProjectTechnologyList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

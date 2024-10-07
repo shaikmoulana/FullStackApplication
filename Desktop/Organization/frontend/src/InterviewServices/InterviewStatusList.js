@@ -21,6 +21,10 @@ function InterviewStatusList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        status: ''
+    }
+    );
 
     useEffect(() => {
         const fetchInterviewStatus = async () => {
@@ -87,6 +91,21 @@ function InterviewStatusList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        if (!currentInterviewStatus.status.trim()) {
+            validationErrors.status = "Please select a status";
+        } 
+        
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentInterviewStatus.id) {
             // Update existing InterviewStatus
             //axios.put(`http://localhost:5200/api/InterviewStatus/${currentInterviewStatus.id}`, currentInterviewStatus)
@@ -121,6 +140,11 @@ function InterviewStatusList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentInterviewStatus({ ...currentInterviewStatus, [name]: value });
+        if (name === "status") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, status: "" }));
+            }
+        }
     };
     const handlePageChange = (event, newPage) => {
         setPage(newPage);
@@ -177,7 +201,7 @@ function InterviewStatusList() {
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add InterviewStatus</Button>
             </div>
             <TableContainer component={Paper}>
-                <Table>
+                <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                         <TableRow>
                             <TableCell>
@@ -186,7 +210,7 @@ function InterviewStatusList() {
                                     direction={orderBy === 'status' ? order : 'asc'}
                                     onClick={() => handleSort('status')}
                                 >
-                                    Status
+                                    <b>Status</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -195,7 +219,7 @@ function InterviewStatusList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -204,7 +228,7 @@ function InterviewStatusList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -213,7 +237,7 @@ function InterviewStatusList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -222,7 +246,7 @@ function InterviewStatusList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -231,10 +255,10 @@ function InterviewStatusList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -278,6 +302,8 @@ function InterviewStatusList() {
                         value={currentInterviewStatus.status}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.status}
+                        helperText={errors.status}
                     />
                 </DialogContent>
                 <DialogActions>

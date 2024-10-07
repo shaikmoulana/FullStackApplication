@@ -34,6 +34,14 @@ function SOWList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        client: '',
+        project: '',
+        preparedDate: '',
+        submittedDate: '',
+        status: '',
+        comments: ''
+    });
 
     useEffect(() => {
         const fetchSOWs = async () => {
@@ -144,6 +152,38 @@ function SOWList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+        // if (!currentSOW.client.trim()) {
+        //     validationErrors.client = "Please select a Project";
+        // }
+        if (!currentSOW.client) {
+            validationErrors.client = "Please select a client";
+        }
+        if (!currentSOW.project) {
+            validationErrors.project = "Please select a project";
+        }
+        if (!currentSOW.preparedDate) {
+            validationErrors.preparedDate = "Please select a preparedDate";
+        }
+        if (!currentSOW.submittedDate) {
+            validationErrors.submittedDate = "Please select a submittedDate";
+        }
+        if (!currentSOW.status) {
+            validationErrors.status = "Please select a status";
+        }
+        if (!currentSOW.comments) {
+            validationErrors.comments = "Please select a comments";
+        }
+        
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentSOW.id) {
             // Update existing SOW
             //axios.put(`http://localhost:5041/api/SOW/${currentSOW.id}`, currentSOW)
@@ -178,6 +218,38 @@ function SOWList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentSOW({ ...currentSOW, [name]: value });
+        if (name === "client") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            }
+        }
+        if (name === "project") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, project: "" }));
+            }
+        }
+
+        if (name === "preparedDate") {
+            // Clear the salesEmployee error if the user selects a value
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, preparedDate: "" }));
+            }
+        }
+        if (name === "submittedDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, submittedDate: "" }));
+            }
+        }
+        if (name === "status") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, status: "" }));
+            }
+        }
+        if (name === "comments") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, comments: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -207,12 +279,18 @@ function SOWList() {
             ...prev,
             preparedDate: newDate ? newDate.toISOString() : "",
         }));
+        if(newDate) {
+            setErrors((prevErrors) => ({ ...prevErrors, preparedDate: "" }));
+        }
     };
     const handleSubmittedDateChange = (newDate) => {
         setCurrentSOW((prev) => ({
             ...prev,
             submittedDate: newDate ? newDate.toISOString() : "",
         }));
+        if(newDate) {
+            setErrors((prevErrors) => ({ ...prevErrors, submittedDate: ""}));
+        }
     };
 
     if (loading) {
@@ -248,7 +326,7 @@ function SOWList() {
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add SOW</Button>
             </div>
             <TableContainer component={Paper}>
-                <Table>
+                <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                         <TableRow>
                             <TableCell>
@@ -257,7 +335,7 @@ function SOWList() {
                                     direction={orderBy === 'client' ? order : 'asc'}
                                     onClick={() => handleSort('client')}
                                 >
-                                    Client
+                                    <b>Client</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -266,7 +344,7 @@ function SOWList() {
                                     direction={orderBy === 'project' ? order : 'asc'}
                                     onClick={() => handleSort('project')}
                                 >
-                                    Project
+                                    <b>Project</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -275,7 +353,7 @@ function SOWList() {
                                     direction={orderBy === 'preparedDate' ? order : 'asc'}
                                     onClick={() => handleSort('preparedDate')}
                                 >
-                                    PreparedDate
+                                    <b>PreparedDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -284,7 +362,7 @@ function SOWList() {
                                     direction={orderBy === 'submittedDate' ? order : 'asc'}
                                     onClick={() => handleSort('submittedDate')}
                                 >
-                                    SubmittedDate
+                                    <b>SubmittedDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -293,7 +371,7 @@ function SOWList() {
                                     direction={orderBy === 'status' ? order : 'asc'}
                                     onClick={() => handleSort('status')}
                                 >
-                                    Status
+                                    <b>Status</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -302,7 +380,7 @@ function SOWList() {
                                     direction={orderBy === 'comments' ? order : 'asc'}
                                     onClick={() => handleSort('comments')}
                                 >
-                                    Comments
+                                    <b>Comments</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -311,7 +389,7 @@ function SOWList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -320,7 +398,7 @@ function SOWList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -329,7 +407,7 @@ function SOWList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -338,7 +416,7 @@ function SOWList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -347,10 +425,10 @@ function SOWList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -399,13 +477,15 @@ function SOWList() {
                         value={currentSOW.client}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.client}
                     >
                         {Clients.map((client) => (
                             <MenuItem key={client.id} value={client.name}>
                                 {client.name}
                             </MenuItem>
-                        ))}
+                        ))}                       
                     </Select>
+                    {errors.client && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.client}</Typography>}
                     <InputLabel>Project</InputLabel>
                     <Select
                         margin="dense"
@@ -413,47 +493,55 @@ function SOWList() {
                         value={currentSOW.project}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.project}
                     >
                         {Projects.map((project) => (
-                            <MenuItem key={project.id} value={project.name}>
-                                {project.name}
+                            <MenuItem key={project.id} value={project.projectName}>
+                                {project.projectName}
                             </MenuItem>
-                        ))}
+                        ))}                        
                     </Select>
+                    {errors.project && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.project}</Typography>}
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="PreparedDate"
                             value={currentSOW.preparedDate ? dayjs(currentSOW.preparedDate) : null}
                             onChange={handlePreparedDateChange}
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense" 
+                                error={!!errors.preparedDate}/>
                             )}
                         />
-                    </LocalizationProvider>
+                         {errors.preparedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.preparedDate}</Typography>}
+                    </LocalizationProvider>                   
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="SubmittedDate"
                             value={currentSOW.submittedDate ? dayjs(currentSOW.submittedDate) : null}
-                            onChange={handleSubmittedDateChange}
+                            onChange={handleSubmittedDateChange}                           
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense" 
+                                error={!!errors.submittedDate}/>
                             )}
                         />
-                    </LocalizationProvider>
+                          {errors.submittedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.submittedDate}</Typography>}
+                    </LocalizationProvider>                  
                     <InputLabel>Status</InputLabel>
                     <Select
                         margin="dense"
                         name="status"
-                        value={currentSOW.Sowstatus}
+                        value={currentSOW.status}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.status}
                     >
                         {SOWStatus.map((Sowstatus) => (
                             <MenuItem key={Sowstatus.id} value={Sowstatus.status}>
                                 {Sowstatus.status}
                             </MenuItem>
-                        ))}
+                        ))}                        
                     </Select>
+                    {errors.status && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.status}</Typography>}
                     <TextField
                         margin="dense"
                         label="Comments"
@@ -461,6 +549,8 @@ function SOWList() {
                         value={currentSOW.comments}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.comments} // Display error if exists
+                        helperText={errors.comments}
                     />
                 </DialogContent>
                 <DialogActions>

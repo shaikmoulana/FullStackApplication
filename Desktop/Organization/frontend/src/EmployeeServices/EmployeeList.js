@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { styled, ListItemText, Checkbox, Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
+import { FormHelperText, styled, ListItemText, Checkbox, Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -47,6 +47,7 @@ function EmployeeList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [validationErrors, setValidationErrors] = useState({});
 
     useEffect(() => {
         const fetchEmployees = async () => {
@@ -211,6 +212,137 @@ function EmployeeList() {
         setConfirmOpen(false);
     };
 
+     // Validation logic for the form
+     const validateForm = () => {
+        let errors = {};
+        // const errors = { name: '', designation: '', employeeID: '' };
+
+        // Regex for validating the name field
+        const nameValidationRegex = /^[a-zA-Z\s]+$/;
+
+        if (!currentEmployee.name) {
+            errors.name = "Name is required";
+        } else if (!nameValidationRegex.test(currentEmployee.name)) {
+            errors.name = "Name should only contain letters and spaces";
+        }
+
+        if (!currentEmployee.designation) {
+            errors.designation = "Designation is required";
+        }
+
+        // // Log currentEmployee to debug
+        console.log("Current Employee:", currentEmployee);
+
+        // Ensure currentEmployee.employeeID is a string and trim it
+        //const employeeID = currentEmployee.employeeID || '';  // Default to empty string
+
+        const employeeIdPattern = /^\d+$/;
+        // Check if EmployeeID is provided
+        if (!currentEmployee.employeeID || !currentEmployee.employeeID.trim()) {
+            errors.employeeID = "Employee ID is required";  // Check if Employee ID is empty or just whitespace
+        }
+        // Check if EmployeeID contains only digits
+        else if (!employeeIdPattern.test(currentEmployee.employeeID)) {
+            errors.employeeID = "Employee ID must contain digits only";  // Validate for numeric values
+        }
+        // Check if EmployeeID is unique
+        else if (
+            Employees.some(emp =>
+                emp.employeeID === currentEmployee.employeeID && emp.id !== currentEmployee.id
+            )
+        ) {
+            errors.employeeID = "Employee ID must be unique";  // Check for uniqueness
+        }
+
+        // Email validation
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@miraclesoft\.com$/;  // Email must end with @miraclesoft.com
+        const emailId = currentEmployee.emailId || '';  // Ensure emailId is a string
+        if (!emailId.trim()) {
+            errors.emailId = "Email ID is required";  // Check if Email ID is empty
+        } else if (!emailPattern.test(emailId)) {
+            errors.emailId = "Email ID must be in the format @miraclesoft.com";  // Validate email format
+        } else if (
+            Employees.some(emp => emp.emailId === emailId && emp.id !== currentEmployee.id)) {
+            errors.emailId = "Email ID must be unique";  // Check for uniqueness
+        }
+
+        // Designation validation
+        if (!currentEmployee.department) {
+            errors.department = "Department is required";  // Check if Department is not selected
+        }
+
+        // Technology validation
+        if (!currentEmployee.technology) {
+            errors.technology = "Technology is required";  // Check if Department is not selected
+        }
+
+        // Reporting validation
+        if (!currentEmployee.reportingTo) {
+            errors.reportingTo = "Reporting is required";  // Check if Department is not selected
+        }
+
+        // Role validation
+        if (!currentEmployee.role) {
+            errors.role = "Role is required";  // Check if Department is not selected
+        }
+
+        // Password validation
+        const password = currentEmployee.password || '';  // Ensure password is a string
+        if (!password.trim()) {
+            errors.password = "Password is required";  // Check if Password is empty
+        } else if (password.length < 8) {
+            errors.password = "Password must be at least 8 characters long";  // Minimum length requirement
+        } else if (!/[a-zA-Z]/.test(password) || !/\d/.test(password) || !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)
+        ) {
+            errors.password = "Password must contain both letters and numbers";  // Check for letters and numbers
+        }
+
+        // Phone number validation pattern (digits only)
+        const phonePattern = /^\d+$/;  // Phone number must contain digits only
+
+        const phoneNo = currentEmployee.phoneNo || '';
+        if (!phoneNo.trim()) {
+            errors.phoneNo = "Phone number is required";  // Check if Phone number is empty
+        } else if (!phonePattern.test(phoneNo)) {
+            errors.phoneNo = "Phone number must contain digits only";  // Validate phone number for numeric values
+        }
+
+        // Date Validations
+        const { joiningDate, relievingDate } = setCurrentEmployee;
+
+        // Check for empty dates
+        if (!joiningDate) {
+            errors.joiningDate = 'Joining Date cannot be left selected';
+        }
+        if (!relievingDate) {
+            errors.relievingDate = 'Relieving Date cannot be left selected';
+        }
+
+        // Check if joining and relieving dates are the same
+        if (joiningDate && relievingDate && dayjs(joiningDate).isSame(dayjs(relievingDate), 'day')) {
+            errors.joiningDate = "Joining date and relieving date cannot be the same"; // Add validation error
+        }
+ // Projection Validation Suggestion - 2
+ const projectionPattern = /^[a-zA-Z\s]+$/;
+ const projection = currentEmployee.projection || '';
+ if (!projection.trim()) {
+     errors.projection = "Projection is required";
+ } else if (!projectionPattern.test(projection)) {
+     errors.projection = "Projection must contain only letters and spaces";
+ } else if (
+     Employees.some(emp =>
+         emp.projection === projection && emp.id !== currentEmployee.id
+     )
+ ) {
+     errors.projection = "Projection must be unique";
+ }
+
+ setValidationErrors(errors);
+
+ // Return true if no errors
+ return Object.keys(errors).length === 0;
+};
+
     const handleSave = async () => {
         try {
             let profilePath = currentEmployee.profile; // Existing profile path (for updates)
@@ -308,11 +440,7 @@ function EmployeeList() {
             technology: typeof value === 'string' ? value.split(',') : value  // Handle multiple selection
         });
     };
-
-    // const VisuallyHiddenInput = styled("input")({
-    //     width: 1,
-    // });
-
+ 
     if (loading) {
         return <p>Loading...</p>;
     }
@@ -346,7 +474,7 @@ function EmployeeList() {
                 <Button variant="contained" color="primary" onClick={handleAdd}>Add Employee</Button>
             </div>
             <TableContainer component={Paper}>
-                <Table>
+                <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                         <TableRow>
                             {/* <TableCell>ID</TableCell> */}
@@ -356,7 +484,7 @@ function EmployeeList() {
                                     direction={orderBy === 'name' ? order : 'asc'}
                                     onClick={() => handleSort('name')}
                                 >
-                                    Name
+                                    <b>Name</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -365,7 +493,7 @@ function EmployeeList() {
                                     direction={orderBy === 'designation' ? order : 'asc'}
                                     onClick={() => handleSort('designation')}
                                 >
-                                    Designation
+                                    <b>Designation</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -374,7 +502,7 @@ function EmployeeList() {
                                     direction={orderBy === 'employeeId' ? order : 'asc'}
                                     onClick={() => handleSort('employeeId')}
                                 >
-                                    EmployeeId
+                                    <b>EmployeeId</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -383,7 +511,7 @@ function EmployeeList() {
                                     direction={orderBy === 'emailId' ? order : 'asc'}
                                     onClick={() => handleSort('emailId')}
                                 >
-                                    EmailId
+                                    <b>EmailId</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -392,7 +520,7 @@ function EmployeeList() {
                                     direction={orderBy === 'department' ? order : 'asc'}
                                     onClick={() => handleSort('department')}
                                 >
-                                    Department
+                                    <b>Department</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -401,7 +529,7 @@ function EmployeeList() {
                                     direction={orderBy === 'reportingTo' ? order : 'asc'}
                                     onClick={() => handleSort('reportingTo')}
                                 >
-                                    ReportingTo
+                                    <b>ReportingTo</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -410,7 +538,7 @@ function EmployeeList() {
                                     direction={orderBy === 'joiningDate' ? order : 'asc'}
                                     onClick={() => handleSort('joiningDate')}
                                 >
-                                    JoiningDate
+                                    <b>JoiningDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -419,7 +547,7 @@ function EmployeeList() {
                                     direction={orderBy === 'relievingDate' ? order : 'asc'}
                                     onClick={() => handleSort('relievingDate')}
                                 >
-                                    RelievingDate
+                                    <b>RelievingDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -428,7 +556,7 @@ function EmployeeList() {
                                     direction={orderBy === 'projection' ? order : 'asc'}
                                     onClick={() => handleSort('projection')}
                                 >
-                                    Projection
+                                    <b>Projection</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -437,7 +565,7 @@ function EmployeeList() {
                                     direction={orderBy === 'phoneNo' ? order : 'asc'}
                                     onClick={() => handleSort('phoneNo')}
                                 >
-                                    PhoneNo
+                                    <b>PhoneNo</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -446,7 +574,7 @@ function EmployeeList() {
                                     direction={orderBy === 'profile' ? order : 'asc'}
                                     onClick={() => handleSort('profile')}
                                 >
-                                    Profile
+                                    <b>Profile</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -455,7 +583,7 @@ function EmployeeList() {
                                     direction={orderBy === 'role' ? order : 'asc'}
                                     onClick={() => handleSort('role')}
                                 >
-                                    Role
+                                    <b>Role</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -464,7 +592,7 @@ function EmployeeList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -473,7 +601,7 @@ function EmployeeList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -482,7 +610,7 @@ function EmployeeList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -491,7 +619,7 @@ function EmployeeList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -500,10 +628,10 @@ function EmployeeList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -568,7 +696,11 @@ function EmployeeList() {
                         value={currentEmployee.name}
                         onChange={handleChange}
                         fullWidth
+                        error={!!validationErrors.name}
                     />
+                     <FormHelperText error={!!validationErrors.name}>
+                        {validationErrors.name}
+                    </FormHelperText>
                     <InputLabel>Designation</InputLabel>
                     <Select
                         margin="dense"
@@ -576,6 +708,7 @@ function EmployeeList() {
                         value={currentEmployee.designation}
                         onChange={handleChange}
                         fullWidth
+                        error={!!validationErrors.designation}
                     >
                         {designations.map((designation) => (
                             <MenuItem key={designation.id} value={designation.name}>
@@ -583,6 +716,9 @@ function EmployeeList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    <FormHelperText error={!!validationErrors.designation}>
+                        {validationErrors.designation}
+                    </FormHelperText>
                     <TextField
                         type='number'
                         margin="dense"
@@ -591,7 +727,11 @@ function EmployeeList() {
                         value={currentEmployee.employeeID}
                         onChange={handleChange}
                         fullWidth
+                        error={!!validationErrors.employeeID}
                     />
+                    <FormHelperText error={!!validationErrors.employeeID}>
+                        {validationErrors.employeeID}
+                    </FormHelperText>
                     <TextField
                         margin="dense"
                         label="Email"
@@ -599,7 +739,11 @@ function EmployeeList() {
                         value={currentEmployee.emailId}
                         onChange={handleChange}
                         fullWidth
+                        error={!!validationErrors.emailId}
                     />
+                    <FormHelperText error={!!validationErrors.emailId}>
+                        {validationErrors.emailId}
+                    </FormHelperText>
                     <InputLabel>Department</InputLabel>
                     <Select
                         margin="dense"
@@ -607,6 +751,7 @@ function EmployeeList() {
                         value={currentEmployee.department}
                         onChange={handleChange}
                         fullWidth
+                        error={!!validationErrors.department}
                     >
                         {departments.map((department) => (
                             <MenuItem key={department.id} value={department.name}>
@@ -614,6 +759,9 @@ function EmployeeList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    <FormHelperText error={!!validationErrors.department}>
+                        {validationErrors.department}
+                    </FormHelperText>
                     <InputLabel id="demo-simple-select-label">Technology</InputLabel>
                     <Select
                         label="Technologies"
@@ -640,6 +788,7 @@ function EmployeeList() {
                         value={currentEmployee.reportingTo}
                         onChange={handleChange}
                         fullWidth
+                        error={!!validationErrors.reportingTo}
                     >
                         {reportingTo.map((report) => (
                             <MenuItem key={report.id} value={report.name}>
@@ -647,18 +796,23 @@ function EmployeeList() {
                             </MenuItem>
                         ))}
                     </Select>
-
+                    <FormHelperText error={!!validationErrors.reportingTo}>
+                        {validationErrors.reportingTo}
+                    </FormHelperText>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="Joining Date"
                             value={currentEmployee.joiningDate ? dayjs(currentEmployee.joiningDate) : null}
                             onChange={handleJoiningDateChange}
+                            error={!!validationErrors.joiningDate}
                             renderInput={(params) => (
                                 <TextField {...params} fullWidth margin="dense" />
                             )}
                         />
                     </LocalizationProvider>
-
+                    <FormHelperText error={!!validationErrors.joiningDate}>
+                        {validationErrors.joiningDate}
+                    </FormHelperText>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="Relieving Date"
@@ -677,7 +831,11 @@ function EmployeeList() {
                         value={currentEmployee.projection}
                         onChange={handleChange}
                         fullWidth
+                        error={!!validationErrors.projection}
                     />
+                    <FormHelperText error={!!validationErrors.projection}>
+                        {validationErrors.projection}
+                    </FormHelperText>
                     <TextField
                         type='password'
                         margin="dense"
@@ -686,7 +844,11 @@ function EmployeeList() {
                         value={currentEmployee.password}
                         onChange={handleChange}
                         fullWidth
+                        error={!!validationErrors.password}
                     />
+                    <FormHelperText error={!!validationErrors.password}>
+                        {validationErrors.password}
+                    </FormHelperText>
                     <TextField
                         type='number'
                         margin="dense"
@@ -695,7 +857,11 @@ function EmployeeList() {
                         value={currentEmployee.phoneNo}
                         onChange={handleChange}
                         fullWidth
+                        error={!!validationErrors.phoneNo}
                     />
+                     <FormHelperText error={!!validationErrors.phoneNo}>
+                        {validationErrors.phoneNo}
+                    </FormHelperText>
                     {/* <TextField
                         margin="dense"
                         label="Profile"
@@ -711,6 +877,7 @@ function EmployeeList() {
                         value={currentEmployee.role}
                         onChange={handleChange}
                         fullWidth
+                        error={!!validationErrors.role}
                     >
                         {roles.map((role) => (
                             <MenuItem key={role.id} value={role.roleName}>
@@ -718,6 +885,9 @@ function EmployeeList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    <FormHelperText error={!!validationErrors.role}>
+                        {validationErrors.role}
+                    </FormHelperText>
                     {/* <Button
                         component="label"
                         variant="contained"
