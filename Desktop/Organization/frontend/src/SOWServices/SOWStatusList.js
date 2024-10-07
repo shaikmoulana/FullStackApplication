@@ -21,6 +21,10 @@ function SOWStatusList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        status: '',
+    }
+    );
 
     useEffect(() => {
         const fetchSowStatus = async () => {
@@ -87,6 +91,24 @@ function SOWStatusList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentSOWStatus.status.trim()) {
+            validationErrors.status = "Status cannot be empty or whitespace";
+        } else if (SOWStatus.some(stat => stat.status === currentSOWStatus.status && stat.id !== currentSOWStatus.id)) {
+            validationErrors.status = "Status must be unique";
+        }
+
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentSOWStatus.id) {
             // Update existing SOWStatus
             //axios.put(`http://localhost:5041/api/SOWStatus/${currentSOWStatus.id}`, currentSOWStatus)
@@ -119,6 +141,20 @@ function SOWStatusList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentSOWStatus({ ...currentSOWStatus, [name]: value });
+        if (name === "status") {
+            // Check if the name is empty or only whitespace
+            if (!value.trim()) {
+                setErrors((prevErrors) => ({ ...prevErrors, status: "" }));
+            }
+            // Check for uniqueness
+            else if (SOWStatus.some(stat => stat.name.toLowerCase() === value.toLowerCase() && stat.id !== currentSOWStatus.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, status: "" }));
+            }
+            // Clear the name error if valid
+            else {
+                setErrors((prevErrors) => ({ ...prevErrors, status: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -184,7 +220,7 @@ function SOWStatusList() {
                                     direction={orderBy === 'status' ? order : 'asc'}
                                     onClick={() => handleSort('status')}
                                 >
-                                    Status
+                                    <b>Status</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -193,7 +229,7 @@ function SOWStatusList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -202,7 +238,7 @@ function SOWStatusList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -211,7 +247,7 @@ function SOWStatusList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -220,7 +256,7 @@ function SOWStatusList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -229,10 +265,10 @@ function SOWStatusList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -275,6 +311,8 @@ function SOWStatusList() {
                         value={currentSOWStatus.status}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.status} // Display error if exists
+                        helperText={errors.status}
                     />
                 </DialogContent>
                 <DialogActions>

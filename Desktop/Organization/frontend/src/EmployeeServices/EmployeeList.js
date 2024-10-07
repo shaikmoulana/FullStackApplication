@@ -51,8 +51,8 @@ function EmployeeList() {
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                // const empResponse = await axios.get('http://localhost:5733/api/Employee');
-                const empResponse = await axios.get('http://172.17.31.61:5733/api/employee');
+                // const empResponse = await axios.get('http://localhost:5033/api/Employee');
+                const empResponse = await axios.get('http://172.17.31.61:5033/api/employee');
                 setEmployees(empResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the employees!', error);
@@ -63,8 +63,8 @@ function EmployeeList() {
 
         const fetchReportingTo = async () => {
             try {
-                // const repoResponse = await axios.get('http://localhost:5733/api/Employee');
-                const repoResponse = await axios.get('http://172.17.31.61:5733/api/employee');
+                // const repoResponse = await axios.get('http://localhost:5033/api/Employee');
+                const repoResponse = await axios.get('http://172.17.31.61:5033/api/employee');
                 setReporting(repoResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the repoting!', error);
@@ -135,7 +135,11 @@ function EmployeeList() {
         setOrderBy(property);
     };
 
-    const sortedEmployees = [...Employees].sort((a, b) => {
+    // Ensure Employees is not undefined or null
+    const safeEmployees = Employees || [];
+
+    // Sorting logic
+    const sortedEmployees = [...safeEmployees].sort((a, b) => {
         const valueA = a[orderBy] || '';
         const valueB = b[orderBy] || '';
 
@@ -146,30 +150,31 @@ function EmployeeList() {
         }
     });
 
+    // Filtering logic
     const filteredEmployees = sortedEmployees.filter((employee) =>
-        (employee.name && typeof employee.name === 'string' &&
-            employee.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        employee && ( // Ensure employee is defined
+            (employee.name && typeof employee.name === 'string' &&
+                employee.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        (employee.designation && typeof employee.designation === 'string' &&
-            employee.designation.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (employee.designation && typeof employee.designation === 'string' &&
+                employee.designation.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        (employee.employeeID && typeof employee.employeeID === 'string' &&
-            employee.employeeID.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (employee.employeeID && typeof employee.employeeID === 'string' &&
+                employee.employeeID.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        (employee.emailId && typeof employee.emailId === 'string' &&
-            employee.emailId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (employee.emailId && typeof employee.emailId === 'string' &&
+                employee.emailId.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        (employee.department && typeof employee.department === 'string' &&
-            employee.department.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (employee.department && typeof employee.department === 'string' &&
+                employee.department.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        (employee.reportingTo && typeof employee.reportingTo === 'string' &&
-            employee.reportingTo.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (employee.reportingTo && typeof employee.reportingTo === 'string' &&
+                employee.reportingTo.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        (employee.projection && typeof employee.projection === 'string' &&
-            employee.projection.toLowerCase().includes(searchQuery.toLowerCase()))
+            (employee.projection && typeof employee.projection === 'string' &&
+                employee.projection.toLowerCase().includes(searchQuery.toLowerCase()))
+        )
     );
-
-
 
     const handleAdd = () => {
         setCurrentEmployee({
@@ -198,9 +203,9 @@ function EmployeeList() {
     };
 
     const handleDelete = (id) => {
-        // axios.delete(`http://localhost:5733/api/Employee/${id}`)
-        // axios.delete(`http://172.17.31.61:5733/api/employee/${id}`)
-        axios.patch(`http://172.17.31.61:5733/api/employee/${id}`)
+        // axios.delete(`http://localhost:5033/api/Employee/${id}`)
+        // axios.delete(`http://172.17.31.61:5033/api/employee/${id}`)
+        axios.patch(`http://172.17.31.61:5033/api/employee/${id}`)
             .then(response => {
                 setEmployees(Employees.filter(tech => tech.id !== id));
             })
@@ -221,7 +226,7 @@ function EmployeeList() {
                 formData.append('profile', selectedFile);
                 formData.append('id', "");
 
-                const uploadResponse = await axios.post('http://localhost:5033/api/Employee/uploadFile', formData, {
+                const uploadResponse = await axios.post('http://localhost:5733/api/Employee/uploadFile', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -242,11 +247,11 @@ function EmployeeList() {
             employeeToSave.profile = profilePath.path;
             if (currentEmployee.id) {
                 // Update existing Employee
-                const response = await axios.put(`http://172.17.31.61:5733/api/employee/${currentEmployee.id}`, employeeToSave);
+                const response = await axios.put(`http://172.17.31.61:5033/api/employee/${currentEmployee.id}`, employeeToSave);
                 setEmployees(Employees.map(emp => emp.id === currentEmployee.id ? response.data : emp));
             } else {
                 // Add new Employee
-                const response = axios.post('http://172.17.31.61:5733/api/employee', employeeToSave);
+                const response = axios.post('http://172.17.31.61:5033/api/employee', employeeToSave);
                 setEmployees([...Employees, response.data]);
                 console.log("emp res", response)
             }
@@ -515,7 +520,7 @@ function EmployeeList() {
                                 <TableCell>{Employee.employeeID}</TableCell>
                                 <TableCell>{Employee.emailId}</TableCell>
                                 <TableCell>{Employee.department}</TableCell>
-                                <TableCell>{Employee.reportingTo}</TableCell>
+                                <TableCell>{Employee.reportingTo || 'NA'}</TableCell>
                                 <TableCell>{Employee.joiningDate}</TableCell>
                                 <TableCell>{Employee.relievingDate}</TableCell>
                                 <TableCell>{Employee.projection}</TableCell>
@@ -586,8 +591,8 @@ function EmployeeList() {
                     <TextField
                         type='number'
                         margin="dense"
-                        label="EmployeeId"
-                        name="employeeId"
+                        label="EmployeeID"
+                        name="employeeID"
                         value={currentEmployee.employeeID}
                         onChange={handleChange}
                         fullWidth

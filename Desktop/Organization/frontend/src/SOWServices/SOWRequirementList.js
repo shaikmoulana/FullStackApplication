@@ -26,6 +26,13 @@ function SOWRequirementList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        sow: '',
+        designation: '',
+        technologies: '',
+        teamSize: ''
+    }
+    );
 
     useEffect(() => {
         const fetchSowRequirements = async () => {
@@ -123,6 +130,31 @@ function SOWRequirementList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentSOWRequirement.sow.trim()) {
+            validationErrors.sow = "Please select a sow";
+        }
+        if (!currentSOWRequirement.designation) {
+            validationErrors.designation = "Please select a designation";
+        }
+        if (!currentSOWRequirement.technologies) {
+            validationErrors.technologies = "Please select a technologies";
+        }
+        if (!currentSOWRequirement.teamSize) {
+            validationErrors.teamSize = "Please select a teamSize";
+        }
+
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentSOWRequirement.id) {
             // Update existing SOWRequirement
             //axios.put(`http://localhost:5041/api/SOWRequirement/${currentSOWRequirement.id}`, currentSOWRequirement)
@@ -157,6 +189,27 @@ function SOWRequirementList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentSOWRequirement({ ...currentSOWRequirement, [name]: value });
+        if (name === "sow") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, sow: "" }));
+            }
+        }
+        if (name === "designation") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, designation: "" }));
+            }
+        }
+
+        if (name === "technologies") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, technologies: "" }));
+            }
+        }
+        if (name === "teamSize") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, teamSize: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -222,7 +275,7 @@ function SOWRequirementList() {
                                     direction={orderBy === 'sow' ? order : 'asc'}
                                     onClick={() => handleSort('sow')}
                                 >
-                                    SOW
+                                    <b>SOW</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -231,7 +284,7 @@ function SOWRequirementList() {
                                     direction={orderBy === 'designation' ? order : 'asc'}
                                     onClick={() => handleSort('designation')}
                                 >
-                                    Designation
+                                    <b>Designation</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -240,7 +293,7 @@ function SOWRequirementList() {
                                     direction={orderBy === 'technologies' ? order : 'asc'}
                                     onClick={() => handleSort('technologies')}
                                 >
-                                    Technologies
+                                    <b>Technologies</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -249,7 +302,7 @@ function SOWRequirementList() {
                                     direction={orderBy === 'teamSize' ? order : 'asc'}
                                     onClick={() => handleSort('teamSize')}
                                 >
-                                    TeamSize
+                                    <b>TeamSize</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -258,7 +311,7 @@ function SOWRequirementList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -267,7 +320,7 @@ function SOWRequirementList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -276,7 +329,7 @@ function SOWRequirementList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -285,7 +338,7 @@ function SOWRequirementList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -294,10 +347,10 @@ function SOWRequirementList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -344,6 +397,7 @@ function SOWRequirementList() {
                         value={currentSOWRequirement.sow}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.sow}
                     >
                         {SOWs.map((sow) => (
                             <MenuItem key={sow.id} value={sow.title}>
@@ -351,6 +405,7 @@ function SOWRequirementList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    {errors.sow && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.sow}</Typography>}
                     <InputLabel>Designation</InputLabel>
                     <Select
                         margin="dense"
@@ -358,6 +413,7 @@ function SOWRequirementList() {
                         value={currentSOWRequirement.designation}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.designation}
                     >
                         {Designations.map((designation) => (
                             <MenuItem key={designation.id} value={designation.name}>
@@ -365,6 +421,7 @@ function SOWRequirementList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    {errors.designation && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.designation}</Typography>}
                     <TextField
                         margin="dense"
                         label="Technologies"
@@ -372,6 +429,8 @@ function SOWRequirementList() {
                         value={currentSOWRequirement.technologies}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.technologies} // Display error if exists
+                        helperText={errors.technologies}
                     />
                     <TextField
                         margin="dense"
@@ -380,6 +439,8 @@ function SOWRequirementList() {
                         value={currentSOWRequirement.teamSize}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.teamSize} // Display error if exists
+                        helperText={errors.teamSize}
                     />
                 </DialogContent>
                 <DialogActions>

@@ -36,6 +36,16 @@ function InterviewList() {
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [errors, setErrors] = useState({
+        sowRequirement: '',
+        name: '',
+        interviewDate: '',
+        yearsOfExperience: '',
+        status: '',
+        on_Boarding: '',
+        recruiter: ''
+    }
+    );
 
     useEffect(() => {
         const fetchInterviews = async () => {
@@ -71,7 +81,7 @@ function InterviewList() {
 
         const fetchRecruiter = async () => {
             try {
-                const recruiterResponse = await axios.get('http://172.17.31.61:5733/api/employee');
+                const recruiterResponse = await axios.get('http://172.17.31.61:5033/api/employee');
                 setEmployee(recruiterResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the recruiter!', error);
@@ -146,6 +156,40 @@ function InterviewList() {
     };
 
     const handleSave = () => {
+        let validationErrors = {};
+
+        // Name field validation
+        if (!currentInterview.sowRequirement.trim()) {
+            validationErrors.sowRequirement = "Please select a sowRequirement";
+        }
+        if (!currentInterview.name) {
+            validationErrors.name = "Please select a name";
+        }
+        if (!currentInterview.interviewDate) {
+            validationErrors.interviewDate = "Please select a interviewDate";
+        }
+        if (!currentInterview.yearsOfExperience) {
+            validationErrors.yearsOfExperience = "Please select a yearsOfExperience";
+        }
+        if (!currentInterview.status) {
+            validationErrors.status = "Please select a status";
+        }
+        if (!currentInterview.on_Boarding) {
+            validationErrors.on_Boarding = "Please select a on_Boarding";
+        }
+        if (!currentInterview.recruiter) {
+            validationErrors.recruiter = "Please select a recruiter";
+        }
+
+        // If there are validation errors, update the state and prevent save
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // Clear any previous errors if validation passes
+        setErrors({});
+
         if (currentInterview.id) {
             // Update existing Interview
             //axios.put(`http://localhost:5200/api/Interview/${currentInterview.id}`, currentInterview)
@@ -180,6 +224,41 @@ function InterviewList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentInterview({ ...currentInterview, [name]: value });
+        if (name === "sowRequirement") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, sowRequirement: "" }));
+            }
+        }
+        if (name === "name") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            }
+        }
+        if (name === "interviewDate") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, interviewDate: "" }));
+            }
+        }
+        if (name === "yearsOfExperience") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, yearsOfExperience: "" }));
+            }
+        }
+        if (name === "status") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, status: "" }));
+            }
+        }
+        if (name === "on_Boarding") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, on_Boarding: "" }));
+            }
+        }
+        if (name === "recruiter") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, recruiter: "" }));
+            }
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -209,12 +288,21 @@ function InterviewList() {
             ...prev,
             interviewDate: newDate ? newDate.toISOString() : "",
         }));
+        if (newDate) {
+            setErrors((prevErrors) => ({ ...prevErrors, interviewDate: "" }));
+        }
     };
     const handleOnBoardingDateChange = (newDate) => {
         setCurrentInterview((prev) => ({
             ...prev,
             on_Boarding: newDate ? newDate.toISOString() : "",
         }));
+        if (newDate) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                on_Boarding: "",
+            }));
+        }
     };
 
     if (loading) {
@@ -259,7 +347,7 @@ function InterviewList() {
                                     direction={orderBy === 'sowRequirement' ? order : 'asc'}
                                     onClick={() => handleSort('sowRequirement')}
                                 >
-                                    SOWRequirement
+                                    <b>SOWRequirement</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -268,7 +356,7 @@ function InterviewList() {
                                     direction={orderBy === 'name' ? order : 'asc'}
                                     onClick={() => handleSort('name')}
                                 >
-                                    Name
+                                    <b>Name</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -277,7 +365,7 @@ function InterviewList() {
                                     direction={orderBy === 'interviewDate' ? order : 'asc'}
                                     onClick={() => handleSort('interviewDate')}
                                 >
-                                    InterviewDate
+                                    <b>InterviewDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -286,7 +374,7 @@ function InterviewList() {
                                     direction={orderBy === 'yearsOfExperience' ? order : 'asc'}
                                     onClick={() => handleSort('yearsOfExperience')}
                                 >
-                                    YearsOfExperience
+                                    <b>YearsOfExperience</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -295,8 +383,7 @@ function InterviewList() {
                                     direction={orderBy === 'status' ? order : 'asc'}
                                     onClick={() => handleSort('status')}
                                 >
-                                    Status
-                                </TableSortLabel>
+                                    <b>Status</b>                                </TableSortLabel>
                             </TableCell>
                             <TableCell>
                                 <TableSortLabel
@@ -304,7 +391,7 @@ function InterviewList() {
                                     direction={orderBy === 'on_Boarding' ? order : 'asc'}
                                     onClick={() => handleSort('on_Boarding')}
                                 >
-                                    On_Boarding
+                                    <b>On_Boarding</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -313,7 +400,7 @@ function InterviewList() {
                                     direction={orderBy === 'recuriter' ? order : 'asc'}
                                     onClick={() => handleSort('recuriter')}
                                 >
-                                    Recuriter
+                                    <b>Recuriter</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -322,7 +409,7 @@ function InterviewList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -331,7 +418,7 @@ function InterviewList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -340,7 +427,7 @@ function InterviewList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -349,7 +436,7 @@ function InterviewList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -358,10 +445,10 @@ function InterviewList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -411,6 +498,7 @@ function InterviewList() {
                         value={currentInterview.sowRequirement}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.sowRequirement}
                     >
                         {SOWRequirement.map((sowRequirement) => (
                             <MenuItem key={sowRequirement.id} value={sowRequirement.status}>
@@ -418,6 +506,7 @@ function InterviewList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    {errors.sowRequirement && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.sowRequirement}</Typography>}
                     <TextField
                         margin="dense"
                         label="Name"
@@ -425,6 +514,8 @@ function InterviewList() {
                         value={currentInterview.name}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.name} // Display error if exists
+                        helperText={errors.name}
                     />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
@@ -432,9 +523,10 @@ function InterviewList() {
                             value={currentInterview.interviewDate ? dayjs(currentInterview.interviewDate) : null}
                             onChange={handleInterviewDateChange}
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense" errors={!!errors.interviewDate} />
                             )}
                         />
+                        {errors.interviewDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.interviewDate}</Typography>}
                     </LocalizationProvider>
                     <TextField
                         margin="dense"
@@ -443,6 +535,8 @@ function InterviewList() {
                         value={currentInterview.yearsOfExperience}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.yearsOfExperience} // Display error if exists
+                        helperText={errors.yearsOfExperience}
                     />
                     <InputLabel>Status</InputLabel>
                     <Select
@@ -451,6 +545,7 @@ function InterviewList() {
                         value={currentInterview.interviewStatus}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.status}
                     >
                         {InterviewStatus.map((interviewStatus) => (
                             <MenuItem key={interviewStatus.id} value={interviewStatus.status}>
@@ -458,15 +553,17 @@ function InterviewList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    {errors.status && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.status}</Typography>}
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="On_Boarding"
                             value={currentInterview.on_Boarding ? dayjs(currentInterview.on_Boarding) : null}
                             onChange={handleOnBoardingDateChange}
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense" />
+                                <TextField {...params} fullWidth margin="dense" errors={!!errors.on_Boarding} />
                             )}
                         />
+                        {errors.on_Boarding && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.on_Boarding}</Typography>}
                     </LocalizationProvider>
                     <InputLabel>Recruiter</InputLabel>
                     <Select
@@ -475,6 +572,7 @@ function InterviewList() {
                         value={currentInterview.employee}
                         onChange={handleChange}
                         fullWidth
+                        error={!!errors.recruiter}
                     >
                         {Employee.map((employee) => (
                             <MenuItem key={employee.id} value={employee.name}>
@@ -482,6 +580,7 @@ function InterviewList() {
                             </MenuItem>
                         ))}
                     </Select>
+                    {errors.recruiter && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.recruiter}</Typography>}
                     <TextField
                         margin="dense"
                         label="Is Active"

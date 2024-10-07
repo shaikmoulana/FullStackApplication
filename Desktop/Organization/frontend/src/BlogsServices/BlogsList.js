@@ -61,8 +61,8 @@ function BlogsList() {
 
         const fetchAuthor = async () => {
             try {
-                // const authorResponse = await axios.get('http://localhost:5733/api/employee');
-                const authorResponse = await axios.get('http://172.17.31.61:5733/api/employee');
+                // const authorResponse = await axios.get('http://localhost:5033/api/employee');
+                const authorResponse = await axios.get('http://172.17.31.61:5033/api/employee');
                 setEmployees(authorResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the speakers!', error);
@@ -289,6 +289,12 @@ function BlogsList() {
             ...prevBlogs,
             targetDate: newDate ? newDate.toISOString() : "",
         }));
+        if (newDate) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                targetDate: "",
+            }));
+        }
     };
 
     const handleCompletedDateChange = (newDate) => {
@@ -296,6 +302,12 @@ function BlogsList() {
             ...prevBlogs,
             completedDate: newDate ? newDate.toISOString() : "",
         }));
+        if (newDate) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                completedDate: "",
+            }));
+        }
     };
 
     const handlePublishedDateChange = (newDate) => {
@@ -303,6 +315,12 @@ function BlogsList() {
             ...prevBlogs,
             publishedDate: newDate ? newDate.toISOString() : "",
         }));
+        if (newDate) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                publishedDate: "",
+            }));
+        }
     };
 
     if (loading) {
@@ -349,7 +367,7 @@ function BlogsList() {
                                     direction={orderBy === 'title' ? order : 'asc'}
                                     onClick={() => handleSort('title')}
                                 >
-                                    Title
+                                    <b>Title</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -358,7 +376,7 @@ function BlogsList() {
                                     direction={orderBy === 'author' ? order : 'asc'}
                                     onClick={() => handleSort('author')}
                                 >
-                                    Author
+                                    <b>Author</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -367,7 +385,7 @@ function BlogsList() {
                                     direction={orderBy === 'status' ? order : 'asc'}
                                     onClick={() => handleSort('status')}
                                 >
-                                    Status
+                                    <b>Status</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -376,7 +394,7 @@ function BlogsList() {
                                     direction={orderBy === 'targetDate' ? order : 'asc'}
                                     onClick={() => handleSort('targetDate')}
                                 >
-                                    TargetDate
+                                    <b>TargetDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -385,7 +403,7 @@ function BlogsList() {
                                     direction={orderBy === 'completedDate' ? order : 'asc'}
                                     onClick={() => handleSort('completedDate')}
                                 >
-                                    CompletedDate
+                                    <b>CompletedDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -394,7 +412,7 @@ function BlogsList() {
                                     direction={orderBy === 'publishedDate' ? order : 'asc'}
                                     onClick={() => handleSort('publishedDate')}
                                 >
-                                    PublishedDate
+                                    <b>PublishedDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -403,7 +421,7 @@ function BlogsList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -412,7 +430,7 @@ function BlogsList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -421,7 +439,7 @@ function BlogsList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -430,7 +448,7 @@ function BlogsList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -439,10 +457,10 @@ function BlogsList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

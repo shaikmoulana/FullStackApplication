@@ -147,7 +147,7 @@ function DepartmentList() {
                 setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
             }
             // Check for uniqueness
-            else if (ClientList.some(cli => cli.name.toLowerCase() === value.toLowerCase() && cli.id !== currentDepartment.id)) {
+            else if (departments.some(dep => dep.name.toLowerCase() === value.toLowerCase() && dep.id !== currentDepartment.id)) {
                 setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
             }
             // Clear the title error if valid
@@ -156,43 +156,7 @@ function DepartmentList() {
             }
         }
 
-        if (name === "lineofBusiness") {
-            // Clear the lineofBusiness error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, lineofBusiness: "" }));
-            }
-        }
-        if (name === "salesEmployee") {
-            // Clear the salesEmployee error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, salesEmployee: "" }));
-            }
-        }
 
-        if (name === "country") {
-            // Clear the country error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, country: "" }));
-            }
-        }
-        if (name === "city") {
-            // Clear the city error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, city: "" }));
-            }
-        }
-        if (name === "state") {
-            // Clear the state error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, state: "" }));
-            }
-        }
-        if (name === "address") {
-            // Clear the address error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, address: "" }));
-            }
-        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -260,7 +224,7 @@ function DepartmentList() {
                                     direction={orderBy === 'name' ? order : 'asc'}
                                     onClick={() => handleSort('name')}
                                 >
-                                    Name
+                                    <b>Name</b>
                                 </TableSortLabel>
                             </TableCell>
                             {/* <TableCell>Name</TableCell> */}
@@ -270,7 +234,7 @@ function DepartmentList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -279,7 +243,7 @@ function DepartmentList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -288,7 +252,7 @@ function DepartmentList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -297,7 +261,7 @@ function DepartmentList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -306,10 +270,10 @@ function DepartmentList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

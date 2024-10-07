@@ -161,60 +161,24 @@ function TechnologyList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentTechnology({ ...currentTechnology, [name]: value });
-        if (name === "client") {
+        if (name === "name") {
             // Check if the title is empty or only whitespace
             if (!value.trim()) {
-                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
             }
             // Check for uniqueness
-            else if (ProjectList.some(pro => pro.client.toLowerCase() === value.toLowerCase() && pro.id !== currentTechnology.id)) {
-                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            else if (technologies.some(tech => tech.client === value && tech.id !== currentTechnology.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
             }
             // Clear the title error if valid
             else {
-                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
             }
         }
 
-        if (name === "projectName") {
+        if (name === "department") {
             if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, projectName: "" }));
-            }
-        }
-        if (name === "technicalProjectManager") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, technicalProjectManager: "" }));
-            }
-        }
-
-        if (name === "salesContact") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, salesContact: "" }));
-            }
-        }
-        if (name === "pmo") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, pmo: "" }));
-            }
-        }
-        if (name === "sowSubmittedDate") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, sowSubmittedDate: "" }));
-            }
-        }
-        if (name === "sowSignedDate") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, sowSignedDate: "" }));
-            }
-        }
-        if (name === "sowValidTill") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, sowValidTill: "" }));
-            }
-        }
-        if (name === "sowLastExtendedDate") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, sowLastExtendedDate: "" }));
+                setErrors((prevErrors) => ({ ...prevErrors, department: "" }));
             }
         }
     };
@@ -285,7 +249,7 @@ function TechnologyList() {
                                     direction={orderBy === 'name' ? order : 'asc'}
                                     onClick={() => handleSort('name')}
                                 >
-                                    Name
+                                    <b>Name</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -294,7 +258,7 @@ function TechnologyList() {
                                     direction={orderBy === 'department' ? order : 'asc'}
                                     onClick={() => handleSort('department')}
                                 >
-                                    Department
+                                    <b>Department</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -303,7 +267,7 @@ function TechnologyList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -312,7 +276,7 @@ function TechnologyList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -321,7 +285,7 @@ function TechnologyList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -330,7 +294,7 @@ function TechnologyList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -339,10 +303,10 @@ function TechnologyList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

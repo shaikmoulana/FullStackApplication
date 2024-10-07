@@ -147,56 +147,18 @@ function ContactTypeList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentContactType({ ...currentContactType, [name]: value });
-        if (name === "name") {
+        if (name === "typeName") {
             // Check if the title is empty or only whitespace
             if (!value.trim()) {
-                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+                setErrors((prevErrors) => ({ ...prevErrors, typeName: "" }));
             }
             // Check for uniqueness
-            else if (ContactTypeList.some(cli => cli.name.toLowerCase() === value.toLowerCase() && cli.id !== currentContactType.id)) {
-                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+            else if (contactTypes.some(cont => cont.client === value && cont.id !== currentContactType.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, typeName: "" }));
             }
             // Clear the title error if valid
             else {
-                setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
-            }
-        }
-
-        if (name === "lineofBusiness") {
-            // Clear the lineofBusiness error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, lineofBusiness: "" }));
-            }
-        }
-        if (name === "salesEmployee") {
-            // Clear the salesEmployee error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, salesEmployee: "" }));
-            }
-        }
-
-        if (name === "country") {
-            // Clear the country error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, country: "" }));
-            }
-        }
-        if (name === "city") {
-            // Clear the city error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, city: "" }));
-            }
-        }
-        if (name === "state") {
-            // Clear the state error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, state: "" }));
-            }
-        }
-        if (name === "address") {
-            // Clear the address error if the user selects a value
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, address: "" }));
+                setErrors((prevErrors) => ({ ...prevErrors, typeName: "" }));
             }
         }
     };
@@ -266,7 +228,7 @@ function ContactTypeList() {
                                     direction={orderBy === 'typeName' ? order : 'asc'}
                                     onClick={() => handleSort('typeName')}
                                 >
-                                    TypeName
+                                    <b>TypeName</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -275,7 +237,7 @@ function ContactTypeList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -284,7 +246,7 @@ function ContactTypeList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -293,7 +255,7 @@ function ContactTypeList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -302,7 +264,7 @@ function ContactTypeList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -311,10 +273,10 @@ function ContactTypeList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

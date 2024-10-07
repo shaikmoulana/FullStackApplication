@@ -48,7 +48,8 @@ function ProjectList() {
         sowSubmittedDate: '',
         sowSignedDate: '',
         sowValidTill: '',
-        sowLastExtendedDate: ''
+        sowLastExtendedDate: '',
+        technology: []
     }
     );
 
@@ -77,7 +78,7 @@ function ProjectList() {
 
         const fetchEmployees = async () => {
             try {
-                const empResponse = await axios.get('http://172.17.31.61:5733/api/employee');
+                const empResponse = await axios.get('http://172.17.31.61:5033/api/employee');
                 setEmployees(empResponse.data);
             } catch (error) {
                 console.error('There was an error fetching the employees!', error);
@@ -175,7 +176,7 @@ function ProjectList() {
         let validationErrors = {};
 
         // Name field validation
-        if (!currentProject.client.trim()) {
+        if (!currentProject.projectName.trim()) {
             validationErrors.projectName = "Project name cannot be empty or whitespace";
         } else if (Projects.some(pro => pro.projectName.toLowerCase() === currentProject.projectName.toLowerCase() && pro.id !== currentProject.id)) {
             validationErrors.projectName = "Project name must be unique";
@@ -204,6 +205,9 @@ function ProjectList() {
         }
         if (!currentProject.sowLastExtendedDate) {
             validationErrors.sowLastExtendedDate = "Please select a sowLastExtendedDate";
+        }
+        if (!currentProject.technology) {
+            validationErrors.technology = "Please select a technology";
         }
 
         // If there are validation errors, update the state and prevent save
@@ -257,24 +261,25 @@ function ProjectList() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrentProject({ ...currentProject, [name]: value });
-        if (name === "client") {
+
+        if (name === "projectName") {
             // Check if the title is empty or only whitespace
             if (!value.trim()) {
-                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+                setErrors((prevErrors) => ({ ...prevErrors, projectName: "" }));
             }
             // Check for uniqueness
-            else if (Projects.some(pro => pro.client.toLowerCase() === value.toLowerCase() && pro.id !== currentProject.id)) {
-                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+            else if (Projects.some(pro => pro.projectName.toLowerCase() === value.toLowerCase() && pro.id !== currentProject.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, projectName: "" }));
             }
             // Clear the title error if valid
             else {
-                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
+                setErrors((prevErrors) => ({ ...prevErrors, projectName: "" }));
             }
         }
 
-        if (name === "projectName") {
+        if (name === "client") {
             if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, projectName: "" }));
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
             }
         }
         if (name === "technicalProjectManager") {
@@ -313,6 +318,11 @@ function ProjectList() {
                 setErrors((prevErrors) => ({ ...prevErrors, sowLastExtendedDate: "" }));
             }
         }
+        if (name === "technology") {
+            if (value) {
+                setErrors((prevErrors) => ({ ...prevErrors, technology: "" }));
+            }
+        }
     };
 
 
@@ -344,6 +354,9 @@ function ProjectList() {
             ...prevSow,
             sowSubmittedDate: newDate ? newDate.toISOString() : "",
         }));
+        if (newDate) {
+            setErrors((prevErrors) => ({ ...prevErrors, sowSubmittedDate: "" }));
+        }
     };
 
     const handleSowSignedDateChange = (newDate) => {
@@ -351,6 +364,9 @@ function ProjectList() {
             ...prevSow,
             sowSignedDate: newDate ? newDate.toISOString() : "",
         }));
+        if (newDate) {
+            setErrors((prevErrors) => ({ ...prevErrors, sowSignedDate: "" }));
+        }
     };
 
     const handleSowValidTillDateChange = (newDate) => {
@@ -358,6 +374,9 @@ function ProjectList() {
             ...prevSow,
             sowValidTill: newDate ? newDate.toISOString() : "",
         }));
+        if (newDate) {
+            setErrors((prevErrors) => ({ ...prevErrors, sowValidTill: "" }));
+        }
     };
 
     const handleSowLastExtendedDateChange = (newDate) => {
@@ -365,6 +384,9 @@ function ProjectList() {
             ...prevSow,
             sowLastExtendedDate: newDate ? newDate.toISOString() : "",
         }));
+        if (newDate) {
+            setErrors((prevErrors) => ({ ...prevErrors, sowLastExtendedDate: "" }));
+        }
     };
     const handleTechnologyChange = (event) => {
         const { value } = event.target;
@@ -416,7 +438,7 @@ function ProjectList() {
                                     direction={orderBy === 'client' ? order : 'asc'}
                                     onClick={() => handleSort('client')}
                                 >
-                                    Client
+                                    <b>Client</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -425,7 +447,7 @@ function ProjectList() {
                                     direction={orderBy === 'projectName' ? order : 'asc'}
                                     onClick={() => handleSort('projectName')}
                                 >
-                                    ProjectName
+                                    <b>ProjectName</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -434,7 +456,7 @@ function ProjectList() {
                                     direction={orderBy === 'technicalProjectManager' ? order : 'asc'}
                                     onClick={() => handleSort('technicalProjectManager')}
                                 >
-                                    TechnicalProjectManager
+                                    <b>TechnicalProjectManager</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -443,7 +465,7 @@ function ProjectList() {
                                     direction={orderBy === 'salesContact' ? order : 'asc'}
                                     onClick={() => handleSort('salesContact')}
                                 >
-                                    SalesContact
+                                    <b>SalesContact</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -452,7 +474,7 @@ function ProjectList() {
                                     direction={orderBy === 'pmo' ? order : 'asc'}
                                     onClick={() => handleSort('pmo')}
                                 >
-                                    PMO
+                                    <b>PMO</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -461,7 +483,7 @@ function ProjectList() {
                                     direction={orderBy === 'sowSubmittedDate' ? order : 'asc'}
                                     onClick={() => handleSort('sowSubmittedDate')}
                                 >
-                                    SOWSubmittedDate
+                                    <b>SOWSubmittedDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -470,7 +492,7 @@ function ProjectList() {
                                     direction={orderBy === 'sowSigniedDate' ? order : 'asc'}
                                     onClick={() => handleSort('sowSigniedDate')}
                                 >
-                                    SOWSigniedDate
+                                    <b>SOWSigniedDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -479,7 +501,7 @@ function ProjectList() {
                                     direction={orderBy === 'sowValidTill' ? order : 'asc'}
                                     onClick={() => handleSort('sowValidTill')}
                                 >
-                                    SOWValidTill
+                                    <b>SOWValidTill</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -488,7 +510,7 @@ function ProjectList() {
                                     direction={orderBy === 'sowLastExtendedDate' ? order : 'asc'}
                                     onClick={() => handleSort('sowLastExtendedDate')}
                                 >
-                                    SOWLastExtendedDate
+                                    <b>SOWLastExtendedDate</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -497,7 +519,7 @@ function ProjectList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    Is Active
+                                    <b>Is Active</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -506,7 +528,7 @@ function ProjectList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    Created By
+                                    <b>Created By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -515,7 +537,7 @@ function ProjectList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    Created Date
+                                    <b>Created Date</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -524,7 +546,7 @@ function ProjectList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    Updated By
+                                    <b>Updated By</b>
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -533,10 +555,10 @@ function ProjectList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    Updated Date
+                                    <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -632,50 +654,50 @@ function ProjectList() {
                     <Select
                         margin="dense"
                         name="salesContact"
-                        value={currentProject.employee}
+                        value={currentProject.salesContact}
                         onChange={handleChange}
                         fullWidth
-                        error={!!errors.employee}
+                        error={!!errors.salesContact}
                     >
-                        {Employees.map((employee) => (
-                            <MenuItem key={employee.id} value={employee.name}>
-                                {employee.name}
+                        {Employees.map((salesContact) => (
+                            <MenuItem key={salesContact.id} value={salesContact.name}>
+                                {salesContact.name}
                             </MenuItem>
                         ))}
                     </Select>
-                    {errors.employee && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.employee}</Typography>}
+                    {errors.salesContact && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.salesContact}</Typography>}
                     <InputLabel>TechnicalProjectManager</InputLabel>
                     <Select
                         margin="dense"
                         name="technicalProjectManager"
-                        value={currentProject.employee}
+                        value={currentProject.technicalProjectManager}
                         onChange={handleChange}
                         fullWidth
-                        error={!!errors.employee}
+                        error={!!errors.technicalProjectManager}
                     >
-                        {Employees.map((employee) => (
-                            <MenuItem key={employee.id} value={employee.name}>
-                                {employee.name}
+                        {Employees.map((technicalProjectManager) => (
+                            <MenuItem key={technicalProjectManager.id} value={technicalProjectManager.name}>
+                                {technicalProjectManager.name}
                             </MenuItem>
                         ))}
                     </Select>
-                    {errors.employee && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.employee}</Typography>}
+                    {errors.technicalProjectManager && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.technicalProjectManager}</Typography>}
                     <InputLabel>PMO</InputLabel>
                     <Select
                         margin="dense"
                         name="pmo"
-                        value={currentProject.employee}
+                        value={currentProject.pmo}
                         onChange={handleChange}
                         fullWidth
-                        error={!!errors.employee}
+                        error={!!errors.pmo}
                     >
-                        {Employees.map((employee) => (
-                            <MenuItem key={employee.id} value={employee.name}>
-                                {employee.name}
+                        {Employees.map((pmo) => (
+                            <MenuItem key={pmo.id} value={pmo.name}>
+                                {pmo.name}
                             </MenuItem>
                         ))}
                     </Select>
-                    {errors.employee && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.employee}</Typography>}
+                    {errors.pmo && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.pmo}</Typography>}
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="SOWSubmittedDate"
@@ -685,7 +707,7 @@ function ProjectList() {
                             // renderInput={(params) => (
                             //     <TextField {...params} fullWidth margin="dense" />
                             // )}
-                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" /> }}
+                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" error={!!errors.sowSubmittedDate} /> }}
                         />
                     </LocalizationProvider>
                     {errors.sowSubmittedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.sowSubmittedDate}</Typography>}
@@ -695,7 +717,7 @@ function ProjectList() {
                             value={currentProject.sowSignedDate ? dayjs(currentProject.sowSignedDate) : null}
                             onChange={handleSowSignedDateChange}
                             fullWidth
-                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" /> }}
+                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" error={!!errors.sowSignedDate} /> }}
 
                         />
                     </LocalizationProvider>
@@ -706,7 +728,7 @@ function ProjectList() {
                             value={currentProject.sowValidTill ? dayjs(currentProject.sowValidTill) : null}
                             onChange={handleSowValidTillDateChange}
                             fullWidth
-                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" /> }}
+                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" error={!!errors.sowValidTill} /> }}
 
                         />
                     </LocalizationProvider>
@@ -717,11 +739,10 @@ function ProjectList() {
                             value={currentProject.sowLastExtendedDate ? dayjs(currentProject.sowLastExtendedDate) : null}
                             onChange={handleSowLastExtendedDateChange}
                             fullWidth
-                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" /> }}
+                            slots={{ textField: (params) => <TextField {...params} fullWidth margin="dense" error={!!errors.sowLastExtendedDate} /> }}
 
                         />
                     </LocalizationProvider>
-
                     {errors.sowLastExtendedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.sowValisowLastExtendedDatedTill}</Typography>}                </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>
