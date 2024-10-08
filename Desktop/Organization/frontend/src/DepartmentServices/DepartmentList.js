@@ -155,9 +155,14 @@ function DepartmentList() {
                 setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
             }
         }
-
-
     };
+
+    const handleClose = () => {
+        setCurrentDepartment({ name: '' }); // Reset the department fields
+        setErrors({ name: '' }); // Reset the error state
+        setOpen(false); // Close the dialog
+    };
+
 
     const handlePageChange = (event, newPage) => {
         setPage(newPage);
@@ -273,7 +278,9 @@ function DepartmentList() {
                                     <b>Updated Date</b>
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell><b>Actions</b></TableCell>
+                            <TableCell
+                            
+                            ><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -322,7 +329,7 @@ function DepartmentList() {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
                     <Button onClick={handleSave} color="primary">
                         {currentDepartment.id ? 'Update' : 'Save'}
                     </Button>
