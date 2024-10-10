@@ -9,8 +9,8 @@ function EmployeeTechnologyList() {
     const [open, setOpen] = useState(false);
     const [currentEmployeeTechnology, setCurrentEmployeeTechnology] = useState({
         id: '',
-        name: '',
-        technologyId: '',
+        employeeID: '',
+        technology: '',
         isActive: true,
         createdBy: '',
         createdDate: '',
@@ -19,7 +19,8 @@ function EmployeeTechnologyList() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:5033/api/EmployeeTechnology')
+        //axios.get('http://localhost:5033/api/EmployeeTechnology')
+        axios.get('http://172.17.31.61:5033/api/employeeTechnology')
             .then(response => {
                 setemployeeTechnologies(response.data);
                 setLoading(false);
@@ -34,8 +35,8 @@ function EmployeeTechnologyList() {
     const handleAdd = () => {
         setCurrentEmployeeTechnology({
             id: '',
-            name: '',
-            technologyId: '',
+            employeeID: '',
+            technology: '',
             isActive: true,
             createdBy: '',
             createdDate: '',
@@ -52,7 +53,8 @@ function EmployeeTechnologyList() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`http://localhost:5033/api/EmployeeTechnology/${id}`)
+        //axios.delete(`http://localhost:5033/api/EmployeeTechnology/${id}`)
+        axios.delete(`http://172.17.31.61:5033/api/employeeTechnology/${id}`)
             .then(response => {
                 setemployeeTechnologies(employeeTechnologies.filter(tech => tech.id !== id));
             })
@@ -65,7 +67,8 @@ function EmployeeTechnologyList() {
     const handleSave = () => {
         if (currentEmployeeTechnology.id) {
             // Update existing EmployeeTechnology
-            axios.put(`http://localhost:5033/api/EmployeeTechnology/${currentEmployeeTechnology.id}`, currentEmployeeTechnology)
+            //axios.put(`http://localhost:5033/api/EmployeeTechnology/${currentEmployeeTechnology.id}`, currentEmployeeTechnology)
+            axios.put(`http://172.17.31.61:5033/api/employeeTechnology/${currentEmployeeTechnology.id}`, currentEmployeeTechnology)
                 .then(response => {
                     console.log(response)
                     //setemployeeTechnologies([...employeeTechnologies, response.data]);
@@ -79,7 +82,8 @@ function EmployeeTechnologyList() {
 
         } else {
             // Add new EmployeeTechnology
-            axios.post('http://localhost:5033/api/EmployeeTechnology', currentEmployeeTechnology)
+            //axios.post('http://localhost:5033/api/EmployeeTechnology', currentEmployeeTechnology)
+            axios.post('http://172.17.31.61:5033/api/employeeTechnology', currentEmployeeTechnology)
                 .then(response => {
                     setemployeeTechnologies([...employeeTechnologies, response.data]);
                 })
@@ -117,9 +121,9 @@ function EmployeeTechnologyList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>technologyId</TableCell>
+                            {/* <TableCell>ID</TableCell> */}
+                            <TableCell>EmployeeID</TableCell>
+                            <TableCell>Technology</TableCell>
                             <TableCell>Is Active</TableCell>
                             <TableCell>Created By</TableCell>
                             <TableCell>Created Date</TableCell>
@@ -131,9 +135,9 @@ function EmployeeTechnologyList() {
                     <TableBody>
                         {employeeTechnologies.map(EmployeeTechnology => (
                             <TableRow key={EmployeeTechnology.id}>
-                                <TableCell>{EmployeeTechnology.id}</TableCell>
-                                <TableCell>{EmployeeTechnology.name}</TableCell>
-                                <TableCell>{EmployeeTechnology.technologyId}</TableCell>
+                                {/* <TableCell>{EmployeeTechnology.id}</TableCell> */}
+                                <TableCell>{EmployeeTechnology.employeeID}</TableCell>
+                                <TableCell>{EmployeeTechnology.technology}</TableCell>
                                 <TableCell>{EmployeeTechnology.isActive ? 'Active' : 'Inactive'}</TableCell>
                                 <TableCell>{EmployeeTechnology.createdBy}</TableCell>
                                 <TableCell>{new Date(EmployeeTechnology.createdDate).toLocaleString()}</TableCell>
@@ -153,17 +157,17 @@ function EmployeeTechnologyList() {
                 <DialogContent>
                     <TextField
                         margin="dense"
-                        label="Name"
-                        name="name"
-                        value={currentEmployeeTechnology.name}
+                        label="EmployeeID"
+                        name="employeeID"
+                        value={currentEmployeeTechnology.employeeID}
                         onChange={handleChange}
                         fullWidth
                     />
                     <TextField
                         margin="dense"
-                        label="technologyId"
-                        name="technologyId"
-                        value={currentEmployeeTechnology.technologyId}
+                        label="technology"
+                        name="technology"
+                        value={currentEmployeeTechnology.technology}
                         onChange={handleChange}
                         fullWidth
                     />

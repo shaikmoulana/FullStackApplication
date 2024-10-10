@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment, Switch } from '@mui/material';
+import { Select, MenuItem, Table, InputLabel, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TableSortLabel, InputAdornment } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -10,10 +10,11 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import '../App.css';
+import ProjectList from '../ProjectServices/ProjectList';
 
-function BlogsList() {
-    const [blogs, setBlogs] = useState([]);
-    const [Employees, setEmployees] = useState([]);
+function POCList() {
+    const [POCs, setPOCs] = useState([]);
+    const [Clients, setClients] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -21,57 +22,53 @@ function BlogsList() {
     const [deleteTechId, setDeleteTechId] = useState(null);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [isAdmin, setIsAdmin] = useState(true); // Assume isAdmin is determined by login/auth
-    const [currentBlogs, setCurrentBlogs] = useState({
+    const [currentPOC, setCurrentPOC] = useState({
         title: '',
-        author: '',
+        client: '',
         status: '',
         targetDate: '',
-        completedDate: '',
-        publishedDate: '',
-        isActive: false // New field to track isActive status
+        comletedDate: '',
+        document: ''
     });
-
     const [order, setOrder] = useState('asc'); // Order of sorting: 'asc' or 'desc'
     const [orderBy, setOrderBy] = useState('createdDate'); // Column to sort by
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
-    const options = ['Completed', 'InProgress', 'InReview', 'Published'];
     const [errors, setErrors] = useState({
         title: '',
-        author: '',
+        client: '',
         status: '',
         targetDate: '',
-        completedDate: '',
-        publishedDate: ''
+        comletedDate: '',
+        document: ''
     }
     );
 
     useEffect(() => {
-        const fetchBlogs = async () => {
+        const fetchPOCs = async () => {
             try {
-                //  const blogResponse = await axios.get('http://localhost:5547/api/blogs');
-                const blogResponse = await axios.get('http://172.17.31.61:5174/api/blogs');
-                setBlogs(blogResponse.data);
+                // const pocResponse = await axios.get('http://localhost:5254/api/POC');
+                const pocResponse = await axios.get('http://172.17.31.61:5254/api/poc');
+                setPOCs(pocResponse.data);
             } catch (error) {
-                console.error('There was an error fetching the Blogs!', error);
+                console.error('There was an error fetching the pocs!', error);
                 setError(error);
             }
             setLoading(false);
         };
 
-        const fetchAuthor = async () => {
+        const fetchClients = async () => {
             try {
-                // const authorResponse = await axios.get('http://localhost:5033/api/employee');
-                const authorResponse = await axios.get('http://172.17.31.61:5033/api/employee');
-                setEmployees(authorResponse.data);
+                // const clientResponse = await axios.get('http://localhost:5142/api/Client');
+                const clientResponse = await axios.get('http://172.17.31.61:5142/api/client');
+                setClients(clientResponse.data);
             } catch (error) {
-                console.error('There was an error fetching the speakers!', error);
+                console.error('There was an error fetching the departments!', error);
                 setError(error);
             }
         };
 
-        fetchBlogs();
-        fetchAuthor();
+        fetchPOCs();
+        fetchClients();
     }, []);
 
     const handleSort = (property) => {
@@ -80,18 +77,7 @@ function BlogsList() {
         setOrderBy(property);
     };
 
-    const handleToggleActive = async (blog) => {
-        try {
-            const updatedBlog = { ...blog, isActive: !blog.isActive };
-            // await axios.put(`http://localhost:5547/api/blogs/${blog.id}`, updatedBlog);
-            await axios.put(`http://172.17.31.61:5174/api/blogs/${blog.id}`, updatedBlog);
-            setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)));
-        } catch (error) {
-            console.error('There was an error updating the active status!', error);
-        }
-    };
-
-    const sortedBlogs = [...blogs].sort((a, b) => {
+    const sortedPOCs = [...POCs].sort((a, b) => {
         const valueA = a[orderBy] || '';
         const valueB = b[orderBy] || '';
 
@@ -102,44 +88,49 @@ function BlogsList() {
         }
     });
 
-    const filteredBlogs = sortedBlogs.filter((blog) =>
-        (blog.title && typeof blog.title === 'string' &&
-            blog.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    const filteredPOCs = sortedPOCs.filter((poc) =>
+        (poc.title && typeof poc.title === 'string' &&
+            poc.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        (blog.author && typeof blog.author === 'string' &&
-            blog.author.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (poc.client && typeof poc.client === 'string' &&
+            poc.client.toLowerCase().includes(searchQuery.toLowerCase())) ||
 
-        (blog.status && typeof blog.status === 'string' &&
-            blog.status.toLowerCase().includes(searchQuery.toLowerCase()))
+        (poc.project && typeof poc.project === 'string' &&
+            poc.project.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (poc.status && typeof poc.status === 'string' &&
+            poc.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
+
+        (poc.comments && typeof poc.comments === 'string' &&
+            poc.comments.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const handleAdd = () => {
-        setCurrentBlogs({
+        setCurrentPOC({
             title: '',
-            author: '',
+            client: '',
             status: '',
             targetDate: '',
             completedDate: '',
-            publishedDate: ''
+            document: ''
         });
         setOpen(true);
     };
 
-    const handleUpdate = (Blogs) => {
-        setCurrentBlogs(Blogs);
+    const handleUpdate = (poc) => {
+        setCurrentPOC(poc);
         setOpen(true);
-
     };
 
     const handleDelete = (id) => {
-        // axios.delete(`http://localhost:5147/api/Blogs/${id}`)
-        //axios.delete(`http://172.17.31.61:5174/api/blogs/${id}`)
-        axios.patch(`http://172.17.31.61:5174/api/blogs/${id}`)
+        // axios.delete(`http://localhost:5254/api/POC/${id}`)
+        // axios.delete(`http://172.17.31.61:5254/api/poc/${id}`)
+        axios.patch(`http://172.17.31.61:5254/api/poc/${id}`)
             .then(response => {
-                setBlogs(blogs.filter(tech => tech.id !== id));
+                setPOCs(POCs.filter(tech => tech.id !== id));
             })
             .catch(error => {
-                console.error('There was an error deleting the Blogs!', error);
+                console.error('There was an error deleting the poc!', error);
                 setError(error);
             });
         setConfirmOpen(false);
@@ -148,24 +139,16 @@ function BlogsList() {
     const handleSave = () => {
         let validationErrors = {};
 
-        // Title field validation
-        if (!currentBlogs.title.trim()) {
-            validationErrors.title = "Please add the Blogs title";
+        // Name field validation
+        if (!currentPOC.title.trim()) {
+            validationErrors.title = "POC title cannot be empty or whitespace";
+        } else if (POCs.some(tech => tech.title.toLowerCase() === currentPOC.title.toLowerCase() && tech.id !== currentPOC.id)) {
+            validationErrors.title = "POC title must be unique";
         }
-        if (!currentBlogs.author) {
-            validationErrors.author = "Please select a author";
-        }
-        if (!currentBlogs.status) {
-            validationErrors.status = "Please select a status";
-        }
-        if (!currentBlogs.targetDate) {
-            validationErrors.targetDate = "Please select a targetDate";
-        }
-        if (!currentBlogs.completedDate) {
-            validationErrors.completedDate = "Please select a completedDate";
-        }
-        if (!currentBlogs.publishedDate) {
-            validationErrors.publishedDate = "Please select a publishedDate";
+
+        // Department field validation 
+        if (!currentPOC.client) {
+            validationErrors.client = "Please select a client";
         }
 
         // If there are validation errors, update the state and prevent save
@@ -177,94 +160,94 @@ function BlogsList() {
         // Clear any previous errors if validation passes
         setErrors({});
 
-        const { blogDate } = currentBlogs;
-
-        // Check if the webinarDate field is empty
-        if (!blogDate) {
-            setErrors((prevErrors) => ({ ...prevErrors, blogDate: "Please fill the datetime field" }));
-        } else {
-            // Proceed with saving the details (you can add more logic here)
-            console.log("Webinar Date:", blogDate);
-        }
-
-        if (currentBlogs.id) {
-            // axios.put(`http://localhost:5147/api/Blogs/${currentBlogs.id}`, currentBlogs)
-            axios.put(`http://172.17.31.61:5174/api/blogs/${currentBlogs.id}`, currentBlogs)
+        if (currentPOC.id) {
+            // axios.put(`http://localhost:5254/api/poc/${currentPOC.id}`, currentPOC)
+            axios.put(`http://172.17.31.61:5254/api/poc/${currentPOC.id}`, currentPOC)
                 .then(response => {
-                    //setBlogs([...blogs, response.data]);
-                    // setBlogs(response.data);
-                    setBlogs(blogs.map(tech => tech.id === currentBlogs.id ? response.data : tech));
+                    setPOCs(POCs.map(tech => tech.id === currentPOC.id ? response.data : tech));
                 })
                 .catch(error => {
-                    console.error('There was an error updating the Blogs!', error);
+                    console.error('There was an error updating the poc!', error);
                     setError(error);
                 });
-
         } else {
-            // Add new Blogs
-            // axios.post('http://localhost:5147/api/Blogs', currentBlogs)
-            axios.post('http://172.17.31.61:5174/api/blogs', currentBlogs)
+            // axios.post('http://localhost:5254/api/poc', currentPOC)
+            axios.post('http://172.17.31.61:5254/api/poc', currentPOC)
                 .then(response => {
-                    setBlogs([...blogs, response.data]);
+                    setPOCs([...POCs, response.data]);
                 })
                 .catch(error => {
-                    console.error('There was an error adding the Blogs!', error);
+                    console.error('There was an error adding the poc!', error);
                     setError(error);
                 });
         }
         setOpen(false);
-
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setCurrentBlogs({ ...currentBlogs, [name]: value });
-        if (name === "title") {
+        const { title, value } = e.target;
+        setCurrentPOC({ ...currentPOC, [title]: value });
+        if (title === "client") {
             // Check if the title is empty or only whitespace
             if (!value.trim()) {
-                setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
             }
             // Check for uniqueness
-            else if (blogs.some(web => web.title.toLowerCase() === value.toLowerCase() && web.id !== currentBlogs.id)) {
-                setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
+            else if (ProjectList.some(pro => pro.client.toLowerCase() === value.toLowerCase() && pro.id !== currentPOC.id)) {
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
             }
             // Clear the title error if valid
             else {
-                setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
+                setErrors((prevErrors) => ({ ...prevErrors, client: "" }));
             }
         }
 
-        if (name === "author") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, author: "" }));
-            }
-        }
-        if (name === "status") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, status: "" }));
-            }
-        }
+        // if (name === "projectName") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, projectName: "" }));
+        //     }
+        // }
+        // if (name === "technicalProjectManager") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, technicalProjectManager: "" }));
+        //     }
+        // }
 
-        if (name === "targetDate") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, targetDate: "" }));
-            }
-        }
-        if (name === "completedDate") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, completedDate: "" }));
-            }
-        }
-        if (name === "publishedDate") {
-            if (value) {
-                setErrors((prevErrors) => ({ ...prevErrors, publishedDate: "" }));
-            }
-        }
+        // if (name === "salesContact") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, salesContact: "" }));
+        //     }
+        // }
+        // if (name === "pmo") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, pmo: "" }));
+        //     }
+        // }
+        // if (name === "sowSubmittedDate") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, sowSubmittedDate: "" }));
+        //     }
+        // }
+        // if (name === "sowSignedDate") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, sowSignedDate: "" }));
+        //     }
+        // }
+        // if (name === "sowValidTill") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, sowValidTill: "" }));
+        //     }
+        // }
+        // if (name === "sowLastExtendedDate") {
+        //     if (value) {
+        //         setErrors((prevErrors) => ({ ...prevErrors, sowLastExtendedDate: "" }));
+        //     }
+        // }
     };
 
     const handleClose = () => {
-        setCurrentBlogs({ title: '', author: '', status: '', targetDate: '', completedDate: '', publishedDate: '' }); // Reset the department fields
-        setErrors({ title: '', author: '', status: '', targetDate: '', completedDate: '', publishedDate: '' }); // Reset the error state
+        setCurrentPOC({ title: '', client: '', status: '', targetDate: '', completedDate: '', document: '' }); // Reset the department fields
+        setErrors({ title: '', client: '', status: '', targetDate: '', completedDate: '', document: '' }); // Reset the error state
         setOpen(false); // Close the dialog
     };
 
@@ -289,45 +272,20 @@ function BlogsList() {
     const handleConfirmYes = () => {
         handleDelete(deleteTechId);
     };
-
     const handleTargetDateChange = (newDate) => {
-        setCurrentBlogs((prevBlogs) => ({
-            ...prevBlogs,
+        setCurrentPOC((prevPOCs) => ({
+            ...prevPOCs,
             targetDate: newDate ? newDate.toISOString() : "",
         }));
-        if (newDate) {
-            setErrors((prevErrors) => ({
-                ...prevErrors,
-                targetDate: "",
-            }));
-        }
     };
 
     const handleCompletedDateChange = (newDate) => {
-        setCurrentBlogs((prevBlogs) => ({
-            ...prevBlogs,
+        setCurrentPOC((prev) => ({
+            ...prev,
             completedDate: newDate ? newDate.toISOString() : "",
         }));
-        if (newDate) {
-            setErrors((prevErrors) => ({
-                ...prevErrors,
-                completedDate: "",
-            }));
-        }
     };
 
-    const handlePublishedDateChange = (newDate) => {
-        setCurrentBlogs((prevBlogs) => ({
-            ...prevBlogs,
-            publishedDate: newDate ? newDate.toISOString() : "",
-        }));
-        if (newDate) {
-            setErrors((prevErrors) => ({
-                ...prevErrors,
-                publishedDate: "",
-            }));
-        }
-    };
 
     if (loading) {
         return <p>Loading...</p>;
@@ -340,7 +298,7 @@ function BlogsList() {
     return (
         <div>
             <div style={{ display: 'flex' }}>
-                <h3>Blogs Table List</h3>
+                <h3>POC Table List</h3>
             </div>
             <div style={{ display: 'flex', marginBottom: '20px' }}>
                 <TextField
@@ -359,13 +317,13 @@ function BlogsList() {
                     }}
                     style={{ marginRight: '20px', width: '90%' }}
                 />
-                <Button variant="contained" color="primary" onClick={handleAdd}>Add Blogs</Button>
+                <Button variant="contained" color="primary" onClick={handleAdd}>Add POC</Button>
             </div>
+
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            {/* <TableCell>ID</TableCell> */}
                             {/* Sorting logic */}
                             <TableCell>
                                 <TableSortLabel
@@ -373,16 +331,16 @@ function BlogsList() {
                                     direction={orderBy === 'title' ? order : 'asc'}
                                     onClick={() => handleSort('title')}
                                 >
-                                    <b>Title</b>
+                                    Title
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
                                 <TableSortLabel
-                                    active={orderBy === 'author'}
-                                    direction={orderBy === 'author' ? order : 'asc'}
-                                    onClick={() => handleSort('author')}
+                                    active={orderBy === 'client'}
+                                    direction={orderBy === 'client' ? order : 'asc'}
+                                    onClick={() => handleSort('client')}
                                 >
-                                    <b>Author</b>
+                                    Client
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -391,7 +349,7 @@ function BlogsList() {
                                     direction={orderBy === 'status' ? order : 'asc'}
                                     onClick={() => handleSort('status')}
                                 >
-                                    <b>Status</b>
+                                    Status
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -400,7 +358,7 @@ function BlogsList() {
                                     direction={orderBy === 'targetDate' ? order : 'asc'}
                                     onClick={() => handleSort('targetDate')}
                                 >
-                                    <b>TargetDate</b>
+                                    TargetDate
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -409,16 +367,16 @@ function BlogsList() {
                                     direction={orderBy === 'completedDate' ? order : 'asc'}
                                     onClick={() => handleSort('completedDate')}
                                 >
-                                    <b>CompletedDate</b>
+                                    CompletedDate
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
                                 <TableSortLabel
-                                    active={orderBy === 'publishedDate'}
-                                    direction={orderBy === 'publishedDate' ? order : 'asc'}
-                                    onClick={() => handleSort('publishedDate')}
+                                    active={orderBy === 'document'}
+                                    direction={orderBy === 'document' ? order : 'asc'}
+                                    onClick={() => handleSort('document')}
                                 >
-                                    <b>PublishedDate</b>
+                                    Document
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -427,7 +385,7 @@ function BlogsList() {
                                     direction={orderBy === 'isActive' ? order : 'asc'}
                                     onClick={() => handleSort('isActive')}
                                 >
-                                    <b>Is Active</b>
+                                    Is Active
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -436,7 +394,7 @@ function BlogsList() {
                                     direction={orderBy === 'createdBy' ? order : 'asc'}
                                     onClick={() => handleSort('createdBy')}
                                 >
-                                    <b>Created By</b>
+                                    Created By
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -445,7 +403,7 @@ function BlogsList() {
                                     direction={orderBy === 'createdDate' ? order : 'asc'}
                                     onClick={() => handleSort('createdDate')}
                                 >
-                                    <b>Created Date</b>
+                                    Created Date
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -454,7 +412,7 @@ function BlogsList() {
                                     direction={orderBy === 'updatedBy' ? order : 'asc'}
                                     onClick={() => handleSort('updatedBy')}
                                 >
-                                    <b>Updated By</b>
+                                    Updated By
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
@@ -463,43 +421,32 @@ function BlogsList() {
                                     direction={orderBy === 'updatedDate' ? order : 'asc'}
                                     onClick={() => handleSort('updatedDate')}
                                 >
-                                    <b>Updated Date</b>
+                                    Updated Date
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell><b>Actions</b></TableCell>
+                            <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredBlogs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Blogs) => (
-                            <TableRow key={Blogs.id}
-                                sx={{ backgroundColor: Blogs.isActive ? 'inherit' : '#FFCCCB' }} >
-                                {/* <TableCell>{Blogs.id}</TableCell> */}
-                                <TableCell>{Blogs.title}</TableCell>
-                                <TableCell>{Blogs.author}</TableCell>
-                                <TableCell>{Blogs.status}</TableCell>
-                                <TableCell>{Blogs.targetDate}</TableCell>
-                                <TableCell>{Blogs.completedDate}</TableCell>
-                                <TableCell>{Blogs.publishedDate}</TableCell>
-                                {/* <TableCell>{Blogs.isActive ? 'Active' : 'Inactive'}</TableCell> */}
-                                <TableCell>
-                                    {isAdmin && (
-                                        <Switch
-                                            checked={Blogs.isActive}
-                                            onChange={() => handleToggleActive(Blogs)}
-                                            color="primary"
-                                        />
-                                    )}
-                                </TableCell>
-                                <TableCell>{Blogs.createdBy}</TableCell>
-                                <TableCell>{new Date(Blogs.createdDate).toLocaleString()}</TableCell>
-                                <TableCell>{Blogs.updatedBy || 'N/A'}</TableCell>
-                                <TableCell>{new Date(Blogs.updatedDate).toLocaleString() || 'N/A'}</TableCell>
+                        {filteredPOCs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((poc) => (
+                            <TableRow key={poc.id}
+                                sx={{ backgroundColor: poc.isActive ? 'inherit' : '#FFCCCB' }} >
+                                <TableCell>{poc.title}</TableCell>
+                                <TableCell>{poc.client}</TableCell>
+                                <TableCell>{poc.status}</TableCell>
+                                <TableCell>{poc.targetDate}</TableCell>
+                                <TableCell>{poc.completedDate}</TableCell>
+                                <TableCell>{poc.document}</TableCell>
+                                <TableCell>{poc.isActive ? 'Yes' : 'No'}</TableCell>
+                                <TableCell>{poc.createdBy}</TableCell>
+                                <TableCell>{new Date(poc.createdDate).toLocaleDateString()}</TableCell>
+                                <TableCell>{poc.updatedBy || 'N/A'}</TableCell>
+                                <TableCell>{new Date(poc.updatedDate).toLocaleDateString()}</TableCell>
                                 <TableCell >
-                                    <IconButton onClick={() => handleUpdate(Blogs)}>
-                                        {/* <IconButton onClick={() => setOpen(true)}> */}
+                                    <IconButton onClick={() => handleUpdate(poc)}>
                                         <EditIcon color="primary" />
                                     </IconButton>
-                                    <IconButton onClick={() => confirmDelete(Blogs.id)}>
+                                    <IconButton onClick={() => confirmDelete(poc.id)}>
                                         <DeleteIcon color="error" />
                                     </IconButton>
                                 </TableCell>
@@ -509,64 +456,48 @@ function BlogsList() {
                 </Table>
                 {/* Pagination Component */}
                 <PaginationComponent
-                    count={filteredBlogs.length}
+                    count={filteredPOCs.length}
                     page={page}
                     rowsPerPage={rowsPerPage}
                     handlePageChange={handlePageChange}
                     handleRowsPerPageChange={handleRowsPerPageChange}
                 />
             </TableContainer>
+
+            {/* Dialogs for adding/editing and confirming delete */}
             <Dialog open={open} onClose={() => setOpen(false)}>
-                <DialogTitle>{currentBlogs.id ? 'Update Blogs' : 'Add Blogs'}</DialogTitle>
+                <DialogTitle>{currentPOC.id ? 'Update POC' : 'Add POC'}</DialogTitle>
                 <DialogContent>
                     <TextField
                         margin="dense"
-                        label="Title"
                         name="title"
-                        value={currentBlogs.title}
+                        label="POC Title"
+                        value={currentPOC.title}
                         onChange={handleChange}
                         fullWidth
-                        error={!!errors.title}
-                        helperText={errors.title} />
-                    <InputLabel>Author</InputLabel>
+                        error={!!errors.title} // Display error if exists
+                        helperText={errors.title}
+                    />
+                    <InputLabel>Client</InputLabel>
                     <Select
                         margin="dense"
-                        name="author"
-                        label="Author"
-                        value={currentBlogs.employee}
+                        name="client"
+                        value={currentPOC.client}
                         onChange={handleChange}
                         fullWidth
-                        error={!!errors.author}
+                        error={!!errors.client}
                     >
-                        {Employees.map((employee) => (
-                            <MenuItem key={employee.id} value={employee.name}>
-                                {employee.name}
+                        {Clients.map((client) => (
+                            <MenuItem key={client.id} value={client.name}>
+                                {client.name}
                             </MenuItem>
                         ))}
                     </Select>
-                    {errors.author && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.author}</Typography>}
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                        margin="dense"
-                        label="Status"
-                        name="status"
-                        value={currentBlogs.status}
-                        onChange={handleChange}
-                        fullWidth
-                        error={!!errors.status}
-                    >
-                        {options.map((option, index) => (
-                            <MenuItem key={index} value={option}>
-                                {option}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    {errors.status && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.status}</Typography>}
-
+                    {errors.client && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.client}</Typography>}
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="TargetDate"
-                            value={currentBlogs.targetDate ? dayjs(currentBlogs.targetDate) : null}
+                            value={currentPOC.targetDate ? dayjs(currentPOC.targetDate) : null}
                             onChange={handleTargetDateChange}
                             renderInput={(params) => (
                                 <TextField {...params} fullWidth margin="dense"
@@ -578,7 +509,7 @@ function BlogsList() {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="CompletedDate"
-                            value={currentBlogs.completedDate ? dayjs(currentBlogs.completedDate) : null}
+                            value={currentPOC.completedDate ? dayjs(currentPOC.completedDate) : null}
                             onChange={handleCompletedDateChange}
                             renderInput={(params) => (
                                 <TextField {...params} fullWidth margin="dense"
@@ -587,23 +518,21 @@ function BlogsList() {
                         />
                     </LocalizationProvider>
                     {errors.completedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.completedDate}</Typography>}
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                            label="PublishedDate"
-                            value={currentBlogs.publishedDate ? dayjs(currentBlogs.publishedDate) : null}
-                            onChange={handlePublishedDateChange}
-                            renderInput={(params) => (
-                                <TextField {...params} fullWidth margin="dense"
-                                    error={!!errors.publishedDate} />
-                            )}
-                        />
-                    </LocalizationProvider>
-                    {errors.publishedDate && <Typography fontSize={12} margin="3px 14px 0px" color="error">{errors.publishedDate}</Typography>}
+                    <TextField
+                        margin="dense"
+                        name="document"
+                        label="POC Document"
+                        value={currentPOC.document}
+                        onChange={handleChange}
+                        fullWidth
+                        error={!!errors.document} // Display error if exists
+                        helperText={errors.document}
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
                     <Button onClick={handleSave} color="primary">
-                        {currentBlogs.id ? 'Update' : 'Save'}
+                        {currentPOC.id ? 'Update' : 'Save'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -611,7 +540,7 @@ function BlogsList() {
             <Dialog open={confirmOpen} onClose={handleConfirmClose}>
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
-                    <Typography>Are you sure you want to delete this blog?</Typography>
+                    <Typography>Are you sure you want to delete this POC?</Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleConfirmClose}>No</Button>
@@ -622,4 +551,5 @@ function BlogsList() {
     );
 }
 
-export default BlogsList;
+export default POCList;
+
